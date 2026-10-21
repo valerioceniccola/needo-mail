@@ -1,0 +1,18 @@
+appId: it.valerioceniccola.gmailhub
+productName: Gmail Hub
+directories:
+  buildResources: build
+files:
+  - out/**
+  - package.json
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+  category: public.app-category.productivity
+  hardenedRuntime: true
+  # firma con il certificato "Developer ID Application" presente nel Portachiavi
+  # notarizzazione: impostare APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD e APPLE_TEAM_ID prima di npm run build:mac
+  notarize: true
+dmg:
+  artifactName: Gmail-Hub-${version}.dmg

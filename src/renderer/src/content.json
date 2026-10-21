@@ -1,0 +1,30 @@
+{
+  "appName": "Gmail Hub",
+  "sidebar": {
+    "accounts": "Account",
+    "settings": "Impostazioni",
+    "addAccount": "Aggiungi account"
+  },
+  "menu": {
+    "pause": "Metti in pausa",
+    "resume": "Riattiva",
+    "settings": "Impostazioni…",
+    "remove": "Rimuovi account"
+  },
+  "topBar": {
+    "back": "Indietro",
+    "forward": "Avanti",
+    "reload": "Ricarica"
+  },
+  "paused": {
+    "title": "In pausa",
+    "description": "Niente notifiche e non conta nel badge. Puoi comunque leggere e scrivere.",
+    "manual": "Finché non lo riattivi",
+    "until": "Pausa automatica fino a",
+    "resume": "Riattiva"
+  },
+  "gmail": {
+    "placeholder": "Qui verrà caricato Gmail",
+    "placeholderHint": "Sessione separata per"
+  }
+}
