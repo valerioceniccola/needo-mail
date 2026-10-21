@@ -178,6 +178,7 @@ Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
 - Versione in `package.json` (mostrata in fondo alle Impostazioni). Novità in `CHANGELOG.md`.
 - Aggiornamenti con **electron-updater** dalle Release di GitHub (`publish` in `electron-builder.yml`, `src/main/updater.ts`): all'avvio e ogni 4 ore, chiede prima di scaricare, poi propone di riavviare. Servono app firmata + notarizzata e il target `zip` oltre al `dmg`.
 - Rilascio: push su `main` con una versione in `package.json` che non ha ancora una Release → workflow `.github/workflows/release.yml` (controllo su Linux, poi build arm64 su macOS, firma, notarizzazione, pubblicazione; l'etichetta `vX.Y.Z` la crea la Release). Niente tag a mano: la sessione di Claude non può crearli. Procedura e segreti: `docs/RELEASING.md`.
+- Nuove versioni **solo quando Valerio lo chiede**: le modifiche si mandano su `main` senza toccare la versione in `package.json` (così non parte nessun rilascio); al rilascio richiesto si alza la versione e si aggiornano le novità in `CHANGELOG.md`.
 - Il nome era "Gmail Hub": `src/main/migrate.ts` sposta i dati da `~/Library/Application Support/Gmail Hub/` alla cartella nuova.
 
 ## 9. Scelte scartate (non riproporle)
