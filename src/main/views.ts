@@ -226,8 +226,10 @@ let lastSnapshot: { id: string; data: string } | null = null
 function layout() {
   for (const [id, view] of views) {
     const show = id === visibleId && !overlay && ready.has(id) && bounds.width > 0
+    // anche le viste nascoste hanno le dimensioni del riquadro: Gmail sceglie l'impaginazione
+    // (densità, colonne, anteprime) dalla larghezza che ha quando carica; nascosta a 0×0 si compatta
+    if (bounds.width > 0) view.setBounds(bounds)
     view.setVisible(show)
-    if (show) view.setBounds(bounds)
   }
 }
 
