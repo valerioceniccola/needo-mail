@@ -10,6 +10,8 @@ type State = AppState & {
   ready: boolean
   /** istantanea di Gmail mostrata al posto della vista mentre c'è un dialog aperto */
   snapshot: string | null
+  /** c'è un dialog aperto: la vista Gmail è nascosta */
+  covered: boolean
   now: Date
   tick: () => void
 }
@@ -24,6 +26,7 @@ export const useStore = create<State>((set) => ({
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   snapshot: null,
+  covered: false,
   now: new Date(),
   tick: () => set({ now: new Date() })
 }))
@@ -40,15 +43,25 @@ export { api }
  * Per i dialog: nasconde la vista Gmail mettendo al suo posto un'istantanea, poi la rimette.
  * Da chiamare in un useEffect; restituisce la funzione di pulizia.
  */
+// quanti dialog coprono Gmail in questo momento: con un contatore aprire, chiudere e riaprire
+// in fretta (o il doppio effetto di React in sviluppo) non lascia mai lo stato a metà
+let covers = 0
+
 export function coverGmail(): () => void {
-  let closed = false
-  api.setOverlay(true).then((snapshot) => {
-    if (!closed) useStore.setState({ snapshot })
-  })
+  covers++
+  useStore.setState({ covered: true })
+  if (covers === 1) {
+    api.setOverlay(true).then((snapshot) => {
+      if (covers > 0 && snapshot) useStore.setState({ snapshot })
+    })
+  }
   return () => {
-    closed = true
+    covers--
+    if (covers > 0) return
     api.setOverlay(false)
     // si toglie dopo che la vista è tornata visibile, così non si vede il riquadro vuoto
-    setTimeout(() => useStore.setState({ snapshot: null }), 150)
+    setTimeout(() => {
+      if (covers === 0) useStore.setState({ snapshot: null, covered: false })
+    }, 150)
   }
 }

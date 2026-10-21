@@ -163,20 +163,22 @@ export async function setOverlay(visible: boolean): Promise<string | null> {
     return null
   }
   const view = visibleId ? views.get(visibleId) : undefined
-  let snapshot: string | null = null
-  if (view && !overlay && bounds.width > 0) {
+  // si fotografa solo una vista davvero a schermo; se è già nascosta si riusa l'ultima foto
+  if (view && view.getVisible() && bounds.width > 0) {
     try {
       const image = await view.webContents.capturePage()
-      if (!image.isEmpty()) snapshot = `data:image/jpeg;base64,${image.toJPEG(85).toString('base64')}`
+      if (!image.isEmpty()) lastSnapshot = { id: visibleId!, data: `data:image/jpeg;base64,${image.toJPEG(85).toString('base64')}` }
     } catch {
-      snapshot = null
+      // nessuna foto: l'interfaccia mostra il riquadro sfocato vuoto
     }
   }
   overlay = true
   // un attimo di ritardo: l'interfaccia fa in tempo a disegnare l'istantanea, niente lampo azzurro
   setTimeout(layout, 80)
-  return snapshot
+  return lastSnapshot?.id === visibleId ? lastSnapshot.data : null
 }
+
+let lastSnapshot: { id: string; data: string } | null = null
 
 function layout() {
   for (const [id, view] of views) {
