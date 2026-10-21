@@ -39,6 +39,8 @@ export type AppState = {
   /** versione dell'app (da package.json) */
   appVersion: string
   update: UpdateStatus
+  /** come macOS mostra le notifiche di Needo (riletto a ogni ritorno sulla finestra) */
+  macNotifications: NotificationStatus
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 
@@ -54,7 +56,6 @@ export type GmailHubApi = {
   openSettingsPage: () => void
   closeSettingsPage: () => void
   checkForUpdates: () => void
-  notificationStatus: () => Promise<NotificationStatus>
   openNotificationSettings: () => void
   installUpdate: () => void
   setSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void
@@ -88,7 +89,6 @@ export const IPC = {
   closeSettingsPage: 'settings-page:close',
   setSetting: 'settings:set',
   checkUpdates: 'update:check',
-  notificationStatus: 'notifications:status',
   openNotificationSettings: 'notifications:open-settings',
   installUpdate: 'update:install',
   update: 'account:update',

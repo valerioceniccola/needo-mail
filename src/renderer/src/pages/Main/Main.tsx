@@ -1,14 +1,18 @@
+import { useState } from 'react'
 import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
 import { api, useStore } from '@/app/store'
 import { formatWhen } from '@/lib/format'
 import PausedBanner from '@/components/organisms/PausedBanner/PausedBanner'
+import NotificationsOffBanner from '@/components/organisms/NotificationsOffBanner/NotificationsOffBanner'
 import GmailFrame from '@/components/organisms/GmailFrame/GmailFrame'
 import NewAccountDialog from '@/components/organisms/NewAccountDialog/NewAccountDialog'
 import content from '@/content.json'
 
-/** Area a destra della colonna degli avatar: eventuale fascia di pausa, poi Gmail. */
+/** Area a destra della colonna degli avatar: eventuali fasce (notifiche spente, pausa), poi Gmail. */
 export default function Main() {
-  const { accounts, selectedId, adding, now } = useStore()
+  const { accounts, selectedId, adding, now, settings, macNotifications } = useStore()
+  // "Non ora" la nasconde fino al prossimo avvio dell'app
+  const [warningDismissed, setWarningDismissed] = useState(false)
 
   // aggiunta di un account: login Google nella vista, poi dialog con etichetta e colore
   if (adding) {
@@ -28,6 +32,8 @@ export default function Main() {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col">
+      {/* solo se in Needo le notifiche sono accese ma macOS le blocca */}
+      {settings.notifications && macNotifications === 'off' && !warningDismissed && <NotificationsOffBanner onDismiss={() => setWarningDismissed(true)} />}
       {paused && <PausedBanner until={end ? `${content.paused.until} ${formatWhen(end, now)}` : null} onResume={() => api.resume(account.id)} />}
       <GmailFrame />
     </main>

@@ -29,6 +29,7 @@ export const useStore = create<State>((set) => ({
   canLaunchAtLogin: false,
   appVersion: '',
   update: { state: 'idle' },
+  macNotifications: 'unknown',
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   snapshot: null,

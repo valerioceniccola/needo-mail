@@ -232,7 +232,6 @@ const menuActions = {
 
 function registerIpc() {
   ipcMain.handle(IPC.getState, () => state.getState())
-  ipcMain.handle(IPC.notificationStatus, () => notificationStatus())
   ipcMain.on(IPC.openNotificationSettings, () => openNotificationSettings())
   ipcMain.on(IPC.select, (_e, id: string) => state.select(id))
   ipcMain.on(IPC.move, (_e, fromId: string, toId: string) => state.move(fromId, toId))
@@ -282,6 +281,11 @@ app.whenReady().then(() => {
   initUpdater(win, state.setUpdate, () => {
     quitting = true
   })
+
+  // stato delle notifiche in macOS: all'avvio e a ogni ritorno sulla finestra (es. dalle Impostazioni di Sistema)
+  const readMacNotifications = () => notificationStatus().then(state.setMacNotifications)
+  readMacNotifications()
+  win.on('focus', readMacNotifications)
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche
   for (const account of state.getState().accounts) views.ensureView(account.id)

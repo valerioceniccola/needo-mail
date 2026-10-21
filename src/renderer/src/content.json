@@ -149,6 +149,12 @@
       ]
     },
     "howTo": "Per avere le notifiche fisse a schermo: Apri Impostazioni di Sistema › attiva Consenti notifiche › come stile scegli Avvisi.",
-    "dev": "In sviluppo le notifiche risultano dell'app Electron."
+    "dev": "In sviluppo le notifiche risultano dell'app Electron.",
+    "warning": {
+      "title": "Notifiche disattivate",
+      "description": "macOS non mostra le notifiche di Needo, quindi non ti avvisa delle email nuove.",
+      "action": "Attiva",
+      "dismiss": "Non ora"
+    }
   }
 }

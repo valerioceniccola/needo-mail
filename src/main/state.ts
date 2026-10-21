@@ -1,4 +1,4 @@
-import type { AccountChanges, AppState, UpdateStatus } from '@shared/api'
+import type { AccountChanges, AppState, NotificationStatus, UpdateStatus } from '@shared/api'
 import { DEFAULT_SETTINGS, type Account, type AppSettings } from '@shared/types'
 import { app } from 'electron'
 import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
@@ -27,6 +27,7 @@ const state: AppState = {
   canLaunchAtLogin: app.isPackaged,
   appVersion: app.getVersion(),
   update: { state: 'idle' },
+  macNotifications: 'unknown',
   nav: { canGoBack: false, canGoForward: false }
 }
 
@@ -65,6 +66,12 @@ export function select(id: string) {
 
 export function setUpdate(update: UpdateStatus) {
   state.update = update
+  emit()
+}
+
+export function setMacNotifications(status: NotificationStatus) {
+  if (state.macNotifications === status) return
+  state.macNotifications = status
   emit()
 }
 
