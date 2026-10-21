@@ -17,7 +17,7 @@ npm run dev
 
 | Comando | Cosa fa |
 |---|---|
-| `npm run dev` | app in sviluppo, l'interfaccia si aggiorna al volo |
+| `npm run dev` | app in sviluppo: l'interfaccia si aggiorna al volo, e quando cambiano processo principale o preload l'app si riavvia da sola |
 | `npm run typecheck` | controllo dei tipi |
 | `npm test` | test del motore delle pause e del badge |
 | `npm run build:mac:local` | .dmg firmato col tuo certificato ma non notarizzato: basta per usarla sul tuo Mac |

@@ -167,7 +167,7 @@ export async function setOverlay(visible: boolean): Promise<string | null> {
   if (view && !overlay && bounds.width > 0) {
     try {
       const image = await view.webContents.capturePage()
-      snapshot = `data:image/jpeg;base64,${image.toJPEG(85).toString('base64')}`
+      if (!image.isEmpty()) snapshot = `data:image/jpeg;base64,${image.toJPEG(85).toString('base64')}`
     } catch {
       snapshot = null
     }
