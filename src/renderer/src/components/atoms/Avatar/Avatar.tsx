@@ -14,7 +14,7 @@ type Props = {
 export default function Avatar({ account, selected = false, paused = false, loading = false }: Props) {
   return (
     <span
-      className={cn('relative flex size-11 items-center justify-center overflow-hidden rounded-full text-sm font-semibold text-white', paused && 'opacity-55 grayscale')}
+      className={cn('relative flex size-9 items-center justify-center overflow-hidden rounded-full text-xs font-semibold text-white', paused && 'opacity-55 grayscale')}
       // bordo nel colore dell'account staccato di 2px; più spesso sull'account aperto
       style={{ background: account.color, boxShadow: `0 0 0 2px var(--sidebar), 0 0 0 ${selected ? 4.5 : 3.5}px ${account.color}` }}
     >
@@ -22,14 +22,14 @@ export default function Avatar({ account, selected = false, paused = false, load
         <img src={account.avatar} alt="" draggable={false} className="size-full object-cover" />
       ) : loading ? (
         <span className="flex size-full items-center justify-center bg-[#222228]">
-          <LoaderCircle className="size-4 animate-spin" style={{ color: account.color }} aria-label="Caricamento foto" />
+          <LoaderCircle className="size-3.5 animate-spin" style={{ color: account.color }} aria-label="Caricamento foto" />
         </span>
       ) : (
         initials(account.label)
       )}
       {paused && (
         <span className="absolute inset-0 flex items-center justify-center bg-[rgba(14,14,16,0.55)]">
-          <Pause className="size-4 fill-foreground text-foreground" strokeWidth={0} aria-hidden="true" />
+          <Pause className="size-3.5 fill-foreground text-foreground" strokeWidth={0} aria-hidden="true" />
         </span>
       )}
     </span>

@@ -7,8 +7,7 @@ import content from '@/content.json'
 /** Primo avvio: nessun account ancora collegato. */
 export default function Welcome() {
   return (
-    <main className="flex min-w-0 flex-1 flex-col">
-      <header className="app-drag h-11 shrink-0 border-b border-sidebar-border" />
+    <main className="mr-2 mb-2 flex min-w-0 flex-1 flex-col rounded-[10px] bg-background shadow-[0_0_0_1px_#26262b]">
       <div className="flex flex-1 flex-col items-center justify-center gap-[18px] p-10 text-center">
         <img src={appIcon} alt="" className="size-20" draggable={false} />
         <h1 className="mt-2 text-[22px] font-semibold tracking-tight">{content.welcome.title}</h1>

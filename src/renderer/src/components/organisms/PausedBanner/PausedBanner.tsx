@@ -10,7 +10,7 @@ type Props = {
 /** Fascia sopra Gmail quando l'account aperto è in pausa. */
 export default function PausedBanner({ until, onResume }: Props) {
   return (
-    <div role="status" className="flex h-10 shrink-0 items-center gap-2.5 border-b border-paused-border bg-paused pr-3 pl-[18px]">
+    <div role="status" className="mr-2 mb-2 flex h-10 shrink-0 items-center gap-2.5 rounded-[10px] border border-paused-border bg-paused pr-1.5 pl-4">
       <CirclePause className="size-3.5 text-[#a5acf0]" strokeWidth={2.2} aria-hidden="true" />
       <span className="font-medium">{content.paused.title}</span>
       <span className="truncate text-paused-foreground">{content.paused.description}</span>
