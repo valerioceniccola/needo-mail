@@ -7,6 +7,8 @@ type Actions = {
   back: () => void
   forward: () => void
   reload: () => void
+  zoom: (step: -1 | 0 | 1) => void
+  gmailDevTools: () => void
   testNotification: () => void
   checkForUpdates: () => void
 }
@@ -52,10 +54,21 @@ export function buildAppMenu(actions: Actions) {
         { label: 'Avanti', accelerator: 'CmdOrCtrl+]', click: actions.forward },
         { label: 'Ricarica', accelerator: 'CmdOrCtrl+R', click: actions.reload },
         { type: 'separator' },
+        // zoom di Gmail, per account: Chromium lo ricorda da solo nella sessione dell'account
+        { label: 'Dimensioni reali', accelerator: 'CmdOrCtrl+0', click: () => actions.zoom(0) },
+        { label: 'Ingrandisci', accelerator: 'CmdOrCtrl+Plus', click: () => actions.zoom(1) },
+        { label: 'Ingrandisci', accelerator: 'CmdOrCtrl+=', visible: false, acceleratorWorksWhenHidden: true, click: () => actions.zoom(1) },
+        { label: 'Riduci', accelerator: 'CmdOrCtrl+-', click: () => actions.zoom(-1) },
+        { type: 'separator' },
         { role: 'togglefullscreen', label: 'Schermo intero' },
         { type: 'separator' },
         { label: 'Invia una notifica di prova', click: actions.testNotification },
-        ...(app.isPackaged ? [] : [{ role: 'toggleDevTools' } as MenuItemConstructorOptions])
+        ...(app.isPackaged
+          ? []
+          : ([
+              { role: 'toggleDevTools' },
+              { label: 'Strumenti per sviluppatori di Gmail', accelerator: 'Alt+CmdOrCtrl+J', click: actions.gmailDevTools }
+            ] as MenuItemConstructorOptions[]))
       ]
     },
     { label: 'Account', submenu: accountItems.length ? accountItems : [{ label: 'Nessun account', enabled: false }] },

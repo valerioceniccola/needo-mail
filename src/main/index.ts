@@ -211,6 +211,11 @@ const menuActions = {
   back: () => views.viewContents(visibleAccountId())?.navigationHistory.goBack(),
   forward: () => views.viewContents(visibleAccountId())?.navigationHistory.goForward(),
   reload: () => views.viewContents(visibleAccountId())?.reload(),
+  zoom: (step: -1 | 0 | 1) => {
+    const wc = views.viewContents(visibleAccountId())
+    if (wc) wc.setZoomLevel(step === 0 ? 0 : Math.max(-3, Math.min(3, wc.getZoomLevel() + step * 0.5)))
+  },
+  gmailDevTools: () => views.viewContents(visibleAccountId())?.openDevTools({ mode: 'detach' }),
   testNotification,
   checkForUpdates
 }
