@@ -3,6 +3,17 @@ import type { Account, AppSettings } from './types'
 /** Campi dell'account modificabili dalle Impostazioni. */
 export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'> & { badge: boolean }
 
+/** Stato degli aggiornamenti, mostrato in fondo alle Impostazioni. */
+export type UpdateStatus =
+  | { state: 'dev' }
+  | { state: 'idle' }
+  | { state: 'checking' }
+  | { state: 'latest' }
+  | { state: 'available'; version: string }
+  | { state: 'downloading'; percent: number }
+  | { state: 'ready'; version: string }
+  | { state: 'error'; message: string }
+
 /** Rettangolo in pixel della finestra (coordinate CSS dell'interfaccia). */
 export type Rect = { x: number; y: number; width: number; height: number }
 
@@ -24,6 +35,7 @@ export type AppState = {
   canLaunchAtLogin: boolean
   /** versione dell'app (da package.json) */
   appVersion: string
+  update: UpdateStatus
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 
@@ -38,6 +50,8 @@ export type GmailHubApi = {
   closeSettings: () => void
   openSettingsPage: () => void
   closeSettingsPage: () => void
+  checkForUpdates: () => void
+  installUpdate: () => void
   setSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void
   updateAccount: (id: string, changes: AccountChanges) => void
   removeAccount: (id: string) => void
@@ -64,6 +78,8 @@ export const IPC = {
   openSettingsPage: 'settings-page:open',
   closeSettingsPage: 'settings-page:close',
   setSetting: 'settings:set',
+  checkUpdates: 'update:check',
+  installUpdate: 'update:install',
   update: 'account:update',
   remove: 'account:remove',
   startAdd: 'add:start',

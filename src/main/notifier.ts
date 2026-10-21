@@ -83,7 +83,7 @@ export function forgetAccount(accountId: string) {
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */
 export function testNotification() {
-  new Notification({ title: 'Gmail Hub', body: 'Le notifiche funzionano.' }).show()
+  new Notification({ title: 'Needo', body: 'Le notifiche funzionano.' }).show()
 }
 
 /** Da chiamare a ogni cambiamento di stato: aggiorna il badge sul Dock. */

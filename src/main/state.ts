@@ -1,4 +1,4 @@
-import type { AccountChanges, AppState } from '@shared/api'
+import type { AccountChanges, AppState, UpdateStatus } from '@shared/api'
 import { DEFAULT_SETTINGS, type Account, type AppSettings } from '@shared/types'
 import { app } from 'electron'
 import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
@@ -26,6 +26,7 @@ const state: AppState = {
   settings: settingsStore.read(),
   canLaunchAtLogin: app.isPackaged,
   appVersion: app.getVersion(),
+  update: { state: 'idle' },
   nav: { canGoBack: false, canGoForward: false }
 }
 
@@ -60,6 +61,11 @@ export function select(id: string) {
   state.selectedId = id
   state.settingsOpen = false
   commit()
+}
+
+export function setUpdate(update: UpdateStatus) {
+  state.update = update
+  emit()
 }
 
 export function setSettingsOpen(open: boolean) {

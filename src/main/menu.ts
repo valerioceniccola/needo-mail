@@ -8,6 +8,7 @@ type Actions = {
   forward: () => void
   reload: () => void
   testNotification: () => void
+  checkForUpdates: () => void
 }
 
 /**
@@ -26,7 +27,19 @@ export function buildAppMenu(actions: Actions) {
   }))
 
   const template: MenuItemConstructorOptions[] = [
-    { role: 'appMenu' },
+    {
+      label: app.name,
+      submenu: [
+        { role: 'about', label: `Informazioni su ${app.name}` },
+        { label: 'Controlla aggiornamenti…', click: actions.checkForUpdates },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    },
     {
       label: 'File',
       submenu: [{ label: 'Aggiungi account…', click: actions.addAccount }, { type: 'separator' }, { role: 'close', label: 'Chiudi finestra' }]
@@ -77,7 +90,7 @@ export async function confirmRemove(win: BrowserWindow, id: string, onRemove: (i
   const { response } = await dialog.showMessageBox(win, {
     type: 'warning',
     message: `Rimuovere ${account.label}?`,
-    detail: `${account.email} verrà scollegato da Gmail Hub e la sua sessione cancellata. L'account Google non viene toccato.`,
+    detail: `${account.email} verrà scollegato da Needo e la sua sessione cancellata. L'account Google non viene toccato.`,
     buttons: ['Rimuovi', 'Annulla'],
     defaultId: 1,
     cancelId: 1

@@ -1,5 +1,5 @@
-appId: it.valerioceniccola.gmailhub
-productName: Gmail Hub
+appId: it.valerioceniccola.needo
+productName: Needo
 directories:
   buildResources: build
 files:
@@ -7,7 +7,10 @@ files:
   - package.json
 mac:
   target:
+    # dmg per la prima installazione, zip per gli aggiornamenti automatici (electron-updater su macOS usa lo zip)
     - target: dmg
+      arch: [arm64]
+    - target: zip
       arch: [arm64]
   category: public.app-category.productivity
   hardenedRuntime: true
@@ -18,4 +21,10 @@ mac:
     # notifiche in stile "Avvisi": restano a schermo e mostrano i pulsanti Elimina / Apri
     NSUserNotificationAlertStyle: alert
 dmg:
-  artifactName: Gmail-Hub-${version}.dmg
+  artifactName: Needo-${version}.dmg
+publish:
+  provider: github
+  owner: valerioceniccola
+  repo: needo-mail
+  # la release esce subito pubblicata: le app la vedono senza passaggi a mano
+  releaseType: release

@@ -35,7 +35,7 @@ export type AppSettings = {
   badge: boolean
   /** notifiche delle email nuove */
   notifications: boolean
-  /** apri Gmail Hub all'accensione del Mac */
+  /** apri Needo all'accensione del Mac */
   launchAtLogin: boolean
 }
 

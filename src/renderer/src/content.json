@@ -1,5 +1,5 @@
 {
-  "appName": "Gmail Hub",
+  "appName": "Needo",
   "sidebar": {
     "accounts": "Account",
     "settings": "Impostazioni",
@@ -22,7 +22,7 @@
     "loading": "Caricamento di Gmail…"
   },
   "welcome": {
-    "title": "Benvenuto in Gmail Hub",
+    "title": "Benvenuto in Needo",
     "text": "Tutti i tuoi account Gmail in una finestra. Ognuno ha la sua sessione e il suo colore, e puoi metterlo in pausa quando non ti serve.",
     "cta": "Aggiungi il primo account",
     "hintSwitch": "cambia account",
@@ -103,10 +103,20 @@
       ],
       "launchAtLogin": [
         "Apri all'accensione del Mac",
-        "Gmail Hub parte da solo quando accedi"
+        "Needo parte da solo quando accedi"
       ]
     },
     "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo",
     "version": "versione"
+  },
+  "updates": {
+    "check": "Controlla aggiornamenti",
+    "restart": "Riavvia e aggiorna",
+    "checking": "controllo in corso…",
+    "latest": "è l'ultima versione",
+    "available": "disponibile la",
+    "downloading": "download",
+    "ready": "pronta da installare",
+    "error": "controllo non riuscito"
   }
 }

@@ -28,6 +28,7 @@ export const useStore = create<State>((set) => ({
   settings: DEFAULT_SETTINGS,
   canLaunchAtLogin: false,
   appVersion: '',
+  update: { state: 'idle' },
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   snapshot: null,

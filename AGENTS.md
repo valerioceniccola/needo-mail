@@ -1,8 +1,8 @@
-# Gmail Hub — istruzioni per gli agenti
+# Needo — istruzioni per gli agenti
 
-App desktop per macOS, ad uso personale di Valerio, che raccoglie più account Gmail in una sola finestra. Gmail resta quello **originale** (mail.google.com) caricato in una vista web: l'app non usa le API di Gmail, non legge le email e non manda dati a nessun server.
+App desktop per macOS (Needo, repo pubblica `valerioceniccola/needo-mail`), per Valerio e qualche amico, che raccoglie più account Gmail in una sola finestra. Gmail resta quello **originale** (mail.google.com) caricato in una vista web: l'app non usa le API di Gmail, non legge le email e non manda dati a nessun server.
 
-Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penwq5ubz8skU5YCCVZsnB). Quando una scelta qui e la tela non coincidono, vale questo file.
+Design di riferimento: tela "Gmail Hub · stile Linear" (nome di lavoro precedente) (claude.ai/artifact/Penwq5ubz8skU5YCCVZsnB). Quando una scelta qui e la tela non coincidono, vale questo file.
 
 ---
 
@@ -43,7 +43,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 
 ### Badge e notifiche
 - Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** degli account **attivi** che hanno **"Conta nel badge del Dock"** acceso (impostazione del singolo account, `Account.badge`, accesa di default). Il pallino rosso nella colonna resta comunque.
-- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
+- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Needo.
 
 ### Impostazioni generali
 Pagina al posto di Gmail aperta dall'ingranaggio in fondo alla colonna (`pages/Settings`, `state.settingsOpen`; cliccando un avatar si torna a Gmail). Elenco account (maniglia per trascinare, stato, ⌘n, menu "…" = stesso menu del tasto destro, "Aggiungi account"), poi interruttori salvati in `settings.json` (`AppSettings` in `shared/types.ts`):
@@ -93,7 +93,7 @@ Processo principale (Node)
 ├── Unread            non letti dal feed Atom di Gmail (session.fetch con i cookie dell'account), riletti 1,5 s dopo ogni cambio del titolo e ogni minuto; il titolo serve solo da ripiego
 ├── Notifier          notifiche native dal feed; tace per gli account in pausa
 ├── Badge             app.dock.setBadge() con la somma degli account attivi
-├── Store             JSON in ~/Library/Application Support/Gmail Hub/ (store.ts)
+├── Store             JSON in ~/Library/Application Support/Needo/ (store.ts)
 └── WindowState       ricorda posizione e dimensioni della finestra (windowState.ts)
 
 Preload Gmail (iniettato in ogni vista Gmail)
@@ -171,7 +171,14 @@ Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno do
 
 Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
 
-## 8. Scelte scartate (non riproporle)
+## 8. Versioni e aggiornamenti
+
+- Versione in `package.json` (mostrata in fondo alle Impostazioni). Novità in `CHANGELOG.md`.
+- Aggiornamenti con **electron-updater** dalle Release di GitHub (`publish` in `electron-builder.yml`, `src/main/updater.ts`): all'avvio e ogni 4 ore, chiede prima di scaricare, poi propone di riavviare. Servono app firmata + notarizzata e il target `zip` oltre al `dmg`.
+- Rilascio: tag `vX.Y.Z` uguale alla versione → workflow `.github/workflows/release.yml` su macOS (build arm64, firma, notarizzazione, pubblicazione). Procedura e segreti: `docs/RELEASING.md`.
+- Il nome era "Gmail Hub": `src/main/migrate.ts` sposta i dati da `~/Library/Application Support/Gmail Hub/` alla cartella nuova.
+
+## 9. Scelte scartate (non riproporle)
 
 - Riepilogo "di nuovo attivo · N non letti" quando finisce una pausa.
 - Icona nella barra dei menu.

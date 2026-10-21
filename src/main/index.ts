@@ -1,3 +1,5 @@
+// prima di tutto: nome dell'app e spostamento dei dati dal vecchio nome (vedi migrate.ts)
+import './migrate'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
@@ -11,9 +13,8 @@ import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } f
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
+import { checkForUpdates, initUpdater, quitAndInstall } from './updater'
 
-// nome mostrato nel menu dell'app e nel Dock anche in sviluppo
-app.setName('Gmail Hub')
 
 let win: BrowserWindow
 // su macOS chiudere la finestra la nasconde soltanto: le viste Gmail restano vive per notifiche e badge
@@ -26,7 +27,7 @@ function createWindow(): BrowserWindow {
     minWidth: 900,
     minHeight: 600,
     show: false,
-    title: 'Gmail Hub',
+    title: 'Needo',
     backgroundColor: '#0E0E10',
     titleBarStyle: 'hiddenInset',
     // nella riga alta 44px che attraversa tutta la finestra (l'intestazione lascia loro 88px)
@@ -192,7 +193,8 @@ const menuActions = {
   back: () => views.viewContents(visibleAccountId())?.navigationHistory.goBack(),
   forward: () => views.viewContents(visibleAccountId())?.navigationHistory.goForward(),
   reload: () => views.viewContents(visibleAccountId())?.reload(),
-  testNotification
+  testNotification,
+  checkForUpdates
 }
 
 function registerIpc() {
@@ -202,6 +204,8 @@ function registerIpc() {
   ipcMain.on(IPC.menu, (_e, id: string) => popupAccountMenu(win, id, removeAccount))
   ipcMain.on(IPC.resume, (_e, id: string) => state.resume(id))
   ipcMain.on(IPC.closeSettings, () => state.setEditing(null))
+  ipcMain.on(IPC.checkUpdates, checkForUpdates)
+  ipcMain.on(IPC.installUpdate, quitAndInstall)
   ipcMain.on(IPC.openSettingsPage, () => state.setSettingsOpen(true))
   ipcMain.on(IPC.closeSettingsPage, () => state.setSettingsOpen(false))
   ipcMain.on(IPC.setSetting, (_e, key: keyof AppSettings, value: boolean) => {
@@ -238,6 +242,9 @@ app.whenReady().then(() => {
   })
   registerIpc()
   applyLaunchAtLogin()
+  initUpdater(win, state.setUpdate, () => {
+    quitting = true
+  })
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche
   for (const account of state.getState().accounts) views.ensureView(account.id)

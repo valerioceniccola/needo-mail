@@ -1,0 +1,48 @@
+# Rilascio di una nuova versione di Needo.
+# Parte quando arriva un tag "v…" (es. v0.2.0): costruisce l'app su un Mac di GitHub (chip Apple),
+# la firma col certificato Developer ID, la notarizza e la pubblica nelle Release.
+# Le app installate la vedono da sole (electron-updater). Configurazione dei segreti: docs/RELEASING.md
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # il tag e la versione in package.json devono coincidere, altrimenti gli aggiornamenti si confondono
+      - name: Controllo versione
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Il tag $GITHUB_REF_NAME non corrisponde a package.json ($VERSION)"
+            exit 1
+          fi
+
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx electron-vite build
+
+      - name: Build, firma, notarizzazione e pubblicazione
+        run: npx electron-builder --mac --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
