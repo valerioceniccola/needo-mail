@@ -92,6 +92,11 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   view.setBackgroundColor('#F6F8FC')
   view.setBorderRadius(10)
   view.setVisible(false)
+  // l'interfaccia non ha ancora detto dov'è il riquadro (avvio): intanto la finestra intera, mai 0×0
+  if (bounds.width === 0) {
+    const [width, height] = win.getContentSize()
+    view.setBounds({ x: 0, y: 0, width, height })
+  }
   win.contentView.addChildView(view)
   views.set(id, view)
 
