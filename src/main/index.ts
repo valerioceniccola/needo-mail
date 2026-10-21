@@ -127,21 +127,29 @@ function onNavigate(id: string) {
   if (id === visibleAccountId()) state.setNav(views.navState(id))
 }
 
-/** Foto profilo: Gmail disegna la barra in alto qualche secondo dopo il caricamento, quindi riproviamo. */
-function refreshAvatar(id: string, attempt = 0) {
+/**
+ * Foto profilo da Google. Si legge da sola una volta sola (account appena aggiunto o ancora senza foto),
+ * poi resta salvata in accounts.json: si riprende solo col pulsante "Prendi da Google".
+ * Gmail disegna la barra in alto qualche secondo dopo il caricamento, quindi riproviamo.
+ * Con `manual` la foto di Google sostituisce anche una foto caricata a mano.
+ */
+function refreshAvatar(id: string, manual = false, attempt = 0) {
   if (attempt === 0) state.setAvatarPending(id, true)
   setTimeout(async () => {
     const account = state.findAccount(id)
-    if (!account || account.avatarCustom) return state.setAvatarPending(id, false)
+    if (!account || (account.avatarCustom && !manual)) return state.setAvatarPending(id, false)
     const avatar = await readAvatar(id)
-    if (avatar) state.setAvatar(id, avatar)
-    if (avatar || attempt >= 4) state.setAvatarPending(id, false)
-    else refreshAvatar(id, attempt + 1)
-  }, 3000)
+    if (avatar) state.setGoogleAvatar(id, avatar)
+    if (avatar || attempt >= (manual ? 6 : 4)) {
+      state.setAvatarPending(id, false)
+      if (!avatar && manual) dialog.showMessageBox(win, { type: 'warning', message: 'Foto non trovata', detail: 'Non sono riuscito a prendere la foto dal profilo Google. Riprova tra qualche secondo, quando Gmail ha finito di caricare.' })
+    } else refreshAvatar(id, manual, attempt + 1)
+  }, attempt === 0 && manual ? 0 : 3000)
 }
 
 function onLoaded(id: string) {
-  if (state.findAccount(id)) refreshAvatar(id)
+  const account = state.findAccount(id)
+  if (account && !account.avatar && !state.getState().avatarPending.includes(id)) refreshAvatar(id)
 }
 
 // --- aggiunta e rimozione account -------------------------------------------
@@ -191,8 +199,9 @@ async function chooseAvatar(id: string) {
 }
 
 function resetAvatar(id: string) {
-  state.setCustomAvatar(id, null)
-  refreshAvatar(id)
+  // la vista dell'account potrebbe non essere ancora aperta in questa sessione
+  views.ensureView(id)
+  refreshAvatar(id, true)
 }
 
 async function removeAccount(id: string) {

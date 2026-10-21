@@ -145,16 +145,14 @@ export function removeAccount(id: string) {
   commit()
 }
 
-/** Foto letta da Google: non tocca una foto caricata a mano. */
-export function setAvatar(id: string, avatar: string) {
-  const account = findAccount(id)
-  if (!account || account.avatarCustom || account.avatar === avatar) return
-  patch(id, { avatar })
+/** Foto presa da Google (al primo accesso o col pulsante "Prendi da Google"). */
+export function setGoogleAvatar(id: string, avatar: string) {
+  patch(id, { avatar, avatarCustom: false })
 }
 
-/** Foto scelta a mano (data URL) o, con null, ritorno a quella di Google. */
-export function setCustomAvatar(id: string, avatar: string | null) {
-  patch(id, avatar ? { avatar, avatarCustom: true } : { avatar: undefined, avatarCustom: false })
+/** Foto scelta a mano dal Mac (data URL). */
+export function setCustomAvatar(id: string, avatar: string) {
+  patch(id, { avatar, avatarCustom: true })
 }
 
 /** Foto profilo in caricamento: l'interfaccia mostra un loader al posto delle iniziali. */

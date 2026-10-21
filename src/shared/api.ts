@@ -57,7 +57,7 @@ export type GmailHubApi = {
   removeAccount: (id: string) => void
   /** sceglie un'immagine dal Mac e la usa come foto dell'account */
   chooseAvatar: (id: string) => void
-  /** torna alla foto del profilo Google */
+  /** riprende la foto dal profilo Google (anche al posto di una caricata a mano) */
   resetAvatar: (id: string) => void
   startAdd: () => void
   cancelAdd: () => void

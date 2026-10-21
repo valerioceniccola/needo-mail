@@ -75,15 +75,16 @@ if (location.hostname === 'mail.google.com') {
     style.textContent = `[${HIDDEN}] { display: none !important; }`
     document.head.append(style)
     apply()
-    // Gmail ridisegna la barra quando vuole: si ricontrolla, al massimo una volta per frame
+    // Gmail ridisegna la barra quando vuole: si ricontrolla, al massimo ogni 150 ms
     let queued = false
     new MutationObserver(() => {
       if (queued) return
       queued = true
-      requestAnimationFrame(() => {
+      // setTimeout e non requestAnimationFrame: nelle viste nascoste il disegno è fermo
+      setTimeout(() => {
         queued = false
         apply()
-      })
+      }, 150)
     }).observe(document.body, { childList: true, subtree: true })
   }
 

@@ -101,6 +101,9 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   views.set(id, view)
 
   const wc = view.webContents
+  // finché carica la vista è nascosta, e Chromium rallenterebbe timer e disegno di una pagina nascosta:
+  // Gmail ci metteva decine di secondi. Il freno si rimette quando è pronta (markReady).
+  wc.setBackgroundThrottling(false)
 
   // finestre nuove (allegati, "apri in nuova finestra"): Google resta nell'app con la stessa sessione, il resto va nel browser
   wc.setWindowOpenHandler(({ url }) => {
@@ -128,6 +131,7 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   wc.on('did-start-navigation', (details) => {
     if (details.isMainFrame && !details.isSameDocument && details.url.startsWith('https://mail.google.com/')) {
       ready.delete(id)
+      wc.setBackgroundThrottling(false)
       layout()
     }
   })
@@ -146,15 +150,17 @@ export function ensureView(id: string, signIn = false): WebContentsView {
 function markReady(id: string) {
   if (ready.has(id)) return
   ready.add(id)
+  // caricata: d'ora in poi Chromium può rallentarla quando non è a schermo (meno CPU per gli account dietro)
+  views.get(id)?.webContents.setBackgroundThrottling(true)
   layout()
 }
 
-// Gmail mostra prima una sua schermata di caricamento (#loading); la vista si scopre quando è sparita
-// e c'è la casella vera. Al massimo 20 secondi, poi si mostra comunque quello che c'è.
+// Gmail mostra prima una sua schermata di caricamento (#loading): la vista si scopre quando Gmail l'ha
+// nascosta, oppure quando c'è già la casella. Al massimo 12 secondi, poi si mostra comunque quello che c'è.
 const GMAIL_READY = `(() => {
   const l = document.getElementById('loading')
-  const loaderGone = !l || l.offsetParent === null || getComputedStyle(l).display === 'none'
-  return loaderGone && !!document.querySelector('[role="main"], [role="navigation"]')
+  const loaderHidden = !!l && (getComputedStyle(l).display === 'none' || getComputedStyle(l).visibility === 'hidden')
+  return loaderHidden || !!document.querySelector('[role="main"]')
 })()`
 
 function waitForGmail(id: string, wc: WebContents) {
@@ -167,7 +173,7 @@ function waitForGmail(id: string, wc: WebContents) {
     } catch {
       // pagina in cambio: si riprova
     }
-    if (ok || Date.now() - started > 20_000) return markReady(id)
+    if (ok || Date.now() - started > 12_000) return markReady(id)
     setTimeout(tick, 200)
   }
   tick()

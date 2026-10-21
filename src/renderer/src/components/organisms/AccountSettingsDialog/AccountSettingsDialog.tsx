@@ -75,11 +75,9 @@ export default function AccountSettingsDialog({ account }: Props) {
             <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => api.chooseAvatar(account.id)}>
               {content.settings.photoUpload}
             </Button>
-            {account.avatarCustom && (
-              <Button type="button" variant="ghost" size="sm" onClick={() => api.resetAvatar(account.id)}>
-                {content.settings.photoGoogle}
-              </Button>
-            )}
+            <Button type="button" variant="ghost" size="sm" disabled={avatarLoading} onClick={() => api.resetAvatar(account.id)}>
+              {content.settings.photoGoogle}
+            </Button>
           </div>
           <label className="flex items-center gap-3">
             <span className="w-[110px] text-muted-foreground">{content.add.label}</span>
