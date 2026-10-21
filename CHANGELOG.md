@@ -1,5 +1,9 @@
 # Novità di Needo
 
+## 0.1.5
+
+- Aprendo le Impostazioni non si intravede più la schermata di caricamento di Gmail
+
 ## 0.1.4
 
 - Notifiche col suono di Mail
