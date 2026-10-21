@@ -1,43 +1,68 @@
-# Needo
+<p align="center">
+  <img src="build/icon.png" alt="" width="128" height="128">
+</p>
 
-App per macOS che raccoglie più account Gmail in una finestra, con pausa per account (manuale o programmata) e badge sul Dock che conta solo gli account attivi. Un contenitore leggero e nativo intorno a Gmail originale: nessuna API, nessun server, niente esce dal Mac se non verso Google.
+<h1 align="center">Needo</h1>
 
-**Installazione:** scarica `Needo-x.y.z.dmg` dalle [Releases](https://github.com/valerioceniccola/needo-mail/releases) e trascinalo in Applicazioni (Mac con chip Apple). Gli aggiornamenti arrivano da soli.
+<p align="center">Tutti i tuoi account Gmail in una finestra sola, leggera e pensata per il Mac.</p>
 
-Needo non è affiliato a Google; Gmail è un marchio di Google LLC.
+<p align="center"><a href="https://github.com/valerioceniccola/needo-mail/releases/latest"><b>Scarica Needo per Mac</b></a></p>
 
-Requisiti, regole, stack e architettura: [AGENTS.md](AGENTS.md).
+---
 
-## Avvio
+Needo è Gmail, quello vero, ma con ogni account al suo posto. Niente più schede del browser da cercare o account da cambiare dal menu in alto a destra: ogni casella ha la sua foto nella colonna a sinistra, e passi da una all'altra con un clic o con ⌘1, ⌘2, ⌘3.
 
-```bash
-npm install
-npm run dev
-```
+E quando una casella non ti serve, la metti in pausa: niente notifiche, niente numeri rossi, finché non sei pronto.
 
-`npm run dev` controlla da solo che Electron sia scaricato e, se manca, lo scarica prima di partire.
+## Cosa fa
 
-## Comandi
+- **Più account Gmail in una finestra.** Ognuno resta collegato per conto suo, con la sua foto e il suo colore.
+- **Cambio veloce.** ⌘1 per il primo account, ⌘2 per il secondo e così via. L'ordine lo decidi tu trascinando le foto.
+- **Pausa con un clic.** Tasto destro su un account › *Metti in pausa*. Resta in pausa finché non lo riattivi.
+- **Pausa automatica.** Per ogni account puoi scegliere giorni e orari in cui va in pausa da solo, per esempio l'account di lavoro la sera e nel weekend.
+- **Badge sull'icona.** Il numero sull'icona di Needo conta solo i non letti degli account attivi. Puoi anche decidere quali account contano.
+- **Notifiche delle email nuove.** Con i pulsanti *Apri* ed *Elimina* direttamente nella notifica.
+- **Si aggiorna da solo.** Quando esce una versione nuova, Needo te la propone.
 
-| Comando | Cosa fa |
+## Installazione
+
+1. [Scarica l'ultima versione](https://github.com/valerioceniccola/needo-mail/releases/latest): è il file `Needo-….dmg`.
+2. Aprilo e trascina **Needo** nella cartella **Applicazioni**.
+3. Apri Needo e premi **Aggiungi il primo account**: si apre la normale pagina di accesso di Google.
+
+Serve un Mac con chip Apple (M1 o successivi).
+
+## Come si usa
+
+| Per… | Fai così |
 |---|---|
-| `npm run dev` | app in sviluppo: l'interfaccia si aggiorna al volo, e quando cambiano processo principale o preload l'app si riavvia da sola |
-| `npm run typecheck` | controllo dei tipi |
-| `npm test` | test del motore delle pause e del badge |
-| `npm run build:mac:local` | .dmg firmato col tuo certificato ma non notarizzato: basta per usarla sul tuo Mac |
-| `npm run release` | build firmata e notarizzata pubblicata nelle Release (di solito lo fa GitHub Actions: [docs/RELEASING.md](docs/RELEASING.md)) |
-| `npm run build:mac` | .dmg firmato e notarizzato (serve il certificato Developer ID nel Portachiavi e le variabili `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`) |
+| aggiungere un account | il **+** in fondo alla colonna a sinistra |
+| passare da un account all'altro | clic sulla foto, oppure ⌘1…⌘9 |
+| cambiare l'ordine | trascina le foto nella colonna |
+| mettere in pausa o riattivare | tasto destro sulla foto |
+| nome, colore, badge e pausa automatica di un account | tasto destro sulla foto › *Impostazioni…* |
+| impostazioni generali | l'ingranaggio in fondo alla colonna |
 
-## Stato
+Un account in pausa resta leggibile: lo apri, leggi, rispondi. Semplicemente non ti disturba.
 
-- [x] Struttura Electron + React + shadcn, tema scuro della tela
-- [x] Barra laterale con lista unica, drag and drop, ⌘1–⌘9, menu del tasto destro (pausa / riattiva / rimuovi)
-- [x] Motore delle pause e calcolo del badge, con test
-- [x] Gmail vero in una vista per account (sessioni separate), indietro / avanti / ricarica
-- [x] Aggiunta account (login Google + etichetta e colore), rimozione con pulizia della sessione
-- [x] Non letti, badge sul Dock solo per gli account attivi (e scelta per account), notifiche
-- [x] Salvataggio su disco di account, ordine e selezione
-- [x] Impostazioni dell'account (etichetta, colore, pausa automatica con fasce, rimozione)
-- [x] Impostazioni generali (riordino account, badge, notifiche, avvio al login)
+## Privacy
 
-Gli account si aggiungono dal + in fondo alla colonna laterale, dalla schermata di benvenuto o da File › Aggiungi account…; le loro impostazioni con tasto destro › Impostazioni…
+Needo non ha server e non legge la tua posta. È un contenitore per la pagina di Gmail: l'accesso lo fai sulla pagina di Google, i dati restano tra il tuo Mac e Google, come quando usi Gmail nel browser. Rimuovendo un account da Needo se ne cancella anche la sessione.
+
+## Domande frequenti
+
+**È sicuro fare l'accesso a Google dentro Needo?**
+La pagina di accesso è quella originale di Google. Needo non vede né salva le tue password, e il codice è pubblico: chiunque può controllarlo.
+
+**Le notifiche non arrivano.**
+Apri *Impostazioni di Sistema › Notifiche › Needo* e scegli *Avvisi*. Con *Avvisi* compaiono anche i pulsanti Apri ed Elimina.
+
+**"Elimina" cancella l'email per sempre?**
+No, la sposta nel Cestino di Gmail, come il pulsante Elimina di Gmail. Dopo 30 giorni Gmail la cancella del tutto.
+
+**Come lo tolgo?**
+Trascina Needo dalla cartella Applicazioni nel Cestino.
+
+---
+
+<sub>Needo non è affiliato a Google. Gmail è un marchio di Google LLC. · [Novità](CHANGELOG.md) · [Per sviluppatori](docs/DEVELOPMENT.md)</sub>
