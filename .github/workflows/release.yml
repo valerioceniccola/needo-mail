@@ -21,7 +21,7 @@ jobs:
       version: ${{ steps.v.outputs.version }}
       release: ${{ steps.v.outputs.release }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: v
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,9 +41,9 @@ jobs:
     if: needs.check.outputs.release == 'true'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -53,8 +53,52 @@ jobs:
       - run: npm test
       - run: npx electron-vite build
 
+      # Controlla i segreti prima della build, così un errore si legge subito nel riepilogo della run
+      - name: Controllo segreti e certificato
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ok=true
+          [ -n "$CSC_LINK" ] || { echo "::error::Manca il segreto MAC_CERT_P12_BASE64"; ok=false; }
+          [ -n "$CSC_KEY_PASSWORD" ] || { echo "::error::Manca il segreto MAC_CERT_PASSWORD"; ok=false; }
+          [ -n "$APPLE_ID" ] || { echo "::error::Manca il segreto APPLE_ID"; ok=false; }
+          [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] || { echo "::error::Manca il segreto APPLE_APP_SPECIFIC_PASSWORD"; ok=false; }
+          [ -n "$APPLE_TEAM_ID" ] || { echo "::error::Manca il segreto APPLE_TEAM_ID"; ok=false; }
+          $ok || exit 1
+
+          if ! printf '%s' "$CSC_LINK" | base64 --decode > "$RUNNER_TEMP/cert.p12" 2>/dev/null || [ ! -s "$RUNNER_TEMP/cert.p12" ]; then
+            echo "::error::MAC_CERT_P12_BASE64 non è un base64 valido: rifallo con  base64 -i Needo.p12 | pbcopy"
+            exit 1
+          fi
+          KC="$RUNNER_TEMP/check.keychain"
+          security create-keychain -p tmp "$KC"
+          security unlock-keychain -p tmp "$KC"
+          if ! security import "$RUNNER_TEMP/cert.p12" -k "$KC" -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign > /dev/null 2>&1; then
+            echo "::error::Il file .p12 non si apre con MAC_CERT_PASSWORD: password sbagliata o file .p12 rovinato"
+            exit 1
+          fi
+          IDS="$(security find-identity -v -p codesigning "$KC")"
+          if ! echo "$IDS" | grep -q "Developer ID Application"; then
+            echo "::error::Nel .p12 non c'è un certificato 'Developer ID Application' con la sua chiave privata. Trovato: $(echo "$IDS" | head -3 | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "::notice::Certificato ok: $(echo "$IDS" | grep -o '"Developer ID Application[^"]*"' | head -1)"
+          security delete-keychain "$KC"; rm -f "$RUNNER_TEMP/cert.p12"
+
       - name: Build, firma, notarizzazione e pubblicazione
-        run: npx electron-builder --mac --publish always
+        run: |
+          set -o pipefail
+          if ! npx electron-builder --mac --publish always 2>&1 | tee "$RUNNER_TEMP/build.log"; then
+            # le ultime righe come annotazione: si leggono dal riepilogo della run senza aprire i log
+            msg="$(grep -E "⨯|Error|error:" "$RUNNER_TEMP/build.log" | tail -8 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
+            [ -n "$msg" ] || msg="$(tail -15 "$RUNNER_TEMP/build.log" | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
+            echo "::error title=electron-builder::$msg"
+            exit 1
+          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
