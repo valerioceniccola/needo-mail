@@ -160,6 +160,7 @@ Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno do
 - Design atomico, un componente per cartella, export default, JSDoc di una riga sopra ogni componente.
 - TypeScript leggero: tipi per dati e props, niente generics inutili.
 - Semplicità prima di tutto: niente astrazioni "per il futuro".
+- Commit e PR: autore Valerio Ceniccola, nessuna menzione di assistenti o strumenti AI (niente Co-Authored-By, Claude-Session, "Generated with…").
 
 ## 7. Comandi
 
