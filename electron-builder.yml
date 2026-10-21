@@ -12,6 +12,9 @@ mac:
       arch: [arm64]
     - target: zip
       arch: [arm64]
+  # icona in formato Icon Composer (.icon): macOS 26 la mostra come le icone di sistema, senza la cornice
+  # grigia che mette attorno alle icone vecchie; da qui electron-builder genera anche l'.icns per i macOS precedenti
+  icon: build/icon.icon
   category: public.app-category.productivity
   hardenedRuntime: true
   # firma con il certificato "Developer ID Application" presente nel Portachiavi
