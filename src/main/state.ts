@@ -95,6 +95,11 @@ export function removeAccount(id: string) {
   commit()
 }
 
+export function setAvatar(id: string, avatar: string) {
+  if (findAccount(id)?.avatar === avatar) return
+  patch(id, { avatar })
+}
+
 export function setAdding(adding: AppState['adding']) {
   state.adding = adding
   emit()

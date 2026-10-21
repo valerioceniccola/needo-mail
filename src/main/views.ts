@@ -18,6 +18,7 @@ const GOOGLE_HOSTS = /(^|\.)(google\.com|googleusercontent\.com|gstatic\.com|you
 type Callbacks = {
   onTitle: (id: string, title: string) => void
   onNavigate: (id: string) => void
+  onLoaded: (id: string) => void
 }
 
 const views = new Map<string, WebContentsView>()
@@ -93,6 +94,7 @@ export function ensureView(id: string): WebContentsView {
   wc.on('page-title-updated', (_e, title) => callbacks.onTitle(id, title))
   wc.on('did-navigate', () => callbacks.onNavigate(id))
   wc.on('did-navigate-in-page', () => callbacks.onNavigate(id))
+  wc.on('did-finish-load', () => callbacks.onLoaded(id))
 
   wc.loadURL(GMAIL_URL)
   layout()

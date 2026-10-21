@@ -21,6 +21,8 @@ export type Account = {
   label: string
   email: string
   color: string
+  /** foto del profilo Google come data URL, letta dalla pagina di Gmail */
+  avatar?: string
   override: Override
   autoPause: { enabled: boolean; rules: PauseRule[] }
 }

@@ -4,10 +4,9 @@ import { Plus, Settings } from 'lucide-react'
 import { isPaused } from '@shared/pause'
 import { api, useStore } from '@/app/store'
 import AccountRow from '@/components/molecules/AccountRow/AccountRow'
-import appIcon from '@/assets/app-icon.png'
 import content from '@/content.json'
 
-/** Barra laterale: nome dell'app, lista unica degli account (riordinabile), Impostazioni in fondo. */
+/** Colonna laterale minimale: un avatar per account, poi + e impostazioni in fondo. */
 export default function Sidebar() {
   const { accounts, unread, selectedId, adding, now } = useStore()
 
@@ -19,20 +18,13 @@ export default function Sidebar() {
   }
 
   return (
-    <nav aria-label={content.sidebar.accounts} className="flex w-[236px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-2.5 pb-2.5">
+    <nav aria-label={content.sidebar.accounts} className="flex w-[76px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
       {/* riga dei semafori: da qui si trascina la finestra */}
-      <div className="app-drag h-11 shrink-0" />
-
-      <div className="app-drag mb-[18px] flex h-[30px] items-center gap-2 px-1.5">
-        <img src={appIcon} alt="" className="size-5" draggable={false} />
-        <strong className="text-sm font-semibold">{content.appName}</strong>
-      </div>
-
-      <div className="px-2 pb-1.5 text-xs font-medium text-subtle">{content.sidebar.accounts}</div>
+      <div className="app-drag h-11 w-full shrink-0" />
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={accounts.map((a) => a.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col gap-px">
+          <div className="flex w-full flex-col gap-3 pt-2.5">
             {accounts.map((account, index) => (
               <AccountRow
                 key={account.id}
@@ -49,35 +41,35 @@ export default function Sidebar() {
         </SortableContext>
       </DndContext>
 
+      {/* account in fase di aggiunta: segnaposto tratteggiato */}
       {adding && (
-        <div aria-current="page" className="mt-px flex h-[30px] items-center gap-2.5 rounded-md bg-sidebar-accent px-2 font-medium text-sidebar-accent-foreground">
-          <span aria-hidden="true" className="size-2.5 rounded-[3px] border border-dashed border-subtle" />
-          {content.sidebar.newAccount}
+        <div aria-current="page" className="relative mt-3 flex h-11 w-full items-center justify-center" title={content.sidebar.newAccount}>
+          <span aria-hidden="true" className="absolute top-2.5 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />
+          <span className="size-10 rounded-full border border-dashed border-subtle" />
         </div>
       )}
 
-      {/* senza account l'unico modo di aggiungerne uno; poi l'aggiunta sta nel menu File (e nelle Impostazioni) */}
-      {accounts.length === 0 && !adding && (
-        <button
-          type="button"
-          onClick={api.startAdd}
-          className="flex h-[30px] items-center gap-2.5 rounded-md border border-dashed border-[#34343b] px-2 font-medium text-sidebar-foreground outline-none hover:bg-[#1c1c21] focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Plus className="size-[13px]" strokeWidth={2.2} aria-hidden="true" />
-          {content.sidebar.addAccount}
-        </button>
-      )}
-
-      <div className="flex-1" />
+      {/* l'area vuota sotto gli avatar sposta la finestra, come la riga in alto */}
+      <div className="app-drag w-full flex-1" />
 
       <button
         type="button"
-        disabled
-        title={content.sidebar.settingsSoon}
-        className="flex h-[30px] items-center gap-2.5 rounded-md px-2 font-medium text-sidebar-foreground outline-none hover:bg-[#1c1c21] focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        onClick={api.startAdd}
+        disabled={!!adding}
+        aria-label={content.sidebar.addAccount}
+        title={content.sidebar.addAccount}
+        className="mb-1.5 flex size-9 items-center justify-center rounded-full border border-dashed border-[#34343b] text-muted-foreground outline-none hover:border-subtle hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
       >
-        <Settings className="size-[15px]" aria-hidden="true" />
-        {content.sidebar.settings}
+        <Plus className="size-4" strokeWidth={2} />
+      </button>
+      <button
+        type="button"
+        disabled
+        aria-label={content.sidebar.settings}
+        title={`${content.sidebar.settings} · ${content.sidebar.settingsSoon}`}
+        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-[#1c1c21] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+      >
+        <Settings className="size-[18px]" strokeWidth={1.8} />
       </button>
     </nav>
   )
