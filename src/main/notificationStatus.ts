@@ -1,21 +1,48 @@
 import { execFile } from 'node:child_process'
+import { join } from 'node:path'
 import { app, shell } from 'electron'
 import type { NotificationStatus } from '@shared/api'
 
 /*
   Come sono impostate le notifiche di Needo in macOS (Impostazioni di Sistema › Notifiche).
-  Electron non lo dice, quindi leggiamo le preferenze del Centro Notifiche con `defaults export`
-  (sola lettura, nessun permesso da chiedere). Ogni app ha un numero "flags":
-  bit 25 = notifiche consentite; bit 4 = stile Avvisi; bit 3 = stile Banner; nessuno dei due = Nessuno.
-  Il formato non è documentato da Apple: se non troviamo l'app rispondiamo "unknown".
+  Electron non lo dice. Strada principale: un piccolo modulo nativo (native/notification-settings)
+  che chiede a macOS con l'API ufficiale UNUserNotificationCenter. Se il modulo manca (es. non compilato
+  in sviluppo) proviamo le preferenze del Centro Notifiche dei macOS più vecchi (com.apple.ncprefs):
+  ogni app ha un numero "flags", bit 25 = consentite, bit 4 = Permanenti, bit 3 = Temporanei.
+  Il gruppo di usernoted dei macOS recenti non si legge: macOS lo protegge e chiederebbe un permesso.
 */
+
+type NativeSettings = { authorization: 'authorized' | 'denied' | 'provisional' | 'notDetermined'; alertStyle: 'alert' | 'banner' | 'none' }
+type NativeModule = { getSettings: () => NativeSettings | null }
+
+let native: NativeModule | null | undefined
+
+function loadNative(): NativeModule | null {
+  if (native !== undefined) return native
+  native = null
+  try {
+    // nell'app installata il .node sta fuori dall'asar (asarUnpack in electron-builder.yml)
+    const file = join(app.getAppPath(), 'native/notification-settings/build/Release/notification_settings.node').replace('app.asar', 'app.asar.unpacked')
+    const mod = { exports: {} as NativeModule }
+    process.dlopen(mod, file)
+    native = mod.exports
+  } catch {
+    // niente modulo: si usa la lettura delle preferenze
+  }
+  return native
+}
+
+function fromNative(): NotificationStatus | null {
+  const settings = loadNative()?.getSettings()
+  if (!settings || settings.authorization === 'notDetermined') return null
+  if (settings.authorization === 'denied') return 'off'
+  return settings.alertStyle === 'alert' ? 'alerts' : settings.alertStyle === 'banner' ? 'banners' : 'none'
+}
 
 // in sviluppo le notifiche risultano dell'app Electron
 const bundleId = () => (app.isPackaged ? 'it.valerioceniccola.needo' : 'com.github.Electron')
 
-// prima com.apple.ncprefs (preferenze normali dell'utente); se l'app non c'è, il gruppo di usernoted
-// dove le tengono i macOS più recenti
-const DOMAINS = ['com.apple.ncprefs', 'group.com.apple.usernoted']
+const DOMAINS = ['com.apple.ncprefs']
 
 function exportDomain(domain: string): Promise<string> {
   return new Promise((resolve) => {
@@ -36,6 +63,12 @@ function flagsOf(xml: string, id: string): number | null {
 
 export async function notificationStatus(): Promise<NotificationStatus> {
   if (process.platform !== 'darwin') return 'unknown'
+  try {
+    const status = fromNative()
+    if (status) return status
+  } catch {
+    // si prova la strada vecchia
+  }
   for (const domain of DOMAINS) {
     const flags = flagsOf(await exportDomain(domain), bundleId())
     if (flags === null) continue

@@ -14,7 +14,7 @@ export type UpdateStatus =
   | { state: 'ready'; version: string }
   | { state: 'error'; message: string }
 
-/** Notifiche di Needo in macOS: spente, stile Banner (spariscono da sole), Avvisi (restano), Nessuno, o non si sa. */
+/** Notifiche di Needo in macOS: spente, stile Temporanei (spariscono da sole), Permanenti (restano), Nessuno, o non si sa. */
 export type NotificationStatus = 'off' | 'banners' | 'alerts' | 'none' | 'unknown'
 
 /** Rettangolo in pixel della finestra (coordinate CSS dell'interfaccia). */

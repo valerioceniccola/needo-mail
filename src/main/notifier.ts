@@ -72,7 +72,7 @@ function notify(accountId: string, title: string, body: string, link?: string) {
 
 /**
  * Notifica di una singola email con i pulsanti Elimina e Apri.
- * macOS mostra i pulsanti solo se l'app è firmata e ha lo stile "Avvisi" (NSUserNotificationAlertStyle
+ * macOS mostra i pulsanti solo se l'app è firmata e ha lo stile avvisi "Permanenti" (NSUserNotificationAlertStyle
  * in electron-builder.yml): in sviluppo resta il clic sulla notifica, che apre l'email.
  */
 function notifyMail(accountId: string, label: string, mail: MailEntry) {

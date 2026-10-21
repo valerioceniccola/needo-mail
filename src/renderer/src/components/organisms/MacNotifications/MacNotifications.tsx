@@ -12,7 +12,7 @@ const DOT: Record<NotificationStatus, string> = {
   unknown: 'bg-subtle'
 }
 
-/** Come macOS mostra le notifiche di Needo (Avvisi, Banner, spente) e come averle fisse a schermo. */
+/** Come macOS mostra le notifiche di Needo (Permanenti, Temporanee, spente) e come averle fisse a schermo. */
 export default function MacNotifications() {
   const update = useStore((s) => s.update)
   // lo rilegge il processo principale a ogni ritorno sulla finestra (es. dalle Impostazioni di Sistema)

@@ -55,7 +55,7 @@ Needo non ha server e non legge la tua posta. È un contenitore per la pagina di
 La pagina di accesso è quella originale di Google. Needo non vede né salva le tue password, e il codice è pubblico: chiunque può controllarlo.
 
 **Le notifiche non arrivano.**
-Apri *Impostazioni di Sistema › Notifiche › Needo* e scegli *Avvisi*. Con *Avvisi* compaiono anche i pulsanti Apri ed Elimina.
+Apri *Impostazioni di Sistema › Notifiche › Needo*, attiva *Consenti notifiche* e in *Stile avvisi* scegli *Permanenti*: così restano a schermo con i pulsanti Apri ed Elimina. Puoi arrivarci anche da Needo: Impostazioni › Notifiche di macOS › *Apri Impostazioni di Sistema*.
 
 **"Elimina" cancella l'email per sempre?**
 No, la sposta nel Cestino di Gmail, come il pulsante Elimina di Gmail. Dopo 30 giorni Gmail la cancella del tutto.

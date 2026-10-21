@@ -5,6 +5,10 @@ directories:
 files:
   - out/**
   - package.json
+  # modulo nativo per leggere lo stato delle notifiche (src/main/notificationStatus.ts)
+  - native/notification-settings/build/Release/notification_settings.node
+asarUnpack:
+  - native/**/*.node
 mac:
   target:
     # dmg per la prima installazione, zip per gli aggiornamenti automatici (electron-updater su macOS usa lo zip)

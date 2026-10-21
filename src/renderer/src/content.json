@@ -132,16 +132,16 @@
     "open": "Apri Impostazioni di Sistema",
     "status": {
       "alerts": [
-        "Avvisi",
+        "Permanenti",
         "Le notifiche restano a schermo finché non le chiudi. Tutto a posto."
       ],
       "banners": [
-        "Banner",
-        "Le notifiche spariscono da sole dopo qualche secondo e non mostrano subito Apri ed Elimina."
+        "Temporanee",
+        "Le notifiche spariscono da sole dopo qualche secondo."
       ],
       "none": [
-        "Nessuno stile",
-        "Le notifiche arrivano solo nel Centro Notifiche, senza comparire a schermo."
+        "Non compaiono a schermo",
+        "Le notifiche arrivano solo nel Centro Notifiche: in Impostazioni di Sistema attiva Scrivania."
       ],
       "off": [
         "Disattivate",
@@ -152,7 +152,7 @@
         "Non riesco a leggere come sono impostate: controllale nelle Impostazioni di Sistema."
       ]
     },
-    "howTo": "Per avere le notifiche fisse a schermo: Apri Impostazioni di Sistema › attiva Consenti notifiche › come stile scegli Avvisi.",
+    "howTo": "Per avere le notifiche fisse a schermo: Apri Impostazioni di Sistema › attiva Consenti notifiche › in Stile avvisi scegli Permanenti.",
     "dev": "In sviluppo le notifiche risultano dell'app Electron.",
     "warning": {
       "title": "Notifiche disattivate",
