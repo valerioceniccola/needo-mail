@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
-import { LoaderCircle } from 'lucide-react'
 import { api, useStore } from '@/app/store'
-import content from '@/content.json'
+import GmailSkeleton from '@/components/molecules/GmailSkeleton/GmailSkeleton'
 
 /**
  * Riquadro dove appare Gmail. La vista vera (WebContentsView) la disegna il processo principale
@@ -34,8 +33,8 @@ export default function GmailFrame() {
   return (
     <div className="flex min-h-0 flex-1 pr-2 pb-2">
       <div ref={ref} className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[10px] bg-[#f6f8fc] shadow-[0_0_0_1px_#26262b]">
-        {/* finché Gmail carica si vede solo la rotellina; sotto un dialog: o l'istantanea, o il riquadro vuoto sfocato */}
-        {!covered && <LoaderCircle className="size-6 animate-spin text-[#8a8f98]" aria-label={content.gmail.loading} />}
+        {/* finché Gmail carica si vede la sua sagoma; sotto un dialog: o l'istantanea, o il riquadro vuoto sfocato */}
+        {!covered && <GmailSkeleton />}
         {snapshot && <img src={snapshot} alt="" draggable={false} className="absolute inset-0 size-full object-cover object-top-left" />}
       </div>
     </div>
