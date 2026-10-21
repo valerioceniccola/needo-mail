@@ -29,5 +29,6 @@ publish:
   provider: github
   owner: valerioceniccola
   repo: needo-mail
-  # la release esce subito pubblicata: le app la vedono senza passaggi a mano
-  releaseType: release
+  # la release nasce come bozza (invisibile alle app) e la pubblica il workflow solo a file tutti caricati:
+  # così nessuno la vede a metà, senza latest-mac.yml (errore 404 in "Controlla aggiornamenti")
+  releaseType: draft

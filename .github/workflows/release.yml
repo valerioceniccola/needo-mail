@@ -132,7 +132,12 @@ jobs:
         run: |
           set -o pipefail
           for attempt in 1 2; do
-            if npx electron-builder --mac --publish always 2>&1 | tee "$RUNNER_TEMP/build.log"; then exit 0; fi
+            if npx electron-builder --mac --publish always 2>&1 | tee "$RUNNER_TEMP/build.log"; then
+              # tutti i file sono su: la bozza diventa la Release ufficiale (e solo ora le app la vedono)
+              VERSION="$(node -p "require('./package.json').version")"
+              gh release edit "v$VERSION" --repo "$GITHUB_REPOSITORY" --draft=false --latest --target "$GITHUB_SHA"
+              exit 0
+            fi
             echo "Tentativo $attempt non riuscito"
           done
           # righe utili come annotazioni separate: si leggono dal riepilogo della run senza aprire i log

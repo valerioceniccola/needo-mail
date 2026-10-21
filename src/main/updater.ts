@@ -60,7 +60,13 @@ export function initUpdater(window: BrowserWindow, statusListener: (status: Upda
   })
   autoUpdater.on('error', (err) => {
     onStatus({ state: 'error', message: err.message })
-    if (manual) dialog.showMessageBox(win, { type: 'warning', message: 'Controllo aggiornamenti non riuscito', detail: err.message })
+    // messaggio breve: l'errore tecnico completo non serve a chi usa l'app
+    if (manual)
+      dialog.showMessageBox(win, {
+        type: 'warning',
+        message: 'Controllo aggiornamenti non riuscito',
+        detail: 'Non riesco a controllare gli aggiornamenti in questo momento. Controlla la connessione e riprova tra qualche minuto.'
+      })
     manual = false
   })
 
