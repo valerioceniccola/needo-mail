@@ -3,7 +3,6 @@
   "sidebar": {
     "accounts": "Account",
     "settings": "Impostazioni",
-    "settingsSoon": "In arrivo",
     "addAccount": "Aggiungi account",
     "newAccount": "Nuovo account"
   },
@@ -80,5 +79,39 @@
     "nowActive": "Adesso attivo · va in pausa",
     "nowPaused": "Adesso in pausa · torna attivo",
     "alwaysPaused": "In pausa per tutta la settimana"
+  },
+  "general": {
+    "accounts": "Account",
+    "accountsHint": "Trascina per cambiare l'ordine: decide anche ⌘1, ⌘2, ⌘3…",
+    "addAccount": "Aggiungi account",
+    "noAccounts": "Nessun account collegato.",
+    "options": "Opzioni account",
+    "stateActive": "Sempre attivo",
+    "stateScheduled": "Pausa automatica",
+    "statePaused": "In pausa",
+    "general": "Generali",
+    "toggles": {
+      "badge": [
+        "Badge sull'icona del Dock",
+        "Somma i non letti dei soli account attivi"
+      ],
+      "notifications": [
+        "Notifiche",
+        "Avviso per ogni email nuova degli account attivi"
+      ],
+      "resumeSummary": [
+        "Riepilogo alla fine della pausa",
+        "Una sola notifica con quante email sono arrivate"
+      ],
+      "menuBar": [
+        "Icona nella barra dei menu",
+        "Totale dei non letti e pausa rapida di ogni account"
+      ],
+      "launchAtLogin": [
+        "Apri all'accensione del Mac",
+        "Gmail Hub parte da solo quando accedi"
+      ]
+    },
+    "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo"
   }
 }

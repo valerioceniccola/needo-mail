@@ -9,7 +9,15 @@ import content from '@/content.json'
  * e account aperto. Così la colonna degli avatar sotto può restare stretta.
  */
 export default function Header() {
-  const { ready, accounts, selectedId, adding } = useStore()
+  const { ready, accounts, selectedId, adding, settingsOpen } = useStore()
+
+  if (ready && settingsOpen && !adding) {
+    return (
+      <header className="app-drag flex h-11 shrink-0 items-center pr-3 pl-[88px]">
+        <strong className="font-semibold">{content.sidebar.settings}</strong>
+      </header>
+    )
+  }
 
   // primo avvio: solo la riga da cui trascinare la finestra
   if (!ready || (accounts.length === 0 && !adding)) return <header className="app-drag h-11 shrink-0" />

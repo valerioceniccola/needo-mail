@@ -4,11 +4,12 @@ import { Plus, Settings } from 'lucide-react'
 import { isPaused } from '@shared/pause'
 import { api, useStore } from '@/app/store'
 import AccountRow from '@/components/molecules/AccountRow/AccountRow'
+import { cn } from '@/lib/utils'
 import content from '@/content.json'
 
 /** Colonna laterale minimale: un avatar per account, poi + e impostazioni in fondo. */
 export default function Sidebar() {
-  const { accounts, unread, selectedId, adding, avatarPending, now } = useStore()
+  const { accounts, unread, selectedId, adding, avatarPending, settingsOpen, now } = useStore()
 
   // il trascinamento parte solo dopo 4px, così un clic resta un clic
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
@@ -31,7 +32,7 @@ export default function Sidebar() {
                 unread={unread[account.id] ?? 0}
                 paused={isPaused(account, now)}
                 loading={avatarPending.includes(account.id)}
-                selected={!adding && account.id === selectedId}
+                selected={!adding && !settingsOpen && account.id === selectedId}
                 onSelect={() => api.select(account.id)}
                 onMenu={() => api.openAccountMenu(account.id)}
               />
@@ -63,10 +64,14 @@ export default function Sidebar() {
       </button>
       <button
         type="button"
-        disabled
+        onClick={settingsOpen ? api.closeSettingsPage : api.openSettingsPage}
+        aria-pressed={settingsOpen}
         aria-label={content.sidebar.settings}
-        title={`${content.sidebar.settings} · ${content.sidebar.settingsSoon}`}
-        className="flex size-8 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-[#1c1c21] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        title={content.sidebar.settings}
+        className={cn(
+          'flex size-8 items-center justify-center rounded-lg outline-none hover:bg-[#1c1c21] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
+          settingsOpen ? 'bg-sidebar-accent text-foreground' : 'text-muted-foreground'
+        )}
       >
         <Settings className="size-[18px]" strokeWidth={1.8} />
       </button>

@@ -45,7 +45,12 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 - Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
 
 ### Impostazioni generali
-Elenco account (riordinabile, stato, ⌘n, menu "…", "Aggiungi account"), poi interruttori: badge sul Dock, notifiche, riepilogo a fine pausa, icona nella barra dei menu (spenta di default), apri all'accensione del Mac.
+Pagina al posto di Gmail aperta dall'ingranaggio in fondo alla colonna (`pages/Settings`, `state.settingsOpen`; cliccando un avatar si torna a Gmail). Elenco account (maniglia per trascinare, stato, ⌘n, menu "…" = stesso menu del tasto destro, "Aggiungi account"), poi interruttori salvati in `settings.json` (`AppSettings` in `shared/types.ts`):
+- badge sul Dock (solo account attivi);
+- notifiche (email nuove);
+- riepilogo alla fine della pausa;
+- icona nella barra dei menu, spenta di default (`tray.ts`): totale dei non letti accanto all'icona, menu con un account per riga e la spunta "attivo" per la pausa rapida;
+- apri all'accensione del Mac (`app.setLoginItemSettings`), solo nell'app installata: in sviluppo l'interruttore è disattivato perché registrerebbe Electron.
 
 ---
 

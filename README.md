@@ -33,6 +33,6 @@ npm run dev
 - [x] Non letti, badge sul Dock solo per gli account attivi, notifiche, riepilogo a fine pausa
 - [x] Salvataggio su disco di account, ordine e selezione
 - [x] Impostazioni dell'account (etichetta, colore, pausa automatica con fasce, rimozione)
-- [ ] Impostazioni generali
+- [x] Impostazioni generali (riordino account, badge, notifiche, riepilogo, icona nella barra dei menu, avvio al login)
 
 Gli account si aggiungono dal + in fondo alla colonna laterale, dalla schermata di benvenuto o da File › Aggiungi account…; le loro impostazioni con tasto destro › Impostazioni…

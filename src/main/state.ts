@@ -1,5 +1,6 @@
 import type { AccountChanges, AppState } from '@shared/api'
-import type { Account } from '@shared/types'
+import { DEFAULT_SETTINGS, type Account, type AppSettings } from '@shared/types'
+import { app } from 'electron'
 import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
 import { createStore } from './store'
 
@@ -12,6 +13,7 @@ type Saved = { accounts: Account[]; selectedId: string | null }
 
 const store = createStore<Saved>('accounts', { accounts: [], selectedId: null })
 const saved = store.read()
+const settingsStore = createStore<AppSettings>('settings', DEFAULT_SETTINGS)
 
 const state: AppState = {
   accounts: saved.accounts,
@@ -20,6 +22,9 @@ const state: AppState = {
   adding: null,
   avatarPending: [],
   editingId: null,
+  settingsOpen: false,
+  settings: settingsStore.read(),
+  canLaunchAtLogin: app.isPackaged,
   nav: { canGoBack: false, canGoForward: false }
 }
 
@@ -48,9 +53,25 @@ export function findAccount(id: string): Account | undefined {
 }
 
 export function select(id: string) {
-  if (!findAccount(id) || state.selectedId === id) return
+  if (!findAccount(id)) return
+  // cliccando un account si torna sempre a Gmail, anche se era già quello selezionato
+  if (state.selectedId === id && !state.settingsOpen) return
   state.selectedId = id
+  state.settingsOpen = false
   commit()
+}
+
+export function setSettingsOpen(open: boolean) {
+  if (state.settingsOpen === open) return
+  state.settingsOpen = open
+  emit()
+}
+
+export function setSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]) {
+  if (!(key in DEFAULT_SETTINGS) || typeof value !== typeof DEFAULT_SETTINGS[key]) return
+  state.settings = { ...state.settings, [key]: value }
+  settingsStore.write(state.settings)
+  emit()
 }
 
 /** ⌘1…⌘9: la scorciatoia dipende solo dalla posizione nella lista. */
