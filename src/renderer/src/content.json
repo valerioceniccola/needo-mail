@@ -78,7 +78,9 @@
     "save": "Salva",
     "nowActive": "Adesso attivo · va in pausa",
     "nowPaused": "Adesso in pausa · torna attivo",
-    "alwaysPaused": "In pausa per tutta la settimana"
+    "alwaysPaused": "In pausa per tutta la settimana",
+    "badge": "Conta nel badge del Dock",
+    "badgeHint": "I non letti di questo account si sommano al numero sull'icona dell'app."
   },
   "general": {
     "accounts": "Account",
@@ -93,19 +95,11 @@
     "toggles": {
       "badge": [
         "Badge sull'icona del Dock",
-        "Somma i non letti dei soli account attivi"
+        "Somma i non letti degli account attivi che contano nel badge"
       ],
       "notifications": [
         "Notifiche",
         "Avviso per ogni email nuova degli account attivi"
-      ],
-      "resumeSummary": [
-        "Riepilogo alla fine della pausa",
-        "Una sola notifica con quante email sono arrivate"
-      ],
-      "menuBar": [
-        "Icona nella barra dei menu",
-        "Totale dei non letti e pausa rapida di ogni account"
       ],
       "launchAtLogin": [
         "Apri all'accensione del Mac",

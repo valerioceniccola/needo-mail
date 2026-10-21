@@ -35,21 +35,20 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 ### Pausa
 - **Tasto destro** su un account → menu con: *Metti in pausa* (o *Riattiva* se è in pausa), *Impostazioni…*, *Rimuovi account*.
 - La pausa manuale è immediata e dura **finché non la togli** (nessuna durata da scegliere).
-- **Pausa automatica** (tasto destro → Impostazioni, `AccountSettingsDialog`): interruttore + una o più fasce (accendendo senza fasce se ne propone una: lun–ven 19:00–09:00). In fondo al dialog lo stato calcolato sulle fasce non ancora salvate ("Adesso attivo · va in pausa alle 19:00"). Fasce senza giorni non si salvano. Ogni fascia = giorni della settimana + orario "dalle–alle" (può scavalcare la mezzanotte, es. 19:00–09:00) oppure "tutto il giorno".
+- **Impostazioni dell'account** (tasto destro → Impostazioni, `AccountSettingsDialog`): etichetta, colore, "Conta nel badge del Dock", pausa automatica.
+- **Pausa automatica**: interruttore + una o più fasce (accendendo senza fasce se ne propone una: lun–ven 19:00–09:00). In fondo al dialog lo stato calcolato sulle fasce non ancora salvate ("Adesso attivo · va in pausa alle 19:00"). Fasce senza giorni non si salvano. Ogni fascia = giorni della settimana + orario "dalle–alle" (può scavalcare la mezzanotte, es. 19:00–09:00) oppure "tutto il giorno".
 - Precedenza: se metti in pausa a mano, l'account resta in pausa finché non lo riattivi tu, anche se la fascia automatica finisce.
 - Un account in pausa: **nessuna notifica**, **non conta nel badge**. Gmail resta visibile e usabile; sopra compare una fascia "In pausa · … · Riattiva" con fino a quando dura la pausa automatica, se c'è.
-- Quando un account torna attivo: **una sola notifica di riepilogo** ("Newsletter: 48 non letti"), non tutte quelle arretrate (disattivabile nelle Impostazioni).
+- Quando un account torna attivo **non arriva nessuna notifica**: le email arrivate durante la pausa restano solo nei non letti (niente riepilogo, scelta di Valerio).
 
 ### Badge e notifiche
-- Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** dei soli account **attivi**. Nessun account attivo → nessun badge.
+- Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** degli account **attivi** che hanno **"Conta nel badge del Dock"** acceso (impostazione del singolo account, `Account.badge`, accesa di default). Il pallino rosso nella colonna resta comunque.
 - Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
 
 ### Impostazioni generali
 Pagina al posto di Gmail aperta dall'ingranaggio in fondo alla colonna (`pages/Settings`, `state.settingsOpen`; cliccando un avatar si torna a Gmail). Elenco account (maniglia per trascinare, stato, ⌘n, menu "…" = stesso menu del tasto destro, "Aggiungi account"), poi interruttori salvati in `settings.json` (`AppSettings` in `shared/types.ts`):
 - badge sul Dock (solo account attivi);
 - notifiche (email nuove);
-- riepilogo alla fine della pausa;
-- icona nella barra dei menu, spenta di default (`tray.ts`): totale dei non letti accanto all'icona, menu con un account per riga e la spunta "attivo" per la pausa rapida;
 - apri all'accensione del Mac (`app.setLoginItemSettings`), solo nell'app installata: in sviluppo l'interruttore è disattivato perché registrerebbe Electron.
 
 ---
@@ -92,7 +91,7 @@ Processo principale (Node)
 ├── AccountManager    crea/rimuove una WebContentsView per account, ognuna con la sua session partition
 ├── PauseEngine       ogni minuto calcola chi è attivo (pausa manuale + fasce) → stato per account
 ├── Unread            non letti dal feed Atom di Gmail (session.fetch con i cookie dell'account), riletti 1,5 s dopo ogni cambio del titolo e ogni minuto; il titolo serve solo da ripiego
-├── Notifier          notifiche native; tace per gli account in pausa; riepilogo al rientro
+├── Notifier          notifiche native dal feed; tace per gli account in pausa
 ├── Badge             app.dock.setBadge() con la somma degli account attivi
 ├── Store             JSON in ~/Library/Application Support/Gmail Hub/ (store.ts)
 └── WindowState       ricorda posizione e dimensioni della finestra (windowState.ts)
@@ -171,3 +170,9 @@ Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno do
 - `npm run build:mac:local` — .dmg firmato ma non notarizzato, per provarlo sul proprio Mac
 
 Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
+
+## 8. Scelte scartate (non riproporle)
+
+- Riepilogo "di nuovo attivo · N non letti" quando finisce una pausa.
+- Icona nella barra dei menu.
+- Travestire lo user agent (Chrome o Firefox): fa scattare il blocco del login Google.

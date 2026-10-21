@@ -11,7 +11,6 @@ import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } f
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
-import { initTray, updateTray } from './tray'
 
 // nome mostrato nel menu dell'app e nel Dock anche in sviluppo
 app.setName('Gmail Hub')
@@ -238,7 +237,6 @@ app.whenReady().then(() => {
     }
   })
   registerIpc()
-  initTray(showWindow)
   applyLaunchAtLogin()
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche
@@ -255,7 +253,6 @@ app.whenReady().then(() => {
     if (!win.isDestroyed()) win.webContents.send(IPC.state, state.getState())
     buildAppMenu(menuActions)
     refresh()
-    updateTray()
   }
   state.onChange(sync)
   sync()

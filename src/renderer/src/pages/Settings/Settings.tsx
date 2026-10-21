@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch'
 import Avatar from '@/components/atoms/Avatar/Avatar'
 import content from '@/content.json'
 
-const TOGGLES: (keyof AppSettings)[] = ['badge', 'notifications', 'resumeSummary', 'menuBar', 'launchAtLogin']
+const TOGGLES: (keyof AppSettings)[] = ['badge', 'notifications', 'launchAtLogin']
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
 export default function Settings() {

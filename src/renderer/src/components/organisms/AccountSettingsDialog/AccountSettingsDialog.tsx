@@ -24,6 +24,7 @@ export default function AccountSettingsDialog({ account }: Props) {
   const now = useStore((s) => s.now)
   const [label, setLabel] = useState(account.label)
   const [color, setColor] = useState(account.color)
+  const [badge, setBadge] = useState(account.badge !== false)
   const [enabled, setEnabled] = useState(account.autoPause.enabled)
   const [rules, setRules] = useState<PauseRule[]>(account.autoPause.rules)
 
@@ -40,7 +41,7 @@ export default function AccountSettingsDialog({ account }: Props) {
   const removeRule = (index: number) => setRules(rules.filter((_, i) => i !== index))
 
   const invalid = enabled && rules.some((r) => r.days.length === 0)
-  const save = () => api.updateAccount(account.id, { label, color, autoPause: { enabled, rules } })
+  const save = () => api.updateAccount(account.id, { label, color, badge, autoPause: { enabled, rules } })
 
   return (
     <Dialog open onOpenChange={(open) => !open && api.closeSettings()}>
@@ -88,6 +89,14 @@ export default function AccountSettingsDialog({ account }: Props) {
               ))}
             </div>
           </div>
+
+          <label className="flex items-start gap-3">
+            <span className="flex flex-1 flex-col gap-0.5">
+              <span className="font-semibold">{content.settings.badge}</span>
+              <span className="leading-relaxed text-muted-foreground">{content.settings.badgeHint}</span>
+            </span>
+            <Switch checked={badge} onCheckedChange={setBadge} className="mt-0.5" />
+          </label>
 
           <div className="-mx-5 h-px bg-[#232328]" />
 

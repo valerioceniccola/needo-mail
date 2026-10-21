@@ -4,7 +4,6 @@ directories:
   buildResources: build
 files:
   - out/**
-  - resources/**
   - package.json
 mac:
   target:

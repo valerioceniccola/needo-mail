@@ -30,9 +30,9 @@ npm run dev
 - [x] Motore delle pause e calcolo del badge, con test
 - [x] Gmail vero in una vista per account (sessioni separate), indietro / avanti / ricarica
 - [x] Aggiunta account (login Google + etichetta e colore), rimozione con pulizia della sessione
-- [x] Non letti, badge sul Dock solo per gli account attivi, notifiche, riepilogo a fine pausa
+- [x] Non letti, badge sul Dock solo per gli account attivi (e scelta per account), notifiche
 - [x] Salvataggio su disco di account, ordine e selezione
 - [x] Impostazioni dell'account (etichetta, colore, pausa automatica con fasce, rimozione)
-- [x] Impostazioni generali (riordino account, badge, notifiche, riepilogo, icona nella barra dei menu, avvio al login)
+- [x] Impostazioni generali (riordino account, badge, notifiche, avvio al login)
 
 Gli account si aggiungono dal + in fondo alla colonna laterale, dalla schermata di benvenuto o da File › Aggiungi account…; le loro impostazioni con tasto destro › Impostazioni…
