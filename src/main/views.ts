@@ -9,13 +9,11 @@ import type { Rect } from '@shared/api'
 
 const GMAIL_URL = 'https://mail.google.com/mail/u/0/'
 
-// Google blocca il login nei browser "non sicuri": ci presentiamo come Chrome, senza la parola Electron
-const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
+// Nessun travestimento dello user agent: come Meru, lasciamo quello di Electron, che si dichiara onestamente.
+// Uno user agent "da Chrome" con i segnali di Chromium incorporato è proprio ciò che Google blocca al login.
 
-// Sulla pagina di accesso Google riconosce comunque Chromium incorporato (dagli header Sec-CH-UA e da
-// navigator.userAgentData) e blocca il login. Lì ci presentiamo come Firefox, che non manda quegli header.
-// Stesso valore in preload/gmail.ts, che sistema anche navigator.* dentro la pagina.
-export const FIREFOX_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0'
+// pagina di accesso di Google per Gmail: da qui parte l'aggiunta di un account
+export const SIGN_IN_URL = 'https://accounts.google.com/ServiceLogin?service=mail&continue=https://mail.google.com/mail/u/0/'
 
 // questi domini restano dentro l'app (login, Gmail, allegati, Drive…); tutto il resto va nel browser
 const GOOGLE_HOSTS = /(^|\.)(google\.com|googleusercontent\.com|gstatic\.com|youtube\.com|google\.it)$/
@@ -51,22 +49,15 @@ function isGoogle(url: string): boolean {
 }
 
 function setupSession(ses: Session) {
-  ses.setUserAgent(USER_AGENT)
   // notifiche: le concediamo a Gmail, poi è il processo principale a decidere se mostrarle
   const allowed = new Set(['notifications', 'clipboard-sanitized-write', 'fullscreen'])
   ses.setPermissionRequestHandler((_wc, permission, done) => done(allowed.has(permission)))
   ses.setPermissionCheckHandler((_wc, permission) => allowed.has(permission))
 
-  ses.webRequest.onBeforeSendHeaders({ urls: ['https://accounts.google.com/*'] }, (details, done) => {
-    const headers = { ...details.requestHeaders }
-    for (const key of Object.keys(headers)) if (key.toLowerCase().startsWith('sec-ch-ua')) delete headers[key]
-    headers['User-Agent'] = FIREFOX_USER_AGENT
-    done({ requestHeaders: headers })
-  })
 }
 
-/** Crea (o restituisce) la vista Gmail di un account. */
-export function ensureView(id: string): WebContentsView {
+/** Crea (o restituisce) la vista Gmail di un account; `signIn` parte dalla pagina di accesso di Google. */
+export function ensureView(id: string, signIn = false): WebContentsView {
   const existing = views.get(id)
   if (existing) return existing
 
@@ -88,7 +79,6 @@ export function ensureView(id: string): WebContentsView {
   views.set(id, view)
 
   const wc = view.webContents
-  wc.setUserAgent(USER_AGENT)
 
   // finestre nuove (allegati, "apri in nuova finestra"): Google resta nell'app con la stessa sessione, il resto va nel browser
   wc.setWindowOpenHandler(({ url }) => {
@@ -108,7 +98,7 @@ export function ensureView(id: string): WebContentsView {
   wc.on('did-navigate-in-page', () => callbacks.onNavigate(id))
   wc.on('did-finish-load', () => callbacks.onLoaded(id))
 
-  wc.loadURL(GMAIL_URL)
+  wc.loadURL(signIn ? SIGN_IN_URL : GMAIL_URL)
   layout()
   return view
 }
