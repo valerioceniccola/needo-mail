@@ -74,20 +74,28 @@ jobs:
             echo "::error::MAC_CERT_P12_BASE64 non è un base64 valido: rifallo con  base64 -i Needo.p12 | pbcopy"
             exit 1
           fi
-          KC="$RUNNER_TEMP/check.keychain"
-          security create-keychain -p tmp "$KC"
-          security unlock-keychain -p tmp "$KC"
-          if ! security import "$RUNNER_TEMP/cert.p12" -k "$KC" -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign > /dev/null 2>&1; then
+          # portachiavi temporaneo con il certificato: electron-builder lo usa da qui (più affidabile di CSC_LINK)
+          KC="$RUNNER_TEMP/needo.keychain-db"
+          KP="$(uuidgen)"
+          security create-keychain -p "$KP" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KP" "$KC"
+          if ! security import "$RUNNER_TEMP/cert.p12" -k "$KC" -f pkcs12 -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild > /dev/null 2>&1; then
             echo "::error::Il file .p12 non si apre con MAC_CERT_PASSWORD: password sbagliata o file .p12 rovinato"
             exit 1
           fi
+          rm -f "$RUNNER_TEMP/cert.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KP" "$KC" > /dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
           IDS="$(security find-identity -v -p codesigning "$KC")"
-          if ! echo "$IDS" | grep -q "Developer ID Application"; then
+          NAME="$(echo "$IDS" | grep -o '"Developer ID Application: [^"]*"' | head -1 | tr -d '"')"
+          if [ -z "$NAME" ]; then
             echo "::error::Nel .p12 non c'è un certificato 'Developer ID Application' con la sua chiave privata. Trovato: $(echo "$IDS" | head -3 | tr '\n' ' ')"
             exit 1
           fi
-          echo "::notice::Certificato ok: $(echo "$IDS" | grep -o '"Developer ID Application[^"]*"' | head -1)"
-          security delete-keychain "$KC"; rm -f "$RUNNER_TEMP/cert.p12"
+          echo "::notice::Certificato ok: $NAME"
+          echo "CSC_NAME=${NAME#Developer ID Application: }" >> "$GITHUB_ENV"
+          echo "CSC_KEYCHAIN=$KC" >> "$GITHUB_ENV"
 
       - name: Build, firma, notarizzazione e pubblicazione
         run: |
@@ -101,8 +109,6 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
