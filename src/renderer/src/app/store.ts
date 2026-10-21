@@ -27,6 +27,7 @@ export const useStore = create<State>((set) => ({
   settingsOpen: false,
   settings: DEFAULT_SETTINGS,
   canLaunchAtLogin: false,
+  appVersion: '',
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   snapshot: null,

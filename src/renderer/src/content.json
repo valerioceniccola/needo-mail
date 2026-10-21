@@ -106,6 +106,7 @@
         "Gmail Hub parte da solo quando accedi"
       ]
     },
-    "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo"
+    "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo",
+    "version": "versione"
   }
 }
