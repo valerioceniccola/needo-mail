@@ -163,6 +163,7 @@ Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno do
 
 ## 7. Comandi
 
+- Comandi completi in `docs/DEVELOPMENT.md`. Il README è per chi scarica l'app: niente tecnicismi.
 - `npm run dev` — avvio in sviluppo con aggiornamento al volo
 - `npm run typecheck` — controllo dei tipi (main + renderer)
 - `npm test` — vitest
