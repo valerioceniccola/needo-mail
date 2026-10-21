@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { IPC, type AccountChanges, type Rect } from '@shared/api'
+import type { AppSettings } from '@shared/types'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 import * as state from './state'
 import * as views from './views'
@@ -10,6 +11,7 @@ import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } f
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
+import { initTray, updateTray } from './tray'
 
 // nome mostrato nel menu dell'app e nel Dock anche in sviluppo
 app.setName('Gmail Hub')
@@ -73,8 +75,17 @@ function showWindow() {
 
 /** Account la cui vista è a schermo: quello in aggiunta, altrimenti quello selezionato. */
 function visibleAccountId(): string | null {
-  const { adding, selectedId } = state.getState()
-  return adding ? adding.id : selectedId
+  const { adding, selectedId, settingsOpen } = state.getState()
+  if (adding) return adding.id
+  // con le Impostazioni generali aperte non si vede nessuna vista Gmail
+  return settingsOpen ? null : selectedId
+}
+
+/** Avvio all'accensione del Mac: solo nell'app installata (in sviluppo registrerebbe Electron). */
+function applyLaunchAtLogin() {
+  if (!app.isPackaged) return
+  const wanted = state.getState().settings.launchAtLogin
+  if (app.getLoginItemSettings().openAtLogin !== wanted) app.setLoginItemSettings({ openAtLogin: wanted })
 }
 
 // --- non letti -------------------------------------------------------------
@@ -136,6 +147,7 @@ function onLoaded(id: string) {
 
 function startAdd() {
   if (state.getState().adding) return
+  state.setSettingsOpen(false)
   const id = randomUUID()
   state.setAdding({ id, email: null })
   // sessione nuova e vuota: si parte dalla pagina di accesso di Google per Gmail
@@ -191,6 +203,12 @@ function registerIpc() {
   ipcMain.on(IPC.menu, (_e, id: string) => popupAccountMenu(win, id, removeAccount))
   ipcMain.on(IPC.resume, (_e, id: string) => state.resume(id))
   ipcMain.on(IPC.closeSettings, () => state.setEditing(null))
+  ipcMain.on(IPC.openSettingsPage, () => state.setSettingsOpen(true))
+  ipcMain.on(IPC.closeSettingsPage, () => state.setSettingsOpen(false))
+  ipcMain.on(IPC.setSetting, (_e, key: keyof AppSettings, value: boolean) => {
+    state.setSetting(key, value)
+    if (key === 'launchAtLogin') applyLaunchAtLogin()
+  })
   ipcMain.on(IPC.update, (_e, id: string, changes: AccountChanges) => state.updateAccount(id, changes))
   ipcMain.on(IPC.remove, (_e, id: string) => confirmRemove(win, id, removeAccount))
   ipcMain.on(IPC.startAdd, startAdd)
@@ -220,6 +238,8 @@ app.whenReady().then(() => {
     }
   })
   registerIpc()
+  initTray(showWindow)
+  applyLaunchAtLogin()
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche
   for (const account of state.getState().accounts) views.ensureView(account.id)
@@ -235,6 +255,7 @@ app.whenReady().then(() => {
     if (!win.isDestroyed()) win.webContents.send(IPC.state, state.getState())
     buildAppMenu(menuActions)
     refresh()
+    updateTray()
   }
   state.onChange(sync)
   sync()

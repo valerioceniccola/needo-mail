@@ -27,5 +27,27 @@ export type Account = {
   autoPause: { enabled: boolean; rules: PauseRule[] }
 }
 
+/** Impostazioni generali dell'app (icona dell'ingranaggio). */
+export type AppSettings = {
+  /** numero dei non letti sull'icona del Dock (solo account attivi) */
+  badge: boolean
+  /** notifiche delle email nuove */
+  notifications: boolean
+  /** una notifica di riepilogo quando un account torna attivo */
+  resumeSummary: boolean
+  /** icona nella barra dei menu con il totale e la pausa rapida */
+  menuBar: boolean
+  /** apri Gmail Hub all'accensione del Mac */
+  launchAtLogin: boolean
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  badge: true,
+  notifications: true,
+  resumeSummary: true,
+  menuBar: false,
+  launchAtLogin: false
+}
+
 /** Palette fissa dei colori degli account (dalla tela di design). */
 export const ACCOUNT_COLORS = ['#5E9CF2', '#F2994A', '#4CB782', '#B37FEB', '#E86C8E', '#4DB6C4', '#8A8B93'] as const

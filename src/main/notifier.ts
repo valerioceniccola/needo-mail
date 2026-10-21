@@ -74,6 +74,7 @@ export function handleInbox(accountId: string, entries: MailEntry[]) {
 
   const fresh = entries.filter((e) => !known.has(e.id))
   const account = findAccount(accountId)
+  if (!getState().settings.notifications) return
   if (!fresh.length || !account || isPaused(account, new Date())) return
 
   // tante email insieme (es. dopo il risveglio del Mac): una notifica sola
@@ -95,16 +96,16 @@ export function testNotification() {
 
 /** Da chiamare a ogni cambiamento di stato: aggiorna il badge e manda i riepiloghi di fine pausa. */
 export function refresh() {
-  const { accounts, unread } = getState()
+  const { accounts, unread, settings } = getState()
   const now = new Date()
 
   const count = badgeCount(accounts, unread, now)
-  app.dock?.setBadge(count > 0 ? String(count) : '')
+  app.dock?.setBadge(settings.badge && count > 0 ? String(count) : '')
 
   const current = pausedMap()
   for (const account of accounts) {
     const n = unread[account.id] ?? 0
-    if (lastPaused.get(account.id) && !current.get(account.id) && n > 0) {
+    if (settings.notifications && settings.resumeSummary && lastPaused.get(account.id) && !current.get(account.id) && n > 0) {
       notify(account.id, `${account.label} è di nuovo attivo`, n === 1 ? '1 non letto arrivato durante la pausa' : `${n} non letti arrivati durante la pausa`)
     }
   }

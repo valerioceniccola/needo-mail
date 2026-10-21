@@ -1,4 +1,4 @@
-import type { Account } from './types'
+import type { Account, AppSettings } from './types'
 
 /** Campi dell'account modificabili dalle Impostazioni. */
 export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'>
@@ -17,6 +17,11 @@ export type AppState = {
   avatarPending: string[]
   /** account con la finestra Impostazioni aperta */
   editingId: string | null
+  /** pagina delle Impostazioni generali aperta al posto di Gmail */
+  settingsOpen: boolean
+  settings: AppSettings
+  /** l'avvio al login si può impostare solo nell'app installata, non in sviluppo */
+  canLaunchAtLogin: boolean
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 
@@ -29,6 +34,9 @@ export type GmailHubApi = {
   openAccountMenu: (id: string) => void
   resume: (id: string) => void
   closeSettings: () => void
+  openSettingsPage: () => void
+  closeSettingsPage: () => void
+  setSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void
   updateAccount: (id: string, changes: AccountChanges) => void
   removeAccount: (id: string) => void
   startAdd: () => void
@@ -51,6 +59,9 @@ export const IPC = {
   menu: 'account:menu',
   resume: 'account:resume',
   closeSettings: 'settings:close',
+  openSettingsPage: 'settings-page:open',
+  closeSettingsPage: 'settings-page:close',
+  setSetting: 'settings:set',
   update: 'account:update',
   remove: 'account:remove',
   startAdd: 'add:start',

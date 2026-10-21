@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { AppState } from '@shared/api'
+import { DEFAULT_SETTINGS } from '@shared/types'
 
 /*
   Copia locale dello stato che arriva dal processo principale.
@@ -23,6 +24,9 @@ export const useStore = create<State>((set) => ({
   adding: null,
   avatarPending: [],
   editingId: null,
+  settingsOpen: false,
+  settings: DEFAULT_SETTINGS,
+  canLaunchAtLogin: false,
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   snapshot: null,
