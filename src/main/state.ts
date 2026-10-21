@@ -118,6 +118,7 @@ export function updateAccount(id: string, changes: AccountChanges) {
   patch(id, {
     ...(label ? { label } : {}),
     color: changes.color,
+    badge: changes.badge !== false,
     autoPause: { enabled: changes.autoPause.enabled && rules.length > 0, rules }
   })
   state.editingId = null

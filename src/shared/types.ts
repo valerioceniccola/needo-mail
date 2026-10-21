@@ -23,6 +23,8 @@ export type Account = {
   color: string
   /** foto del profilo Google come data URL, letta dalla pagina di Gmail */
   avatar?: string
+  /** conta nel badge del Dock (assente = sì, per gli account salvati prima di questa opzione) */
+  badge?: boolean
   override: Override
   autoPause: { enabled: boolean; rules: PauseRule[] }
 }
@@ -33,10 +35,6 @@ export type AppSettings = {
   badge: boolean
   /** notifiche delle email nuove */
   notifications: boolean
-  /** una notifica di riepilogo quando un account torna attivo */
-  resumeSummary: boolean
-  /** icona nella barra dei menu con il totale e la pausa rapida */
-  menuBar: boolean
   /** apri Gmail Hub all'accensione del Mac */
   launchAtLogin: boolean
 }
@@ -44,8 +42,6 @@ export type AppSettings = {
 export const DEFAULT_SETTINGS: AppSettings = {
   badge: true,
   notifications: true,
-  resumeSummary: true,
-  menuBar: false,
   launchAtLogin: false
 }
 

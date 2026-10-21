@@ -1,7 +1,7 @@
 import type { Account, AppSettings } from './types'
 
 /** Campi dell'account modificabili dalle Impostazioni. */
-export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'>
+export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'> & { badge: boolean }
 
 /** Rettangolo in pixel della finestra (coordinate CSS dell'interfaccia). */
 export type Rect = { x: number; y: number; width: number; height: number }

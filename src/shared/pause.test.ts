@@ -93,4 +93,9 @@ describe('badgeCount', () => {
     expect(badgeCount([personal, work, news], unread, at(20, '10:30'))).toBe(15)
     expect(badgeCount([personal, work, news], unread, at(24, '12:00'))).toBe(3)
   })
+
+  it('salta gli account con il badge spento, anche se attivi', () => {
+    const personal: Account = { ...work, id: 'personal', badge: false, autoPause: { enabled: false, rules: [] } }
+    expect(badgeCount([personal, work], { personal: 3, work: 12 }, at(20, '10:30'))).toBe(12)
+  })
 })

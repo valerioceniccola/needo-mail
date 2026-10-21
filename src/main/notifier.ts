@@ -8,7 +8,7 @@ import type { MailEntry } from './unread'
   Notifiche e badge. Regola: un account in pausa non notifica e non conta nel badge.
   Le notifiche nascono dal feed della posta (email nuove rispetto all'ultimo controllo),
   non dalle notifiche desktop di Gmail, così funzionano senza toccare le impostazioni di Gmail.
-  Quando un account torna attivo arriva un solo riepilogo invece delle notifiche arretrate.
+  Le email arrivate durante una pausa non vengono notificate nemmeno dopo: restano solo nei non letti.
 */
 
 type Handlers = {
@@ -18,19 +18,11 @@ type Handlers = {
 }
 
 let handlers: Handlers
-// stato di pausa all'ultimo controllo, per accorgersi di quando un account torna attivo
-let lastPaused = new Map<string, boolean>()
 // email già viste per account: la prima lettura dopo l'avvio non notifica nulla
 const seen = new Map<string, Set<string>>()
 
 export function initNotifier(h: Handlers) {
   handlers = h
-  lastPaused = pausedMap()
-}
-
-function pausedMap() {
-  const now = new Date()
-  return new Map(getState().accounts.map((a) => [a.id, isPaused(a, now)]))
 }
 
 function open(accountId: string, link?: string) {
@@ -94,20 +86,9 @@ export function testNotification() {
   new Notification({ title: 'Gmail Hub', body: 'Le notifiche funzionano.' }).show()
 }
 
-/** Da chiamare a ogni cambiamento di stato: aggiorna il badge e manda i riepiloghi di fine pausa. */
+/** Da chiamare a ogni cambiamento di stato: aggiorna il badge sul Dock. */
 export function refresh() {
   const { accounts, unread, settings } = getState()
-  const now = new Date()
-
-  const count = badgeCount(accounts, unread, now)
+  const count = badgeCount(accounts, unread, new Date())
   app.dock?.setBadge(settings.badge && count > 0 ? String(count) : '')
-
-  const current = pausedMap()
-  for (const account of accounts) {
-    const n = unread[account.id] ?? 0
-    if (settings.notifications && settings.resumeSummary && lastPaused.get(account.id) && !current.get(account.id) && n > 0) {
-      notify(account.id, `${account.label} è di nuovo attivo`, n === 1 ? '1 non letto arrivato durante la pausa' : `${n} non letti arrivati durante la pausa`)
-    }
-  }
-  lastPaused = current
 }
