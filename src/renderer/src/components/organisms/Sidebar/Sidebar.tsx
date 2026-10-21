@@ -1,6 +1,7 @@
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { Mail, Settings } from 'lucide-react'
+import { Settings } from 'lucide-react'
+import appIcon from '@/assets/app-icon.png'
 import { isPaused } from '@shared/pause'
 import { useStore } from '@/app/store'
 import AccountRow from '@/components/molecules/AccountRow/AccountRow'
@@ -23,9 +24,7 @@ export default function Sidebar() {
       <div className="app-drag h-11 shrink-0" />
 
       <div className="app-drag mb-[18px] flex h-[30px] items-center gap-2 px-1.5">
-        <span className="flex size-5 items-center justify-center rounded-[5px] bg-primary">
-          <Mail className="size-3 text-white" strokeWidth={2.4} aria-hidden="true" />
-        </span>
+        <img src={appIcon} alt="" className="size-5" draggable={false} />
         <strong className="text-sm font-semibold">{content.appName}</strong>
       </div>
 

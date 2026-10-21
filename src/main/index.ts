@@ -43,6 +43,9 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
+  // in sviluppo il Dock mostrerebbe l'icona di Electron; nell'app impacchettata usa build/icon.icns
+  if (!app.isPackaged) app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
+
   createWindow()
 
   // su macOS cliccando l'icona nel Dock si riapre la finestra se era chiusa
