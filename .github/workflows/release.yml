@@ -1,18 +1,44 @@
 # Rilascio di una nuova versione di Needo.
-# Parte quando arriva un tag "v…" (es. v0.2.0): costruisce l'app su un Mac di GitHub (chip Apple),
-# la firma col certificato Developer ID, la notarizza e la pubblica nelle Release.
+# Parte a ogni push su main (e a mano da Actions › Release › Run workflow): se la versione in package.json
+# non ha ancora una Release, costruisce l'app su un Mac di GitHub (chip Apple), la firma col certificato
+# Developer ID, la notarizza e la pubblica come Release "vX.Y.Z" (l'etichetta la crea GitHub).
 # Le app installate la vedono da sole (electron-updater). Configurazione dei segreti: docs/RELEASING.md
 name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
+  # controllo veloce su Linux: c'è già una Release per questa versione?
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      release: ${{ steps.v.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "La versione $VERSION è già uscita: niente da fare."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Versione nuova: $VERSION"
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
   release:
+    needs: check
+    if: needs.check.outputs.release == 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,16 +49,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      # il tag e la versione in package.json devono coincidere, altrimenti gli aggiornamenti si confondono
-      - name: Controllo versione
-        run: |
-          VERSION="v$(node -p "require('./package.json').version")"
-          if [ "$VERSION" != "$GITHUB_REF_NAME" ]; then
-            echo "Il tag $GITHUB_REF_NAME non corrisponde a package.json ($VERSION)"
-            exit 1
-          fi
-
       - run: npm run typecheck
       - run: npm test
       - run: npx electron-vite build

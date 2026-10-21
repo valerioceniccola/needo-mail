@@ -5,15 +5,10 @@ Le versioni escono come **Release** di questa repository. Le app installate cont
 ## Rilascio (ogni volta)
 
 1. Alza la versione in `package.json` (es. `0.1.0` → `0.2.0`) e scrivi le novità in `CHANGELOG.md`.
-2. Commit e tag con la stessa versione, preceduta da `v`:
-   ```bash
-   git commit -am "Needo 0.2.0"
-   git tag v0.2.0
-   git push && git push --tags
-   ```
-3. GitHub Actions (scheda **Actions**, workflow *Release*) costruisce, firma, notarizza e pubblica. Ci mette circa 10–15 minuti.
+2. Commit e push su `main`.
+3. GitHub Actions (scheda **Actions**, workflow *Release*) vede che la versione `0.2.0` non ha ancora una Release: costruisce, firma, notarizza e pubblica la Release `v0.2.0` (l'etichetta la crea da sola). Ci mette circa 10–15 minuti. I push che non cambiano versione non rilasciano nulla.
 
-In alternativa basta chiedere a Claude "rilascia la 0.2.0": fa lui i passi 1 e 2.
+In alternativa basta chiedere a Claude "rilascia la 0.2.0": fa lui i passi 1 e 2. Per rilanciare a mano: Actions › Release › **Run workflow**.
 
 ## Configurazione iniziale (una volta sola)
 
