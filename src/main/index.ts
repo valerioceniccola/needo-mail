@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { app, BrowserWindow, shell } from 'electron'
+import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 
 // nome mostrato nel menu dell'app e nel Dock anche in sviluppo
 app.setName('Gmail Hub')
@@ -7,8 +8,7 @@ app.setName('Gmail Hub')
 /** Crea la finestra principale: barra del titolo nascosta, semafori dentro la barra laterale. */
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    ...savedBounds(),
     minWidth: 900,
     minHeight: 600,
     show: false,
@@ -25,7 +25,11 @@ function createWindow(): BrowserWindow {
   })
 
   // si mostra solo a contenuto pronto, così non si vede il flash bianco
-  win.once('ready-to-show', () => win.show())
+  win.once('ready-to-show', () => {
+    if (wasMaximized()) win.maximize()
+    win.show()
+  })
+  trackWindowState(win)
 
   // i link esterni dell'interfaccia vanno nel browser predefinito
   win.webContents.setWindowOpenHandler(({ url }) => {

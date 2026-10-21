@@ -58,7 +58,7 @@ Base: lo stack personale "Nebula" di Valerio, adattato a Electron.
 | Stato interfaccia | **zustand** | Base Nebula |
 | Drag and drop | **@dnd-kit/core** + **@dnd-kit/sortable** | Riordino della lista account |
 | Date e orari | **dayjs** (locale italiano) | Calcolo delle fasce di pausa |
-| Dati salvati | **electron-store** | Account, ordine, fasce, preferenze in un JSON locale |
+| Dati salvati | file JSON in `userData` (`src/main/store.ts`) | Account, ordine, fasce, preferenze, finestra. Niente electron-store: dalla v10 è solo ESM e il processo principale è CommonJS |
 | Test | **vitest** | Solo la logica importante: motore delle pause, calcolo del badge |
 | Pacchetto | **electron-builder** | .dmg firmato e notarizzato con l'account Apple Developer di Valerio |
 
@@ -83,7 +83,8 @@ Processo principale (Node)
 ├── UnreadTracker     legge i non letti dal titolo della pagina Gmail ("Posta in arrivo (12)") via 'page-title-updated'
 ├── Notifier          notifiche native; tace per gli account in pausa; riepilogo al rientro
 ├── Badge             app.dock.setBadge() con la somma degli account attivi
-└── Store             electron-store
+├── Store             JSON in ~/Library/Application Support/Gmail Hub/ (store.ts)
+└── WindowState       ricorda posizione e dimensioni della finestra (windowState.ts)
 
 Preload Gmail (iniettato in ogni vista Gmail)
 └── intercetta window.Notification di Gmail e la inoltra al processo principale (che decide se mostrarla)
