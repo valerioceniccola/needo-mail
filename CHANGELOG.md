@@ -1,5 +1,12 @@
 # Novità di Needo
 
+## 0.1.6
+
+- Stato delle notifiche di macOS letto in modo ufficiale (prima risultava "Non rilevabile")
+- Testi con i nomi di macOS 26: stile avvisi Temporanei / Permanenti
+- Le versioni nuove compaiono solo quando sono complete: niente più errore su latest-mac.yml in "Controlla aggiornamenti"
+- Messaggio più chiaro se il controllo degli aggiornamenti non riesce
+
 ## 0.1.5
 
 - Aprendo le Impostazioni non si intravede più la schermata di caricamento di Gmail
