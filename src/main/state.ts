@@ -145,9 +145,16 @@ export function removeAccount(id: string) {
   commit()
 }
 
+/** Foto letta da Google: non tocca una foto caricata a mano. */
 export function setAvatar(id: string, avatar: string) {
-  if (findAccount(id)?.avatar === avatar) return
+  const account = findAccount(id)
+  if (!account || account.avatarCustom || account.avatar === avatar) return
   patch(id, { avatar })
+}
+
+/** Foto scelta a mano (data URL) o, con null, ritorno a quella di Google. */
+export function setCustomAvatar(id: string, avatar: string | null) {
+  patch(id, avatar ? { avatar, avatarCustom: true } : { avatar: undefined, avatarCustom: false })
 }
 
 /** Foto profilo in caricamento: l'interfaccia mostra un loader al posto delle iniziali. */

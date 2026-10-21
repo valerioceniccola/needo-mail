@@ -23,6 +23,8 @@ export type Account = {
   color: string
   /** foto del profilo Google come data URL, letta dalla pagina di Gmail */
   avatar?: string
+  /** foto caricata a mano dalle Impostazioni dell'account: quella di Google non la sostituisce più */
+  avatarCustom?: boolean
   /** conta nel badge del Dock (assente = sì, per gli account salvati prima di questa opzione) */
   badge?: boolean
   override: Override

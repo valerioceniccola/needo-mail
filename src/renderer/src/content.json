@@ -42,7 +42,7 @@
     "confirm": "Aggiungi"
   },
   "settings": {
-    "description": "Etichetta, colore e pausa automatica di questo account.",
+    "description": "Foto, etichetta, colore e pausa automatica di questo account.",
     "close": "Chiudi",
     "autoPause": "Pausa automatica",
     "autoPauseHint": "Nelle fasce scelte l'account va in pausa da solo: niente notifiche e non conta nel badge.",
@@ -80,7 +80,11 @@
     "nowPaused": "Adesso in pausa · torna attivo",
     "alwaysPaused": "In pausa per tutta la settimana",
     "badge": "Conta nel badge del Dock",
-    "badgeHint": "I non letti di questo account si sommano al numero sull'icona dell'app."
+    "badgeHint": "I non letti di questo account si sommano al numero sull'icona dell'app.",
+    "photo": "Foto",
+    "photoUpload": "Carica foto…",
+    "photoGoogle": "Usa quella di Google",
+    "photoHint": "Di solito è la foto del profilo Google."
   },
   "general": {
     "accounts": "Account",

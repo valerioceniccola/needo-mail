@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
+import Avatar from '@/components/atoms/Avatar/Avatar'
 import ColorDot from '@/components/atoms/ColorDot/ColorDot'
 import PauseRuleEditor from '@/components/molecules/PauseRuleEditor/PauseRuleEditor'
 import content from '@/content.json'
@@ -19,9 +20,10 @@ type Props = {
 
 const NEW_RULE: PauseRule = { days: [0, 1, 2, 3, 4], allDay: false, from: '19:00', to: '09:00' }
 
-/** Impostazioni di un account: etichetta, colore, pausa automatica, rimozione. */
+/** Impostazioni di un account: foto, etichetta, colore, pausa automatica, rimozione. */
 export default function AccountSettingsDialog({ account }: Props) {
   const now = useStore((s) => s.now)
+  const avatarLoading = useStore((s) => s.avatarPending.includes(account.id))
   const [label, setLabel] = useState(account.label)
   const [color, setColor] = useState(account.color)
   const [badge, setBadge] = useState(account.badge !== false)
@@ -64,6 +66,21 @@ export default function AccountSettingsDialog({ account }: Props) {
             if (!invalid) save()
           }}
         >
+          <div className="flex items-center gap-3">
+            <span className="w-[110px] text-muted-foreground">{content.settings.photo}</span>
+            {/* l'anteprima usa etichetta e colore non ancora salvati, la foto è già quella applicata */}
+            <span className="pl-1">
+              <Avatar account={{ ...account, label: label.trim() || account.label, color }} loading={avatarLoading} />
+            </span>
+            <Button type="button" variant="outline" size="sm" className="ml-2" onClick={() => api.chooseAvatar(account.id)}>
+              {content.settings.photoUpload}
+            </Button>
+            {account.avatarCustom && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => api.resetAvatar(account.id)}>
+                {content.settings.photoGoogle}
+              </Button>
+            )}
+          </div>
           <label className="flex items-center gap-3">
             <span className="w-[110px] text-muted-foreground">{content.add.label}</span>
             <input

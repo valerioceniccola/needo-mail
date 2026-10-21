@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.1.2
+
+- Account Google Workspace (aziendali): niente più selettore di account in alto a destra e foto profilo letta correttamente
+- Foto dell'account caricabile a mano: tasto destro › Impostazioni… › Carica foto…
+
 ## 0.1.1
 
 - Icona nuova nel formato di macOS 26: niente più cornice chiara attorno

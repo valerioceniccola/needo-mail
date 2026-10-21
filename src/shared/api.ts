@@ -55,6 +55,10 @@ export type GmailHubApi = {
   setSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void
   updateAccount: (id: string, changes: AccountChanges) => void
   removeAccount: (id: string) => void
+  /** sceglie un'immagine dal Mac e la usa come foto dell'account */
+  chooseAvatar: (id: string) => void
+  /** torna alla foto del profilo Google */
+  resetAvatar: (id: string) => void
   startAdd: () => void
   cancelAdd: () => void
   confirmAdd: (label: string, color: string) => void
@@ -82,6 +86,8 @@ export const IPC = {
   installUpdate: 'update:install',
   update: 'account:update',
   remove: 'account:remove',
+  chooseAvatar: 'account:avatar-choose',
+  resetAvatar: 'account:avatar-reset',
   startAdd: 'add:start',
   cancelAdd: 'add:cancel',
   confirmAdd: 'add:confirm',

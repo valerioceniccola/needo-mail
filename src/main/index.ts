@@ -2,7 +2,7 @@
 import './migrate'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { IPC, type AccountChanges, type Rect } from '@shared/api'
 import type { AppSettings } from '@shared/types'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
@@ -11,7 +11,7 @@ import * as views from './views'
 import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
 import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } from './notifier'
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
-import { readAvatar } from './avatar'
+import { avatarFromFile, readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
 import { checkForUpdates, initUpdater, quitAndInstall } from './updater'
 
@@ -131,7 +131,8 @@ function onNavigate(id: string) {
 function refreshAvatar(id: string, attempt = 0) {
   if (attempt === 0) state.setAvatarPending(id, true)
   setTimeout(async () => {
-    if (!state.findAccount(id)) return state.setAvatarPending(id, false)
+    const account = state.findAccount(id)
+    if (!account || account.avatarCustom) return state.setAvatarPending(id, false)
     const avatar = await readAvatar(id)
     if (avatar) state.setAvatar(id, avatar)
     if (avatar || attempt >= 4) state.setAvatarPending(id, false)
@@ -177,6 +178,23 @@ function confirmAdd(label: string, color: string) {
   refreshAvatar(adding.id)
 }
 
+async function chooseAvatar(id: string) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    title: 'Scegli una foto',
+    properties: ['openFile'],
+    filters: [{ name: 'Immagini', extensions: ['png', 'jpg', 'jpeg', 'heic', 'webp', 'gif', 'tiff'] }]
+  })
+  if (canceled || !filePaths[0]) return
+  const avatar = avatarFromFile(filePaths[0])
+  if (avatar) state.setCustomAvatar(id, avatar)
+  else dialog.showMessageBox(win, { type: 'warning', message: 'Immagine non leggibile', detail: 'Prova con un file PNG o JPG.' })
+}
+
+function resetAvatar(id: string) {
+  state.setCustomAvatar(id, null)
+  refreshAvatar(id)
+}
+
 async function removeAccount(id: string) {
   state.removeAccount(id)
   forgetAccount(id)
@@ -213,6 +231,8 @@ function registerIpc() {
     if (key === 'launchAtLogin') applyLaunchAtLogin()
   })
   ipcMain.on(IPC.update, (_e, id: string, changes: AccountChanges) => state.updateAccount(id, changes))
+  ipcMain.on(IPC.chooseAvatar, (_e, id: string) => chooseAvatar(id))
+  ipcMain.on(IPC.resetAvatar, (_e, id: string) => resetAvatar(id))
   ipcMain.on(IPC.remove, (_e, id: string) => confirmRemove(win, id, removeAccount))
   ipcMain.on(IPC.startAdd, startAdd)
   ipcMain.on(IPC.cancelAdd, cancelAdd)
