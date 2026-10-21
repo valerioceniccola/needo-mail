@@ -1,6 +1,10 @@
-# Gmail Hub
+# Needo
 
-App per macOS che raccoglie più account Gmail in una finestra, con pausa per account (manuale o programmata) e badge sul Dock che conta solo gli account attivi. Uso personale.
+App per macOS che raccoglie più account Gmail in una finestra, con pausa per account (manuale o programmata) e badge sul Dock che conta solo gli account attivi. Un contenitore leggero e nativo intorno a Gmail originale: nessuna API, nessun server, niente esce dal Mac se non verso Google.
+
+**Installazione:** scarica `Needo-x.y.z.dmg` dalle [Releases](https://github.com/valerioceniccola/needo-mail/releases) e trascinalo in Applicazioni (Mac con chip Apple). Gli aggiornamenti arrivano da soli.
+
+Needo non è affiliato a Google; Gmail è un marchio di Google LLC.
 
 Requisiti, regole, stack e architettura: [AGENTS.md](AGENTS.md).
 
@@ -21,6 +25,7 @@ npm run dev
 | `npm run typecheck` | controllo dei tipi |
 | `npm test` | test del motore delle pause e del badge |
 | `npm run build:mac:local` | .dmg firmato col tuo certificato ma non notarizzato: basta per usarla sul tuo Mac |
+| `npm run release` | build firmata e notarizzata pubblicata nelle Release (di solito lo fa GitHub Actions: [docs/RELEASING.md](docs/RELEASING.md)) |
 | `npm run build:mac` | .dmg firmato e notarizzato (serve il certificato Developer ID nel Portachiavi e le variabili `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`) |
 
 ## Stato

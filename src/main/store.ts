@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path'
 import { app } from 'electron'
 
 /**
- * Archivio locale minimo: un file JSON in ~/Library/Application Support/Gmail Hub/.
+ * Archivio locale minimo: un file JSON in ~/Library/Application Support/Needo/.
  * Al posto di electron-store, che dalla v10 è solo ESM mentre il nostro processo principale è CommonJS.
  */
 export function createStore<T extends object>(name: string, defaults: T) {

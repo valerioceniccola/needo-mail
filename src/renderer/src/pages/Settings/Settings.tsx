@@ -3,6 +3,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, MoreHorizontal, Plus } from 'lucide-react'
 import type { Account, AppSettings } from '@shared/types'
+import type { UpdateStatus } from '@shared/api'
 import { isPaused } from '@shared/pause'
 import { api, useStore } from '@/app/store'
 import { cn } from '@/lib/utils'
@@ -15,7 +16,7 @@ const TOGGLES: (keyof AppSettings)[] = ['badge', 'notifications', 'launchAtLogin
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
 export default function Settings() {
-  const { accounts, settings, canLaunchAtLogin, appVersion, now } = useStore()
+  const { accounts, settings, canLaunchAtLogin, appVersion, update, now } = useStore()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
@@ -64,12 +65,46 @@ export default function Settings() {
           })}
         </div>
 
-        <p className="mt-6 text-center text-xs text-subtle">
-          {content.appName} · {content.general.version} {appVersion}
-        </p>
+        <div className="mt-6 flex flex-col items-center gap-2 text-xs text-subtle">
+          <span>
+            {content.appName} · {content.general.version} {appVersion}
+            {updateText(update) && <> · {updateText(update)}</>}
+          </span>
+          {update.state === 'ready' ? (
+            <Button size="sm" onClick={api.installUpdate}>
+              {content.updates.restart}
+            </Button>
+          ) : (
+            update.state !== 'dev' && (
+              <Button variant="outline" size="sm" disabled={update.state === 'checking' || update.state === 'downloading'} onClick={api.checkForUpdates}>
+                {content.updates.check}
+              </Button>
+            )
+          )}
+        </div>
       </div>
     </main>
   )
+}
+
+/** Riga di stato degli aggiornamenti sotto la versione. */
+function updateText(update: UpdateStatus): string {
+  switch (update.state) {
+    case 'checking':
+      return content.updates.checking
+    case 'latest':
+      return content.updates.latest
+    case 'available':
+      return `${content.updates.available} ${update.version}`
+    case 'downloading':
+      return `${content.updates.downloading} ${update.percent}%`
+    case 'ready':
+      return `${update.version} ${content.updates.ready}`
+    case 'error':
+      return content.updates.error
+    default:
+      return ''
+  }
 }
 
 type ItemProps = {

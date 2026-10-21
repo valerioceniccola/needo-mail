@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Token della tela "Gmail Hub · stile Linear".
+  Token della tela "Gmail Hub · stile Linear" (nome di lavoro precedente di Needo).
   Nomi alla shadcn, così i componenti generati con `npx shadcn add` li usano da soli.
   L'app è solo scura: Gmail dentro resta del suo colore.
 */
