@@ -1,3 +1,6 @@
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { app, Notification } from 'electron'
 import { badgeCount } from '@shared/badge'
 import { isPaused } from '@shared/pause'
@@ -25,6 +28,36 @@ export function initNotifier(h: Handlers) {
   handlers = h
 }
 
+/*
+  Suono delle notifiche: quello di Mail ("Nuova email"), che sta dentro Mail.app su ogni Mac.
+  macOS suona per le notifiche solo i file nell'app o nelle cartelle Sounds, quindi lo copiamo una volta
+  in ~/Library/Sounds e lo usiamo per nome. Così è macOS a suonarlo: rispetta Full immersion / Non disturbare
+  e l'interruttore "Riproduci suono" nelle impostazioni delle notifiche. Se Mail non c'è, il suono "Glass".
+*/
+const MAIL_SOUND_FILES = ['/System/Applications/Mail.app/Contents/Resources/New Mail.aiff', '/Applications/Mail.app/Contents/Resources/New Mail.aiff']
+const SOUND_NAME = 'Needo Nuova email'
+let sound: string | undefined
+
+function notificationSound(): string {
+  if (sound) return sound
+  sound = 'Glass'
+  try {
+    const dir = join(homedir(), 'Library', 'Sounds')
+    const target = join(dir, `${SOUND_NAME}.aiff`)
+    if (!existsSync(target)) {
+      const source = MAIL_SOUND_FILES.find((f) => existsSync(f))
+      if (source) {
+        mkdirSync(dir, { recursive: true })
+        copyFileSync(source, target)
+      }
+    }
+    if (existsSync(target)) sound = SOUND_NAME
+  } catch {
+    // resta Glass
+  }
+  return sound
+}
+
 function open(accountId: string, link?: string) {
   select(accountId)
   handlers.showWindow()
@@ -32,7 +65,7 @@ function open(accountId: string, link?: string) {
 }
 
 function notify(accountId: string, title: string, body: string, link?: string) {
-  const n = new Notification({ title, body })
+  const n = new Notification({ title, body, sound: notificationSound() })
   n.on('click', () => open(accountId, link))
   n.show()
 }
@@ -47,7 +80,8 @@ function notifyMail(accountId: string, label: string, mail: MailEntry) {
     title: `${label} · ${mail.author || 'Nuova email'}`,
     body: mail.subject,
     actions: mail.link ? [{ type: 'button', text: 'Elimina' }, { type: 'button', text: 'Apri' }] : [],
-    closeButtonText: 'Chiudi'
+    closeButtonText: 'Chiudi',
+    sound: notificationSound()
   })
   n.on('click', () => open(accountId, mail.link || undefined))
   n.on('action', async (event) => {
@@ -83,7 +117,7 @@ export function forgetAccount(accountId: string) {
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */
 export function testNotification() {
-  new Notification({ title: 'Needo', body: 'Le notifiche funzionano.' }).show()
+  new Notification({ title: 'Needo', body: 'Le notifiche funzionano.', sound: notificationSound() }).show()
 }
 
 /** Da chiamare a ogni cambiamento di stato: aggiorna il badge sul Dock. */
