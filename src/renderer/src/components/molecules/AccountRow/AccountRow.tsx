@@ -21,9 +21,9 @@ export default function AccountRow({ account, index, unread, paused, loading, se
   const shortcut = index < 9 ? ` · ⌘${index + 1}` : ''
 
   return (
-    <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn('relative flex h-11 items-center justify-center', isDragging && 'z-10')}>
+    <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn('relative flex h-12 items-center justify-center', isDragging && 'z-10')}>
       {/* barretta dell'account aperto, come in Slack */}
-      {selected && <span aria-hidden="true" className="absolute top-2.5 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />}
+      {selected && <span aria-hidden="true" className="absolute top-3 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />}
 
       <button
         type="button"
@@ -44,7 +44,7 @@ export default function AccountRow({ account, index, unread, paused, loading, se
       </button>
 
       {!paused && unread > 0 && (
-        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-[54px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d93f45] px-[5px] text-[11px] font-semibold text-white shadow-[0_0_0_2px_var(--sidebar)]">
+        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-[60px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d93f45] px-[5px] text-[11px] font-semibold text-white shadow-[0_0_0_2px_var(--sidebar)]">
           {unread > 99 ? '99+' : unread}
         </span>
       )}

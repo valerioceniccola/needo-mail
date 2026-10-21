@@ -14,7 +14,7 @@ type Props = {
 export default function Avatar({ account, selected = false, paused = false, loading = false }: Props) {
   return (
     <span
-      className={cn('relative flex size-10 items-center justify-center overflow-hidden rounded-full text-[13px] font-semibold text-white', paused && 'opacity-55 grayscale')}
+      className={cn('relative flex size-11 items-center justify-center overflow-hidden rounded-full text-sm font-semibold text-white', paused && 'opacity-55 grayscale')}
       // bordo nel colore dell'account staccato di 2px; più spesso sull'account aperto
       style={{ background: account.color, boxShadow: `0 0 0 2px var(--sidebar), 0 0 0 ${selected ? 4.5 : 3.5}px ${account.color}` }}
     >

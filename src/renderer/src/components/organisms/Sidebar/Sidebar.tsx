@@ -18,13 +18,13 @@ export default function Sidebar() {
   }
 
   return (
-    <nav aria-label={content.sidebar.accounts} className="flex w-[92px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
+    <nav aria-label={content.sidebar.accounts} className="flex w-[100px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
       {/* riga dei semafori: da qui si trascina la finestra */}
       <div className="app-drag h-11 w-full shrink-0" />
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={accounts.map((a) => a.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex w-full flex-col gap-3 pt-2.5">
+          <div className="flex w-full flex-col gap-4 pt-2.5">
             {accounts.map((account, index) => (
               <AccountRow
                 key={account.id}
@@ -44,9 +44,9 @@ export default function Sidebar() {
 
       {/* account in fase di aggiunta: segnaposto tratteggiato */}
       {adding && (
-        <div aria-current="page" className="relative mt-3 flex h-11 w-full items-center justify-center" title={content.sidebar.newAccount}>
-          <span aria-hidden="true" className="absolute top-2.5 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />
-          <span className="size-10 rounded-full border border-dashed border-subtle" />
+        <div aria-current="page" className="relative mt-4 flex h-12 w-full items-center justify-center" title={content.sidebar.newAccount}>
+          <span aria-hidden="true" className="absolute top-3 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />
+          <span className="size-11 rounded-full border border-dashed border-subtle" />
         </div>
       )}
 

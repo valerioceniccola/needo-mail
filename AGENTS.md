@@ -15,7 +15,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 - Si aggiunge dal + in fondo alla colonna laterale, da File › Aggiungi account… o dalla schermata di benvenuto (primo avvio).
 
 ### Barra laterale
-- **Colonna minimale** larga 92 px, stile Slack: in alto i semafori, poi **un avatar per account** (foto profilo Google letta dalla pagina di Gmail; mentre si legge un loader, se non arriva le iniziali sul colore dell'account). Niente nome dell'app, niente etichette: nome e colore stanno nell'intestazione.
+- **Colonna minimale** larga 100 px (avatar da 44 px, 16 px tra uno e l'altro), stile Slack: in alto i semafori, poi **un avatar per account** (foto profilo Google letta dalla pagina di Gmail; mentre si legge un loader, se non arriva le iniziali sul colore dell'account). Niente nome dell'app, niente etichette: nome e colore stanno nell'intestazione.
 - Avatar: bordo sottile nel colore dell'account; quello aperto ha una barretta bianca a sinistra e il bordo più spesso; non letti in un pallino rosso (oltre 99: "99+").
 - **Una sola lista**, nessuna sezione "Attivi / In pausa". Un account in pausa resta al suo posto: avatar grigio e trasparente, icona di pausa sopra, nessun numero.
 - Passando col mouse: suggerimento nativo (`title`) con etichetta e scorciatoia, es. "Lavoro · ⌘2" (un tooltip HTML finirebbe sotto la vista Gmail).
