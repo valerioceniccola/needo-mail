@@ -9,6 +9,7 @@ import content from '@/content.json'
 export default function GmailFrame() {
   const ref = useRef<HTMLDivElement>(null)
   const snapshot = useStore((s) => s.snapshot)
+  const covered = useStore((s) => s.covered)
 
   useLayoutEffect(() => {
     const el = ref.current
@@ -32,7 +33,8 @@ export default function GmailFrame() {
   return (
     <div className="flex min-h-0 flex-1 pr-2 pb-2">
       <div ref={ref} className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[10px] bg-[#bbd5ec] text-[#444746] shadow-[0_0_0_1px_#26262b]">
-        {content.gmail.loading}
+        {/* sotto un dialog niente "Caricamento…": o l'istantanea, o il riquadro vuoto sfocato */}
+        {!covered && content.gmail.loading}
         {snapshot && <img src={snapshot} alt="" draggable={false} className="absolute inset-0 size-full object-cover object-top-left" />}
       </div>
     </div>
