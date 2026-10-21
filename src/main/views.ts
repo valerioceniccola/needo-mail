@@ -25,6 +25,8 @@ type Callbacks = {
 }
 
 const views = new Map<string, WebContentsView>()
+// viste pronte da mostrare: finché Gmail carica resta nascosta e sotto si vede la rotellina dell'interfaccia
+const ready = new Set<string>()
 
 // Gmail ha il suo selettore di account (foto in alto a destra): qui ogni account ha già la sua vista,
 // quindi lo togliamo per non avere due modi di cambiare account. Si nasconde il contenitore del pulsante
@@ -87,7 +89,7 @@ export function ensureView(id: string, signIn = false): WebContentsView {
       sandbox: true
     }
   })
-  view.setBackgroundColor('#BBD5EC')
+  view.setBackgroundColor('#F6F8FC')
   view.setBorderRadius(10)
   view.setVisible(false)
   win.contentView.addChildView(view)
@@ -117,13 +119,53 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   wc.on('did-navigate', () => callbacks.onNavigate(id))
   wc.on('did-navigate-in-page', () => callbacks.onNavigate(id))
   wc.on('did-finish-load', () => callbacks.onLoaded(id))
+  // caricamento di pagina intera verso Gmail (avvio, ricarica, fine dell'accesso): si torna alla rotellina
+  wc.on('did-start-navigation', (details) => {
+    if (details.isMainFrame && !details.isSameDocument && details.url.startsWith('https://mail.google.com/')) {
+      ready.delete(id)
+      layout()
+    }
+  })
   wc.on('dom-ready', () => {
-    if (wc.getURL().startsWith('https://mail.google.com/')) wc.insertCSS(HIDE_ACCOUNT_SWITCHER)
+    if (wc.getURL().startsWith('https://mail.google.com/')) {
+      wc.insertCSS(HIDE_ACCOUNT_SWITCHER)
+      waitForGmail(id, wc)
+    } else markReady(id) // pagina di accesso di Google: si mostra subito
   })
 
   wc.loadURL(signIn ? SIGN_IN_URL : GMAIL_URL)
   layout()
   return view
+}
+
+function markReady(id: string) {
+  if (ready.has(id)) return
+  ready.add(id)
+  layout()
+}
+
+// Gmail mostra prima una sua schermata di caricamento (#loading); la vista si scopre quando è sparita
+// e c'è la casella vera. Al massimo 20 secondi, poi si mostra comunque quello che c'è.
+const GMAIL_READY = `(() => {
+  const l = document.getElementById('loading')
+  const loaderGone = !l || l.offsetParent === null || getComputedStyle(l).display === 'none'
+  return loaderGone && !!document.querySelector('[role="main"], [role="navigation"]')
+})()`
+
+function waitForGmail(id: string, wc: WebContents) {
+  const started = Date.now()
+  const tick = async () => {
+    if (wc.isDestroyed() || ready.has(id)) return
+    let ok = false
+    try {
+      ok = await wc.executeJavaScript(GMAIL_READY, true)
+    } catch {
+      // pagina in cambio: si riprova
+    }
+    if (ok || Date.now() - started > 20_000) return markReady(id)
+    setTimeout(tick, 200)
+  }
+  tick()
 }
 
 /** Chiude la vista; con `clearData` cancella anche cookie e dati della sessione (account rimosso). */
@@ -134,6 +176,7 @@ export async function destroyView(id: string, clearData: boolean) {
     view.webContents.close()
     views.delete(id)
   }
+  ready.delete(id)
   if (clearData) await partitionOf(id).clearStorageData()
   if (visibleId === id) visibleId = null
 }
@@ -182,7 +225,7 @@ let lastSnapshot: { id: string; data: string } | null = null
 
 function layout() {
   for (const [id, view] of views) {
-    const show = id === visibleId && !overlay && bounds.width > 0
+    const show = id === visibleId && !overlay && ready.has(id) && bounds.width > 0
     view.setVisible(show)
     if (show) view.setBounds(bounds)
   }

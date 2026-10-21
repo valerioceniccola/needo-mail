@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
+import { LoaderCircle } from 'lucide-react'
 import { api, useStore } from '@/app/store'
 import content from '@/content.json'
 
@@ -32,9 +33,9 @@ export default function GmailFrame() {
 
   return (
     <div className="flex min-h-0 flex-1 pr-2 pb-2">
-      <div ref={ref} className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[10px] bg-[#bbd5ec] text-[#444746] shadow-[0_0_0_1px_#26262b]">
-        {/* sotto un dialog niente "Caricamento…": o l'istantanea, o il riquadro vuoto sfocato */}
-        {!covered && content.gmail.loading}
+      <div ref={ref} className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[10px] bg-[#f6f8fc] shadow-[0_0_0_1px_#26262b]">
+        {/* finché Gmail carica si vede solo la rotellina; sotto un dialog: o l'istantanea, o il riquadro vuoto sfocato */}
+        {!covered && <LoaderCircle className="size-6 animate-spin text-[#8a8f98]" aria-label={content.gmail.loading} />}
         {snapshot && <img src={snapshot} alt="" draggable={false} className="absolute inset-0 size-full object-cover object-top-left" />}
       </div>
     </div>

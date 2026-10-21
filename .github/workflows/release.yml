@@ -49,6 +49,13 @@ jobs:
           node-version: 22
           cache: npm
 
+      # l'icona .icon si compila con actool di Xcode 26 o successivo: si sceglie l'Xcode più recente sul Mac di GitHub
+      - name: Xcode recente
+        run: |
+          XC="$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)"
+          sudo xcode-select -s "$XC"
+          echo "Xcode: $XC"; xcrun actool --version | grep -A1 short-bundle-version | tail -1 || true
+
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
