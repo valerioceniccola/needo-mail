@@ -27,14 +27,14 @@ type Callbacks = {
 const views = new Map<string, WebContentsView>()
 
 // Gmail ha il suo selettore di account (foto in alto a destra): qui ogni account ha già la sua vista,
-// quindi lo nascondiamo per non avere due modi di cambiare account. visibility e non display,
-// così il resto della barra non si sposta e la foto resta leggibile per l'avatar.
+// quindi lo togliamo per non avere due modi di cambiare account. Si nasconde il contenitore del pulsante
+// (display: none), così le icone accanto scorrono a destra; il :not evita di nascondere per sbaglio
+// un contenitore che ha dentro anche la griglia delle app Google. La foto resta nella pagina per l'avatar.
+const ACCOUNT_LINK = 'a[href^="https://accounts.google.com/SignOutOptions"]'
 const HIDE_ACCOUNT_SWITCHER = `
-  header a[href^="https://accounts.google.com/SignOutOptions"],
-  header a[aria-label^="Account Google"],
-  header a[aria-label^="Google Account"] {
-    visibility: hidden !important;
-    pointer-events: none !important;
+  header div:has(> ${ACCOUNT_LINK}):not(:has(a[href*="/about/products"])),
+  header ${ACCOUNT_LINK} {
+    display: none !important;
   }
 `
 

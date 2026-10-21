@@ -18,7 +18,7 @@ export default function Sidebar() {
   }
 
   return (
-    <nav aria-label={content.sidebar.accounts} className="flex w-[84px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
+    <nav aria-label={content.sidebar.accounts} className="flex w-[92px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
       {/* riga dei semafori: da qui si trascina la finestra */}
       <div className="app-drag h-11 w-full shrink-0" />
 
