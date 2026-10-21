@@ -5,8 +5,8 @@ import { IPC, type Rect } from '@shared/api'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 import * as state from './state'
 import * as views from './views'
-import { emailFromTitle, fetchUnread, unreadFromTitle } from './unread'
-import { initNotifier, notifyFromGmail, refresh } from './notifier'
+import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
+import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } from './notifier'
 import { buildAppMenu, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
 
@@ -27,8 +27,8 @@ function createWindow(): BrowserWindow {
     title: 'Gmail Hub',
     backgroundColor: '#0E0E10',
     titleBarStyle: 'hiddenInset',
-    // centrati nella barra laterale larga 76px, nella riga alta 44px
-    trafficLightPosition: { x: 12, y: 16 },
+    // centrati nella colonna laterale larga 84px, nella riga alta 44px
+    trafficLightPosition: { x: 16, y: 16 },
     webPreferences: {
       preload: join(__dirname, '../preload/app.js'),
       sandbox: true,
@@ -86,8 +86,14 @@ function refreshUnreadSoon(id: string, titleCount: number | null) {
   unreadTimers.set(
     id,
     setTimeout(async () => {
-      const count = (await fetchUnread(id)) ?? titleCount
-      if (count !== null && state.findAccount(id)) state.setUnread(id, count)
+      const inbox = await fetchInbox(id)
+      if (!state.findAccount(id)) return
+      if (inbox) {
+        state.setUnread(id, inbox.count)
+        handleInbox(id, inbox.entries)
+      } else if (titleCount !== null) {
+        state.setUnread(id, titleCount)
+      }
     }, 1500)
   )
 }
@@ -111,11 +117,13 @@ function onNavigate(id: string) {
 
 /** Foto profilo: Gmail disegna la barra in alto qualche secondo dopo il caricamento, quindi riproviamo. */
 function refreshAvatar(id: string, attempt = 0) {
+  if (attempt === 0) state.setAvatarPending(id, true)
   setTimeout(async () => {
-    if (!state.findAccount(id)) return
+    if (!state.findAccount(id)) return state.setAvatarPending(id, false)
     const avatar = await readAvatar(id)
     if (avatar) state.setAvatar(id, avatar)
-    else if (attempt < 4) refreshAvatar(id, attempt + 1)
+    if (avatar || attempt >= 4) state.setAvatarPending(id, false)
+    else refreshAvatar(id, attempt + 1)
   }, 3000)
 }
 
@@ -158,6 +166,7 @@ function confirmAdd(label: string, color: string) {
 
 async function removeAccount(id: string) {
   state.removeAccount(id)
+  forgetAccount(id)
   await views.destroyView(id, true)
 }
 
@@ -170,7 +179,8 @@ const menuActions = {
   },
   back: () => views.viewContents(visibleAccountId())?.navigationHistory.goBack(),
   forward: () => views.viewContents(visibleAccountId())?.navigationHistory.goForward(),
-  reload: () => views.viewContents(visibleAccountId())?.reload()
+  reload: () => views.viewContents(visibleAccountId())?.reload(),
+  testNotification
 }
 
 function registerIpc() {
@@ -188,11 +198,6 @@ function registerIpc() {
   ipcMain.on(IPC.forward, menuActions.forward)
   ipcMain.on(IPC.reload, menuActions.reload)
 
-  // notifiche intercettate dal preload Gmail: si capisce l'account da quale vista arrivano
-  ipcMain.on(IPC.notify, (event, title: string, body: string) => {
-    const id = views.accountOfContents(event.sender)
-    if (id && id !== state.getState().adding?.id) notifyFromGmail(id, title, body)
-  })
 }
 
 app.whenReady().then(() => {
@@ -201,7 +206,7 @@ app.whenReady().then(() => {
 
   win = createWindow()
   views.initViews(win, { onTitle, onNavigate, onLoaded })
-  initNotifier(showWindow)
+  initNotifier({ showWindow, openLink: (id, url) => views.viewContents(id)?.loadURL(url) })
   registerIpc()
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche

@@ -7,6 +7,7 @@ type Actions = {
   back: () => void
   forward: () => void
   reload: () => void
+  testNotification: () => void
 }
 
 /**
@@ -39,6 +40,8 @@ export function buildAppMenu(actions: Actions) {
         { label: 'Ricarica', accelerator: 'CmdOrCtrl+R', click: actions.reload },
         { type: 'separator' },
         { role: 'togglefullscreen', label: 'Schermo intero' },
+        { type: 'separator' },
+        { label: 'Invia una notifica di prova', click: actions.testNotification },
         ...(app.isPackaged ? [] : [{ role: 'toggleDevTools' } as MenuItemConstructorOptions])
       ]
     },

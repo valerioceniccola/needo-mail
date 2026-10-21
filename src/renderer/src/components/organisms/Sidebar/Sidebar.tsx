@@ -8,7 +8,7 @@ import content from '@/content.json'
 
 /** Colonna laterale minimale: un avatar per account, poi + e impostazioni in fondo. */
 export default function Sidebar() {
-  const { accounts, unread, selectedId, adding, now } = useStore()
+  const { accounts, unread, selectedId, adding, avatarPending, now } = useStore()
 
   // il trascinamento parte solo dopo 4px, così un clic resta un clic
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
@@ -18,7 +18,7 @@ export default function Sidebar() {
   }
 
   return (
-    <nav aria-label={content.sidebar.accounts} className="flex w-[76px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
+    <nav aria-label={content.sidebar.accounts} className="flex w-[84px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
       {/* riga dei semafori: da qui si trascina la finestra */}
       <div className="app-drag h-11 w-full shrink-0" />
 
@@ -32,6 +32,7 @@ export default function Sidebar() {
                 index={index}
                 unread={unread[account.id] ?? 0}
                 paused={isPaused(account, now)}
+                loading={avatarPending.includes(account.id)}
                 selected={!adding && account.id === selectedId}
                 onSelect={() => api.select(account.id)}
                 onMenu={() => api.openAccountMenu(account.id)}

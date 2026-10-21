@@ -146,11 +146,6 @@ export function viewContents(id: string | null): WebContents | undefined {
   return id ? views.get(id)?.webContents : undefined
 }
 
-/** Da quale account arriva un messaggio IPC (es. una notifica dal preload Gmail). */
-export function accountOfContents(contents: WebContents): string | undefined {
-  for (const [id, view] of views) if (view.webContents === contents) return id
-  return undefined
-}
 
 export function navState(id: string | null) {
   const history = viewContents(id)?.navigationHistory
