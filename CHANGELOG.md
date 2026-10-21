@@ -3,6 +3,7 @@
 ## 0.1.3
 
 - Gmail carica molto più in fretta all'apertura
+- Durante il caricamento si vede una sagoma semplificata di Gmail
 - Gmail non si impagina più "compattato" (testi e righe stretti) in alcuni account
 - Foto profilo presa da Google una sola volta e poi salvata; nelle impostazioni dell'account c'è "Prendi da Google" per riprenderla
 - Corretta la foto profilo degli account Gmail che mostrava un cerchio colorato
