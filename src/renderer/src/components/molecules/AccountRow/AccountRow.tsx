@@ -44,7 +44,7 @@ export default function AccountRow({ account, index, unread, paused, loading, se
       </button>
 
       {!paused && unread > 0 && (
-        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-[50px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d93f45] px-[5px] text-[11px] font-semibold text-white shadow-[0_0_0_2px_var(--sidebar)]">
+        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-[54px] flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d93f45] px-[5px] text-[11px] font-semibold text-white shadow-[0_0_0_2px_var(--sidebar)]">
           {unread > 99 ? '99+' : unread}
         </span>
       )}

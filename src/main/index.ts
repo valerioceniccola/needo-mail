@@ -28,8 +28,8 @@ function createWindow(): BrowserWindow {
     title: 'Gmail Hub',
     backgroundColor: '#0E0E10',
     titleBarStyle: 'hiddenInset',
-    // centrati nella colonna laterale larga 84px, nella riga alta 44px
-    trafficLightPosition: { x: 16, y: 16 },
+    // centrati nella colonna laterale larga 92px, nella riga alta 44px
+    trafficLightPosition: { x: 18, y: 16 },
     webPreferences: {
       preload: join(__dirname, '../preload/app.js'),
       sandbox: true,
