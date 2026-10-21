@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ACCOUNT_COLORS } from '@shared/types'
-import { api, useStore } from '@/app/store'
+import { api, coverGmail, useStore } from '@/app/store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
@@ -17,11 +17,8 @@ export default function NewAccountDialog({ email }: Props) {
   // primo colore non ancora usato da un altro account
   const [color, setColor] = useState<string>(() => ACCOUNT_COLORS.find((c) => !accounts.some((a) => a.color === c)) ?? ACCOUNT_COLORS[0])
 
-  // la vista Gmail starebbe sopra il dialog: la nascondiamo finché è aperto
-  useEffect(() => {
-    api.setOverlay(true)
-    return () => api.setOverlay(false)
-  }, [])
+  // la vista Gmail starebbe sopra il dialog: finché è aperto al suo posto c'è un'istantanea
+  useEffect(coverGmail, [])
 
   const confirm = () => api.confirmAdd(label, color)
 

@@ -197,7 +197,7 @@ function registerIpc() {
   ipcMain.on(IPC.cancelAdd, cancelAdd)
   ipcMain.on(IPC.confirmAdd, (_e, label: string, color: string) => confirmAdd(label, color))
   ipcMain.on(IPC.bounds, (_e, rect: Rect) => views.setViewBounds(rect))
-  ipcMain.on(IPC.overlay, (_e, visible: boolean) => views.setOverlay(visible))
+  ipcMain.handle(IPC.overlay, (_e, visible: boolean) => views.setOverlay(visible))
   ipcMain.on(IPC.back, menuActions.back)
   ipcMain.on(IPC.forward, menuActions.forward)
   ipcMain.on(IPC.reload, menuActions.reload)

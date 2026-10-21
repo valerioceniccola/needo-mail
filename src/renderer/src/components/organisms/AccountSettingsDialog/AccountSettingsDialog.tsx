@@ -3,7 +3,7 @@ import { Plus, X } from 'lucide-react'
 import type { Account, PauseRule } from '@shared/types'
 import { ACCOUNT_COLORS } from '@shared/types'
 import { isScheduledPause, nextScheduledPauseAt, scheduledPauseEndsAt } from '@shared/pause'
-import { api, useStore } from '@/app/store'
+import { api, coverGmail, useStore } from '@/app/store'
 import { formatWhen } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -27,11 +27,8 @@ export default function AccountSettingsDialog({ account }: Props) {
   const [enabled, setEnabled] = useState(account.autoPause.enabled)
   const [rules, setRules] = useState<PauseRule[]>(account.autoPause.rules)
 
-  // la vista Gmail starebbe sopra il dialog: la nascondiamo finché è aperto
-  useEffect(() => {
-    api.setOverlay(true)
-    return () => api.setOverlay(false)
-  }, [])
+  // la vista Gmail starebbe sopra il dialog: finché è aperto al suo posto c'è un'istantanea
+  useEffect(coverGmail, [])
 
   const toggleEnabled = (on: boolean) => {
     setEnabled(on)

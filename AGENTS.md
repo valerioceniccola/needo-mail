@@ -100,7 +100,7 @@ Preload app + Renderer (React)
 ```
 
 Punti delicati:
-- **Menu del tasto destro nativo** (`Menu.popup`): un menu HTML finirebbe sotto la vista Gmail, che sta sopra la pagina. Per lo stesso motivo, con un dialog aperto l'interfaccia chiama `setOverlay(true)` e la vista si nasconde.
+- **Menu del tasto destro nativo** (`Menu.popup`): un menu HTML finirebbe sotto la vista Gmail, che sta sopra la pagina. Per lo stesso motivo, con un dialog aperto l'interfaccia chiama `coverGmail()` (store.ts): il principale scatta un'istantanea della vista (`capturePage`), la nasconde, e l'interfaccia mostra l'istantanea al suo posto sotto il dialog, così Gmail non sembra sparire.
 - **Scorciatoie ⌘1…⌘9 nel menu dell'app** (`menu.ts`), non nell'interfaccia: così funzionano anche col cursore dentro Gmail.
 - **Chiudere la finestra la nasconde** (macOS): le viste restano vive per non letti e notifiche; ⌘Q chiude davvero.
 - **Preload in sandbox**: non possono importare altri file del progetto. `preload/gmail.ts` non importa nulla da `shared/` (altrimenti Rollup crea un file condiviso tra i due preload che la sandbox non sa caricare).
