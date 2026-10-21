@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
-import { IPC, type Rect } from '@shared/api'
+import { IPC, type AccountChanges, type Rect } from '@shared/api'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 import * as state from './state'
 import * as views from './views'
 import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
 import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } from './notifier'
-import { buildAppMenu, popupAccountMenu } from './menu'
+import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
 
@@ -190,6 +190,9 @@ function registerIpc() {
   ipcMain.on(IPC.move, (_e, fromId: string, toId: string) => state.move(fromId, toId))
   ipcMain.on(IPC.menu, (_e, id: string) => popupAccountMenu(win, id, removeAccount))
   ipcMain.on(IPC.resume, (_e, id: string) => state.resume(id))
+  ipcMain.on(IPC.closeSettings, () => state.setEditing(null))
+  ipcMain.on(IPC.update, (_e, id: string, changes: AccountChanges) => state.updateAccount(id, changes))
+  ipcMain.on(IPC.remove, (_e, id: string) => confirmRemove(win, id, removeAccount))
   ipcMain.on(IPC.startAdd, startAdd)
   ipcMain.on(IPC.cancelAdd, cancelAdd)
   ipcMain.on(IPC.confirmAdd, (_e, label: string, color: string) => confirmAdd(label, color))

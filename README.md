@@ -32,7 +32,7 @@ npm run dev
 - [x] Aggiunta account (login Google + etichetta e colore), rimozione con pulizia della sessione
 - [x] Non letti, badge sul Dock solo per gli account attivi, notifiche, riepilogo a fine pausa
 - [x] Salvataggio su disco di account, ordine e selezione
-- [ ] Impostazioni dell'account (etichetta, colore, pausa automatica)
+- [x] Impostazioni dell'account (etichetta, colore, pausa automatica con fasce, rimozione)
 - [ ] Impostazioni generali
 
-Gli account si aggiungono dalla schermata di benvenuto o da File › Aggiungi account…
+Gli account si aggiungono dal + in fondo alla colonna laterale, dalla schermata di benvenuto o da File › Aggiungi account…; le loro impostazioni con tasto destro › Impostazioni…

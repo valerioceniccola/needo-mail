@@ -1,4 +1,4 @@
-import type { AppState } from '@shared/api'
+import type { AccountChanges, AppState } from '@shared/api'
 import type { Account } from '@shared/types'
 import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
 import { createStore } from './store'
@@ -19,6 +19,7 @@ const state: AppState = {
   unread: {},
   adding: null,
   avatarPending: [],
+  editingId: null,
   nav: { canGoBack: false, canGoForward: false }
 }
 
@@ -89,7 +90,26 @@ export function addAccount(account: Account) {
   commit()
 }
 
+/** Salva le Impostazioni dell'account: solo i campi ammessi, con un minimo di controllo. */
+export function updateAccount(id: string, changes: AccountChanges) {
+  const label = changes.label.trim()
+  const rules = changes.autoPause.rules.filter((r) => r.days.length > 0)
+  patch(id, {
+    ...(label ? { label } : {}),
+    color: changes.color,
+    autoPause: { enabled: changes.autoPause.enabled && rules.length > 0, rules }
+  })
+  state.editingId = null
+  emit()
+}
+
+export function setEditing(id: string | null) {
+  state.editingId = id && findAccount(id) ? id : null
+  emit()
+}
+
 export function removeAccount(id: string) {
+  if (state.editingId === id) state.editingId = null
   state.accounts = state.accounts.filter((a) => a.id !== id)
   delete state.unread[id]
   if (state.selectedId === id) state.selectedId = state.accounts[0]?.id ?? null

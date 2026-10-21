@@ -18,6 +18,7 @@ export const useStore = create<State>((set) => ({
   selectedId: null,
   adding: null,
   avatarPending: [],
+  editingId: null,
   nav: { canGoBack: false, canGoForward: false },
   ready: false,
   now: new Date(),

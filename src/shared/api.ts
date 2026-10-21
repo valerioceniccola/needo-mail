@@ -1,5 +1,8 @@
 import type { Account } from './types'
 
+/** Campi dell'account modificabili dalle Impostazioni. */
+export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'>
+
 /** Rettangolo in pixel della finestra (coordinate CSS dell'interfaccia). */
 export type Rect = { x: number; y: number; width: number; height: number }
 
@@ -12,6 +15,8 @@ export type AppState = {
   adding: { id: string; email: string | null } | null
   /** account di cui si sta leggendo la foto profilo */
   avatarPending: string[]
+  /** account con la finestra Impostazioni aperta */
+  editingId: string | null
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 
@@ -23,6 +28,9 @@ export type GmailHubApi = {
   move: (fromId: string, toId: string) => void
   openAccountMenu: (id: string) => void
   resume: (id: string) => void
+  closeSettings: () => void
+  updateAccount: (id: string, changes: AccountChanges) => void
+  removeAccount: (id: string) => void
   startAdd: () => void
   cancelAdd: () => void
   confirmAdd: (label: string, color: string) => void
@@ -41,6 +49,9 @@ export const IPC = {
   move: 'account:move',
   menu: 'account:menu',
   resume: 'account:resume',
+  closeSettings: 'settings:close',
+  update: 'account:update',
+  remove: 'account:remove',
   startAdd: 'add:start',
   cancelAdd: 'add:cancel',
   confirmAdd: 'add:confirm',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Account } from './types'
-import { isPaused, scheduledPauseEndsAt } from './pause'
+import { isPaused, nextScheduledPauseAt, scheduledPauseEndsAt } from './pause'
 import { badgeCount } from './badge'
 
 // 20 ottobre 2026 è un martedì
@@ -71,6 +71,17 @@ describe('scheduledPauseEndsAt', () => {
 
   it('null se non è in pausa automatica', () => {
     expect(scheduledPauseEndsAt(work, at(20, '10:30'))).toBeNull()
+  })
+})
+
+describe('nextScheduledPauseAt', () => {
+  it('martedì mattina la prossima pausa è martedì alle 19', () => {
+    expect(nextScheduledPauseAt(work, at(20, '10:30'))).toEqual(at(20, '19:00'))
+  })
+
+  it('null se è già in pausa o non ci sono fasce', () => {
+    expect(nextScheduledPauseAt(work, at(20, '22:00'))).toBeNull()
+    expect(nextScheduledPauseAt({ ...work, autoPause: { enabled: false, rules: [] } }, at(20, '10:30'))).toBeNull()
   })
 })
 

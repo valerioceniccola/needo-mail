@@ -16,7 +16,7 @@
     "title": "In pausa",
     "description": "Niente notifiche e non conta nel badge. Puoi comunque leggere e scrivere.",
     "manual": "Finché non lo riattivi",
-    "until": "Pausa automatica fino a",
+    "until": "Pausa automatica · torna attivo",
     "resume": "Riattiva"
   },
   "gmail": {
@@ -39,7 +39,46 @@
     "connected": "Account collegato",
     "label": "Etichetta",
     "color": "Colore",
-    "note": "Verrà aggiunto in fondo alla barra laterale: trascinalo per cambiarne la posizione. Per le notifiche attiva \"Notifiche desktop\" nelle impostazioni di Gmail di questo account.",
+    "note": "Verrà aggiunto in fondo alla colonna laterale: trascinalo per cambiarne la posizione. Pausa automatica e altre opzioni: tasto destro sull'account › Impostazioni.",
     "confirm": "Aggiungi"
+  },
+  "settings": {
+    "description": "Etichetta, colore e pausa automatica di questo account.",
+    "close": "Chiudi",
+    "autoPause": "Pausa automatica",
+    "autoPauseHint": "Nelle fasce scelte l'account va in pausa da solo: niente notifiche e non conta nel badge.",
+    "addRule": "Aggiungi fascia",
+    "removeRule": "Elimina fascia",
+    "pausedFrom": "In pausa",
+    "allDay": "tutto il giorno",
+    "from": "dalle",
+    "to": "alle",
+    "fromLabel": "Inizio della pausa",
+    "toLabel": "Fine della pausa",
+    "nextDay": "del giorno dopo",
+    "noDays": "Scegli almeno un giorno.",
+    "dayLetters": [
+      "L",
+      "M",
+      "M",
+      "G",
+      "V",
+      "S",
+      "D"
+    ],
+    "dayNames": [
+      "Lunedì",
+      "Martedì",
+      "Mercoledì",
+      "Giovedì",
+      "Venerdì",
+      "Sabato",
+      "Domenica"
+    ],
+    "remove": "Rimuovi account…",
+    "save": "Salva",
+    "nowActive": "Adesso attivo · va in pausa",
+    "nowPaused": "Adesso in pausa · torna attivo",
+    "alwaysPaused": "In pausa per tutta la settimana"
   }
 }

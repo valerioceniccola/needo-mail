@@ -35,7 +35,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 ### Pausa
 - **Tasto destro** su un account → menu con: *Metti in pausa* (o *Riattiva* se è in pausa), *Impostazioni…*, *Rimuovi account*.
 - La pausa manuale è immediata e dura **finché non la togli** (nessuna durata da scegliere).
-- **Pausa automatica** (tasto destro → Impostazioni): interruttore + una o più fasce. Ogni fascia = giorni della settimana + orario "dalle–alle" (può scavalcare la mezzanotte, es. 19:00–09:00) oppure "tutto il giorno".
+- **Pausa automatica** (tasto destro → Impostazioni, `AccountSettingsDialog`): interruttore + una o più fasce (accendendo senza fasce se ne propone una: lun–ven 19:00–09:00). In fondo al dialog lo stato calcolato sulle fasce non ancora salvate ("Adesso attivo · va in pausa alle 19:00"). Fasce senza giorni non si salvano. Ogni fascia = giorni della settimana + orario "dalle–alle" (può scavalcare la mezzanotte, es. 19:00–09:00) oppure "tutto il giorno".
 - Precedenza: se metti in pausa a mano, l'account resta in pausa finché non lo riattivi tu, anche se la fascia automatica finisce.
 - Un account in pausa: **nessuna notifica**, **non conta nel badge**. Gmail resta visibile e usabile; sopra compare una fascia "In pausa · … · Riattiva" con fino a quando dura la pausa automatica, se c'è.
 - Quando un account torna attivo: **una sola notifica di riepilogo** ("Newsletter: 48 non letti"), non tutte quelle arretrate (disattivabile nelle Impostazioni).
