@@ -25,6 +25,21 @@ type Callbacks = {
 }
 
 const views = new Map<string, WebContentsView>()
+
+// Gmail ha il suo selettore di account (foto in alto a destra): qui ogni account ha già la sua vista,
+// quindi lo nascondiamo per non avere due modi di cambiare account. visibility e non display,
+// così il resto della barra non si sposta e la foto resta leggibile per l'avatar.
+const HIDE_ACCOUNT_SWITCHER = `
+  header a[href^="https://accounts.google.com/SignOutOptions"],
+  header a[aria-label^="Account Google"],
+  header a[aria-label^="Google Account"] {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+`
+
+// pagine Google per aggiungere o scegliere un altro account dentro la stessa sessione: non servono
+const ACCOUNT_SWITCH_PAGES = /^https:\/\/accounts\.google\.com\/(AddSession|AccountChooser|SignOutOptions)/
 let win: BrowserWindow
 let callbacks: Callbacks
 let bounds: Rectangle = { x: 0, y: 0, width: 0, height: 0 }
@@ -87,6 +102,11 @@ export function ensureView(id: string, signIn = false): WebContentsView {
     return { action: 'deny' }
   })
   wc.on('will-navigate', (event, url) => {
+    // durante l'aggiunta (signIn) Google può passare dalla scelta dell'account, dopo no
+    if (!signIn && ACCOUNT_SWITCH_PAGES.test(url)) {
+      event.preventDefault()
+      return
+    }
     if (!isGoogle(url)) {
       event.preventDefault()
       shell.openExternal(url)
@@ -97,6 +117,9 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   wc.on('did-navigate', () => callbacks.onNavigate(id))
   wc.on('did-navigate-in-page', () => callbacks.onNavigate(id))
   wc.on('did-finish-load', () => callbacks.onLoaded(id))
+  wc.on('dom-ready', () => {
+    if (wc.getURL().startsWith('https://mail.google.com/')) wc.insertCSS(HIDE_ACCOUNT_SWITCHER)
+  })
 
   wc.loadURL(signIn ? SIGN_IN_URL : GMAIL_URL)
   layout()

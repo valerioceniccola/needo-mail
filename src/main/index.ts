@@ -9,6 +9,7 @@ import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
 import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } from './notifier'
 import { buildAppMenu, popupAccountMenu } from './menu'
 import { readAvatar } from './avatar'
+import { deleteMail } from './mailActions'
 
 // nome mostrato nel menu dell'app e nel Dock anche in sviluppo
 app.setName('Gmail Hub')
@@ -206,7 +207,15 @@ app.whenReady().then(() => {
 
   win = createWindow()
   views.initViews(win, { onTitle, onNavigate, onLoaded })
-  initNotifier({ showWindow, openLink: (id, url) => views.viewContents(id)?.loadURL(url) })
+  initNotifier({
+    showWindow,
+    openLink: (id, url) => views.viewContents(id)?.loadURL(url.replace(/^http:/, 'https:')),
+    deleteMail: async (id, url) => {
+      const ok = await deleteMail(id, url)
+      refreshUnreadSoon(id, null)
+      return ok
+    }
+  })
   registerIpc()
 
   // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche

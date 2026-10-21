@@ -14,5 +14,8 @@ mac:
   # firma con il certificato "Developer ID Application" presente nel Portachiavi
   # notarizzazione: impostare APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD e APPLE_TEAM_ID prima di npm run build:mac
   notarize: true
+  extendInfo:
+    # notifiche in stile "Avvisi": restano a schermo e mostrano i pulsanti Elimina / Apri
+    NSUserNotificationAlertStyle: alert
 dmg:
   artifactName: Gmail-Hub-${version}.dmg

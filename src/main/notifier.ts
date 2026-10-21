@@ -14,6 +14,7 @@ import type { MailEntry } from './unread'
 type Handlers = {
   showWindow: () => void
   openLink: (accountId: string, url: string) => void
+  deleteMail: (accountId: string, url: string) => Promise<boolean>
 }
 
 let handlers: Handlers
@@ -32,12 +33,35 @@ function pausedMap() {
   return new Map(getState().accounts.map((a) => [a.id, isPaused(a, now)]))
 }
 
+function open(accountId: string, link?: string) {
+  select(accountId)
+  handlers.showWindow()
+  if (link) handlers.openLink(accountId, link)
+}
+
 function notify(accountId: string, title: string, body: string, link?: string) {
   const n = new Notification({ title, body })
-  n.on('click', () => {
-    select(accountId)
-    handlers.showWindow()
-    if (link) handlers.openLink(accountId, link)
+  n.on('click', () => open(accountId, link))
+  n.show()
+}
+
+/**
+ * Notifica di una singola email con i pulsanti Elimina e Apri.
+ * macOS mostra i pulsanti solo se l'app è firmata e ha lo stile "Avvisi" (NSUserNotificationAlertStyle
+ * in electron-builder.yml): in sviluppo resta il clic sulla notifica, che apre l'email.
+ */
+function notifyMail(accountId: string, label: string, mail: MailEntry) {
+  const n = new Notification({
+    title: `${label} · ${mail.author || 'Nuova email'}`,
+    body: mail.subject,
+    actions: mail.link ? [{ type: 'button', text: 'Elimina' }, { type: 'button', text: 'Apri' }] : [],
+    closeButtonText: 'Chiudi'
+  })
+  n.on('click', () => open(accountId, mail.link || undefined))
+  n.on('action', async (event) => {
+    if (event.actionIndex === 1) return open(accountId, mail.link)
+    const deleted = await handlers.deleteMail(accountId, mail.link)
+    if (!deleted) notify(accountId, `${label} · non eliminata`, `Non sono riuscito a eliminare "${mail.subject}". Aprila e riprova da Gmail.`, mail.link)
   })
   n.show()
 }
@@ -57,9 +81,7 @@ export function handleInbox(accountId: string, entries: MailEntry[]) {
     notify(accountId, account.label, `${fresh.length} nuove email`)
     return
   }
-  for (const mail of fresh) {
-    notify(accountId, `${account.label} · ${mail.author || 'Nuova email'}`, mail.subject, mail.link || undefined)
-  }
+  for (const mail of fresh) notifyMail(accountId, account.label, mail)
 }
 
 export function forgetAccount(accountId: string) {

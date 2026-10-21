@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
     "build:mac": "npm run typecheck && electron-vite build && electron-builder --mac",
+    "build:mac:local": "npm run typecheck && electron-vite build && electron-builder --mac -c.mac.notarize=false",
     "postinstall": "node node_modules/electron/install.js"
   },
   "dependencies": {
