@@ -11,6 +11,8 @@ npm install
 npm run dev
 ```
 
+`npm run dev` controlla da solo che Electron sia scaricato e, se manca, lo scarica prima di partire.
+
 ## Comandi
 
 | Comando | Cosa fa |
