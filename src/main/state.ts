@@ -18,6 +18,7 @@ const state: AppState = {
   selectedId: saved.selectedId ?? saved.accounts[0]?.id ?? null,
   unread: {},
   adding: null,
+  avatarPending: [],
   nav: { canGoBack: false, canGoForward: false }
 }
 
@@ -98,6 +99,14 @@ export function removeAccount(id: string) {
 export function setAvatar(id: string, avatar: string) {
   if (findAccount(id)?.avatar === avatar) return
   patch(id, { avatar })
+}
+
+/** Foto profilo in caricamento: l'interfaccia mostra un loader al posto delle iniziali. */
+export function setAvatarPending(id: string, pending: boolean) {
+  const has = state.avatarPending.includes(id)
+  if (pending === has) return
+  state.avatarPending = pending ? [...state.avatarPending, id] : state.avatarPending.filter((x) => x !== id)
+  emit()
 }
 
 export function setAdding(adding: AppState['adding']) {

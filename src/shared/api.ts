@@ -10,6 +10,8 @@ export type AppState = {
   selectedId: string | null
   /** account in fase di aggiunta: email presente quando il login Google è completato */
   adding: { id: string; email: string | null } | null
+  /** account di cui si sta leggendo la foto profilo */
+  avatarPending: string[]
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 
@@ -46,6 +48,5 @@ export const IPC = {
   overlay: 'view:overlay',
   back: 'nav:back',
   forward: 'nav:forward',
-  reload: 'nav:reload',
-  notify: 'gmail:notify'
+  reload: 'nav:reload'
 } as const

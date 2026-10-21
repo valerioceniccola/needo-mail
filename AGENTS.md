@@ -15,7 +15,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 - Si aggiunge dal + in fondo alla colonna laterale, da File › Aggiungi account… o dalla schermata di benvenuto (primo avvio).
 
 ### Barra laterale
-- **Colonna minimale** larga 76 px, stile Slack: in alto i semafori, poi **un avatar per account** (foto profilo Google letta dalla pagina di Gmail; iniziali sul colore dell'account finché non c'è). Niente nome dell'app, niente etichette: nome e colore stanno nell'intestazione.
+- **Colonna minimale** larga 84 px, stile Slack: in alto i semafori, poi **un avatar per account** (foto profilo Google letta dalla pagina di Gmail; mentre si legge un loader, se non arriva le iniziali sul colore dell'account). Niente nome dell'app, niente etichette: nome e colore stanno nell'intestazione.
 - Avatar: bordo sottile nel colore dell'account; quello aperto ha una barretta bianca a sinistra e il bordo più spesso; non letti in un pallino rosso (oltre 99: "99+").
 - **Una sola lista**, nessuna sezione "Attivi / In pausa". Un account in pausa resta al suo posto: avatar grigio e trasparente, icona di pausa sopra, nessun numero.
 - Passando col mouse: suggerimento nativo (`title`) con etichetta e scorciatoia, es. "Lavoro · ⌘2" (un tooltip HTML finirebbe sotto la vista Gmail).
@@ -39,7 +39,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 
 ### Badge e notifiche
 - Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** dei soli account **attivi**. Nessun account attivo → nessun badge.
-- Notifiche native di macOS con l'etichetta dell'account nel titolo; clic → apre l'app su quell'account.
+- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic → apre l'account e quell'email. Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
 
 ### Impostazioni generali
 Elenco account (riordinabile, stato, ⌘n, menu "…", "Aggiungi account"), poi interruttori: badge sul Dock, notifiche, riepilogo a fine pausa, icona nella barra dei menu (spenta di default), apri all'accensione del Mac.
@@ -90,7 +90,7 @@ Processo principale (Node)
 └── WindowState       ricorda posizione e dimensioni della finestra (windowState.ts)
 
 Preload Gmail (iniettato in ogni vista Gmail)
-└── sostituisce window.Notification di Gmail e inoltra titolo e testo al processo principale (che decide se mostrarla)
+└── sostituisce window.Notification di Gmail con una versione muta (le notifiche le crea il principale dal feed)
 
 Preload app + Renderer (React)
 └── barra laterale, intestazione, menu contestuale, dialog, impostazioni; parla col principale via IPC tipizzato (contextBridge)
@@ -101,7 +101,7 @@ Punti delicati:
 - **Scorciatoie ⌘1…⌘9 nel menu dell'app** (`menu.ts`), non nell'interfaccia: così funzionano anche col cursore dentro Gmail.
 - **Chiudere la finestra la nasconde** (macOS): le viste restano vive per non letti e notifiche; ⌘Q chiude davvero.
 - **Preload in sandbox**: non possono importare altri file del progetto. `preload/gmail.ts` non importa nulla da `shared/` (altrimenti Rollup crea un file condiviso tra i due preload che la sandbox non sa caricare).
-- **Notifiche**: Gmail le manda solo se in Gmail › Impostazioni › Notifiche desktop sono attive, per ogni account.
+- **Notifiche**: non dipendono dalle impostazioni di Gmail; per controllare i permessi di macOS c'è Vista › Invia una notifica di prova.
 - **User agent**: NON travestirlo. Si lascia quello di Electron (come fa Meru). Uno user agent di Chrome (o Firefox) sopra i segnali di Chromium incorporato fa scattare il blocco di Google "Questo browser o questa app potrebbero non essere sicuri". L'aggiunta di un account parte da `accounts.google.com/ServiceLogin?service=mail`.
 - **Memoria**: le viste degli account non visibili restano caricate (servono per notifiche e conteggi); valutare di sospendere solo gli account in pausa.
 - **Link esterni**: i link fuori da Google si aprono nel browser predefinito (`shell.openExternal`), quelli di Google restano nella vista.
