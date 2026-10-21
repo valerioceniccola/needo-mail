@@ -102,7 +102,7 @@ Punti delicati:
 - **Chiudere la finestra la nasconde** (macOS): le viste restano vive per non letti e notifiche; ⌘Q chiude davvero.
 - **Preload in sandbox**: non possono importare altri file del progetto. `preload/gmail.ts` non importa nulla da `shared/` (altrimenti Rollup crea un file condiviso tra i due preload che la sandbox non sa caricare).
 - **Notifiche**: Gmail le manda solo se in Gmail › Impostazioni › Notifiche desktop sono attive, per ogni account.
-- **User agent**: impostare uno user agent di Chrome senza "Electron", altrimenti Google può bloccare il login ("browser non sicuro").
+- **User agent**: NON travestirlo. Si lascia quello di Electron (come fa Meru). Uno user agent di Chrome (o Firefox) sopra i segnali di Chromium incorporato fa scattare il blocco di Google "Questo browser o questa app potrebbero non essere sicuri". L'aggiunta di un account parte da `accounts.google.com/ServiceLogin?service=mail`.
 - **Memoria**: le viste degli account non visibili restano caricate (servono per notifiche e conteggi); valutare di sospendere solo gli account in pausa.
 - **Link esterni**: i link fuori da Google si aprono nel browser predefinito (`shell.openExternal`), quelli di Google restano nella vista.
 - Finestra: `titleBarStyle: 'hiddenInset'`, semafori nella barra laterale, barra laterale scura.

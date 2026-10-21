@@ -129,8 +129,8 @@ function startAdd() {
   if (state.getState().adding) return
   const id = randomUUID()
   state.setAdding({ id, email: null })
-  // sessione nuova e vuota: Gmail rimanda alla pagina di accesso di Google
-  views.ensureView(id)
+  // sessione nuova e vuota: si parte dalla pagina di accesso di Google per Gmail
+  views.ensureView(id, true)
 }
 
 async function cancelAdd() {
