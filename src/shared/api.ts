@@ -35,7 +35,8 @@ export type GmailHubApi = {
   cancelAdd: () => void
   confirmAdd: (label: string, color: string) => void
   setViewBounds: (rect: Rect) => void
-  setOverlay: (visible: boolean) => void
+  /** nasconde (o rimostra) la vista Gmail; nascondendola restituisce un'istantanea da mettere al suo posto */
+  setOverlay: (visible: boolean) => Promise<string | null>
   back: () => void
   forward: () => void
   reload: () => void

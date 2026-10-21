@@ -151,10 +151,31 @@ export function setViewBounds(rect: Rect) {
   layout()
 }
 
-/** Con un dialog aperto nell'interfaccia la vista va nascosta, altrimenti gli starebbe sopra. */
-export function setOverlay(visible: boolean) {
-  overlay = visible
-  layout()
+/**
+ * Con un dialog aperto nell'interfaccia la vista va nascosta, altrimenti gli starebbe sopra.
+ * Prima di nasconderla ne scattiamo un'istantanea: l'interfaccia la mette al suo posto sotto il dialog,
+ * così Gmail sembra restare lì (solo non cliccabile) invece di sparire.
+ */
+export async function setOverlay(visible: boolean): Promise<string | null> {
+  if (!visible) {
+    overlay = false
+    layout()
+    return null
+  }
+  const view = visibleId ? views.get(visibleId) : undefined
+  let snapshot: string | null = null
+  if (view && !overlay && bounds.width > 0) {
+    try {
+      const image = await view.webContents.capturePage()
+      snapshot = `data:image/jpeg;base64,${image.toJPEG(85).toString('base64')}`
+    } catch {
+      snapshot = null
+    }
+  }
+  overlay = true
+  // un attimo di ritardo: l'interfaccia fa in tempo a disegnare l'istantanea, niente lampo azzurro
+  setTimeout(layout, 80)
+  return snapshot
 }
 
 function layout() {
