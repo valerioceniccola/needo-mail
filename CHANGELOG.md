@@ -1,5 +1,9 @@
 # Novità di Needo
 
+## 0.1.7
+
+- Come la 0.1.6, che era stata pubblicata a metà: stato delle notifiche di macOS letto in modo ufficiale, testi con i nomi di macOS 26, aggiornamenti visibili solo quando sono completi
+
 ## 0.1.6
 
 - Stato delle notifiche di macOS letto in modo ufficiale (prima risultava "Non rilevabile")

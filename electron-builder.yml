@@ -33,6 +33,6 @@ publish:
   provider: github
   owner: valerioceniccola
   repo: needo-mail
-  # la release nasce come bozza (invisibile alle app) e la pubblica il workflow solo a file tutti caricati:
-  # così nessuno la vede a metà, senza latest-mac.yml (errore 404 in "Controlla aggiornamenti")
+  # serve per scrivere latest-mac.yml (dove le app guardano se c'è una versione nuova); a caricare i file
+  # e pubblicare la Release ci pensa il workflow con gh, tutto in una volta (.github/workflows/release.yml)
   releaseType: draft
