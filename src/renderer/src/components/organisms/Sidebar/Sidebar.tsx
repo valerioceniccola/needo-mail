@@ -18,13 +18,11 @@ export default function Sidebar() {
   }
 
   return (
-    <nav aria-label={content.sidebar.accounts} className="flex w-[100px] shrink-0 flex-col items-center border-r border-sidebar-border bg-sidebar pb-3">
-      {/* riga dei semafori: da qui si trascina la finestra */}
-      <div className="app-drag h-11 w-full shrink-0" />
+    <nav aria-label={content.sidebar.accounts} className="flex w-[68px] shrink-0 flex-col items-center pb-3">
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={accounts.map((a) => a.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex w-full flex-col gap-4 pt-2.5">
+          <div className="flex w-full flex-col gap-5 pt-2">
             {accounts.map((account, index) => (
               <AccountRow
                 key={account.id}
@@ -44,9 +42,9 @@ export default function Sidebar() {
 
       {/* account in fase di aggiunta: segnaposto tratteggiato */}
       {adding && (
-        <div aria-current="page" className="relative mt-4 flex h-12 w-full items-center justify-center" title={content.sidebar.newAccount}>
-          <span aria-hidden="true" className="absolute top-3 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />
-          <span className="size-11 rounded-full border border-dashed border-subtle" />
+        <div aria-current="page" className="relative mt-5 flex h-10 w-full items-center justify-center" title={content.sidebar.newAccount}>
+          <span aria-hidden="true" className="absolute top-2 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />
+          <span className="size-9 rounded-full border border-dashed border-subtle" />
         </div>
       )}
 
@@ -59,7 +57,7 @@ export default function Sidebar() {
         disabled={!!adding}
         aria-label={content.sidebar.addAccount}
         title={content.sidebar.addAccount}
-        className="mb-1.5 flex size-9 items-center justify-center rounded-full border border-dashed border-[#34343b] text-muted-foreground outline-none hover:border-subtle hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
+        className="mb-2 flex size-8 items-center justify-center rounded-full border border-dashed border-[#34343b] text-muted-foreground outline-none hover:border-subtle hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
       >
         <Plus className="size-4" strokeWidth={2} />
       </button>
@@ -68,7 +66,7 @@ export default function Sidebar() {
         disabled
         aria-label={content.sidebar.settings}
         title={`${content.sidebar.settings} · ${content.sidebar.settingsSoon}`}
-        className="flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-[#1c1c21] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+        className="flex size-8 items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-[#1c1c21] hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
       >
         <Settings className="size-[18px]" strokeWidth={1.8} />
       </button>

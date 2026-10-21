@@ -14,7 +14,8 @@ export default function TopBar({ children, actions }: Props) {
   const nav = useStore((s) => s.nav)
 
   return (
-    <header className="app-drag flex h-11 shrink-0 items-center gap-2.5 border-b border-sidebar-border px-3">
+    // pl: lascia spazio ai semafori, che stanno in questa riga
+    <header className="app-drag flex h-11 shrink-0 items-center gap-2.5 pr-3 pl-[88px]">
       <div className="app-no-drag flex items-center gap-1">
         <Button variant="ghost" size="icon" aria-label={content.topBar.back} disabled={!nav.canGoBack} onClick={api.back}>
           <ChevronLeft className="size-4" />
@@ -26,7 +27,7 @@ export default function TopBar({ children, actions }: Props) {
           <RotateCw className="size-3.5" />
         </Button>
       </div>
-      <span className="mx-1 h-[18px] w-px bg-border" aria-hidden="true" />
+      <span className="mx-1 h-[18px] w-px bg-[#2c2c33]" aria-hidden="true" />
       <div className="flex min-w-0 flex-1 items-center gap-2.5">{children}</div>
       {actions && <div className="app-no-drag flex items-center gap-2">{actions}</div>}
     </header>
