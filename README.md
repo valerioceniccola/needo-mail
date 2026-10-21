@@ -65,4 +65,4 @@ Trascina Needo dalla cartella Applicazioni nel Cestino.
 
 ---
 
-<sub>Needo non è affiliato a Google. Gmail è un marchio di Google LLC. · [Novità](CHANGELOG.md) · [Per sviluppatori](docs/DEVELOPMENT.md)</sub>
+<sub>Needo non è affiliato a Google. Gmail è un marchio di Google LLC. · [Novità](CHANGELOG.md) · [Per sviluppatori](docs/DEVELOPMENT.md) · [Idee future](docs/ROADMAP.md)</sub>
