@@ -62,6 +62,10 @@ Base: lo stack personale "Nebula" di Valerio, adattato a Electron.
 | Test | **vitest** | Solo la logica importante: motore delle pause, calcolo del badge |
 | Pacchetto | **electron-builder** | .dmg firmato e notarizzato con l'account Apple Developer di Valerio |
 
+Versioni: Electron 44, electron-vite 5, Vite 7, TypeScript 6, vitest 4, React 19, Tailwind 4. Volutamente non le ultimissime uscite (Electron 45 ed electron-vite 6 erano appena uscite allo scaffold). `.npmrc` imposta `legacy-peer-deps=true` per un errore di npm 10 sui peer opzionali di vite/vitest.
+
+Alias: `@/` → `src/renderer/src` (serve a shadcn), `@shared/` → `src/shared`. I componenti shadcn si aggiungono con `npx shadcn add <nome>` (vedi `components.json`).
+
 Dalla base Nebula restano React + TypeScript, zustand, lucide-react, motion e dayjs. Restano fuori:
 - `react-router-dom`: c'è una sola finestra, le "pagine" (principale, benvenuto, aggiunta account, impostazioni) sono stati in zustand;
 - `axios` e TanStack Query: nessuna API da chiamare;
@@ -117,7 +121,9 @@ src/
   shared/          tipi e funzioni usati da main e renderer (Account, PauseRule, isPaused(), …)
 ```
 
-Il motore delle pause (`shared/pause.ts`) è una funzione pura `isPaused(account, now)`: facile da testare con vitest.
+Il motore delle pause (`shared/pause.ts`) è fatto di funzioni pure (`isPaused`, `scheduledPauseEndsAt`), testate in `shared/pause.test.ts`. La scelta manuale è `Account.override`: `{ state: 'paused' }` (in pausa finché non la togli) oppure `{ state: 'active', until }` (riattivato a mano durante una pausa automatica, fino alla fine della fascia in corso).
+
+Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno dopo. Con "lun–ven 19:00–09:00" la domenica sera non è coperta: per averla serve spuntare anche la domenica.
 
 ---
 
