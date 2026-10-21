@@ -3,13 +3,9 @@
   "sidebar": {
     "accounts": "Account",
     "settings": "Impostazioni",
-    "addAccount": "Aggiungi account"
-  },
-  "menu": {
-    "pause": "Metti in pausa",
-    "resume": "Riattiva",
-    "settings": "Impostazioni…",
-    "remove": "Rimuovi account"
+    "settingsSoon": "In arrivo",
+    "addAccount": "Aggiungi account",
+    "newAccount": "Nuovo account"
   },
   "topBar": {
     "back": "Indietro",
@@ -24,7 +20,26 @@
     "resume": "Riattiva"
   },
   "gmail": {
-    "placeholder": "Qui verrà caricato Gmail",
-    "placeholderHint": "Sessione separata per"
+    "loading": "Caricamento di Gmail…"
+  },
+  "welcome": {
+    "title": "Benvenuto in Gmail Hub",
+    "text": "Tutti i tuoi account Gmail in una finestra. Ognuno ha la sua sessione e il suo colore, e puoi metterlo in pausa quando non ti serve.",
+    "cta": "Aggiungi il primo account",
+    "hintSwitch": "cambia account",
+    "hintMenu": "pausa e opzioni",
+    "rightClick": "tasto destro"
+  },
+  "add": {
+    "step1": "1 di 2",
+    "step2": "2 di 2",
+    "title": "Nuovo account",
+    "signIn": "accedi con Google",
+    "cancel": "Annulla",
+    "connected": "Account collegato",
+    "label": "Etichetta",
+    "color": "Colore",
+    "note": "Verrà aggiunto in fondo alla barra laterale: trascinalo per cambiarne la posizione. Per le notifiche attiva \"Notifiche desktop\" nelle impostazioni di Gmail di questo account.",
+    "confirm": "Aggiungi"
   }
 }
