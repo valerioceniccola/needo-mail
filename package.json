@@ -7,12 +7,13 @@
   "author": "Valerio Ceniccola",
   "main": "./out/main/index.js",
   "scripts": {
-    "dev": "electron-vite dev",
+    "dev": "node node_modules/electron/install.js && electron-vite dev",
     "build": "electron-vite build",
-    "preview": "electron-vite preview",
+    "preview": "node node_modules/electron/install.js && electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
-    "build:mac": "npm run typecheck && electron-vite build && electron-builder --mac"
+    "build:mac": "npm run typecheck && electron-vite build && electron-builder --mac",
+    "postinstall": "node node_modules/electron/install.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
