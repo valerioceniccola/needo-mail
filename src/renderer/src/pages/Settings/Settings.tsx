@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import Avatar from '@/components/atoms/Avatar/Avatar'
+import MacNotifications from '@/components/organisms/MacNotifications/MacNotifications'
 import content from '@/content.json'
 
 const TOGGLES: (keyof AppSettings)[] = ['badge', 'notifications', 'launchAtLogin']
@@ -64,6 +65,8 @@ export default function Settings() {
             )
           })}
         </div>
+
+        <MacNotifications />
 
         <div className="mt-6 flex flex-col items-center gap-2 text-xs text-subtle">
           <span>

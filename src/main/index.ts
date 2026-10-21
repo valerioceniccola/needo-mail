@@ -13,6 +13,7 @@ import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } f
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { avatarFromFile, readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
+import { notificationStatus, openNotificationSettings } from './notificationStatus'
 import { checkForUpdates, initUpdater, quitAndInstall } from './updater'
 
 
@@ -231,6 +232,8 @@ const menuActions = {
 
 function registerIpc() {
   ipcMain.handle(IPC.getState, () => state.getState())
+  ipcMain.handle(IPC.notificationStatus, () => notificationStatus())
+  ipcMain.on(IPC.openNotificationSettings, () => openNotificationSettings())
   ipcMain.on(IPC.select, (_e, id: string) => state.select(id))
   ipcMain.on(IPC.move, (_e, fromId: string, toId: string) => state.move(fromId, toId))
   ipcMain.on(IPC.menu, (_e, id: string) => popupAccountMenu(win, id, removeAccount))

@@ -14,6 +14,9 @@ export type UpdateStatus =
   | { state: 'ready'; version: string }
   | { state: 'error'; message: string }
 
+/** Notifiche di Needo in macOS: spente, stile Banner (spariscono da sole), Avvisi (restano), Nessuno, o non si sa. */
+export type NotificationStatus = 'off' | 'banners' | 'alerts' | 'none' | 'unknown'
+
 /** Rettangolo in pixel della finestra (coordinate CSS dell'interfaccia). */
 export type Rect = { x: number; y: number; width: number; height: number }
 
@@ -51,6 +54,8 @@ export type GmailHubApi = {
   openSettingsPage: () => void
   closeSettingsPage: () => void
   checkForUpdates: () => void
+  notificationStatus: () => Promise<NotificationStatus>
+  openNotificationSettings: () => void
   installUpdate: () => void
   setSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void
   updateAccount: (id: string, changes: AccountChanges) => void
@@ -83,6 +88,8 @@ export const IPC = {
   closeSettingsPage: 'settings-page:close',
   setSetting: 'settings:set',
   checkUpdates: 'update:check',
+  notificationStatus: 'notifications:status',
+  openNotificationSettings: 'notifications:open-settings',
   installUpdate: 'update:install',
   update: 'account:update',
   remove: 'account:remove',

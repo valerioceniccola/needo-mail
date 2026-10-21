@@ -122,5 +122,33 @@
     "downloading": "download",
     "ready": "pronta da installare",
     "error": "controllo non riuscito"
+  },
+  "macNotifications": {
+    "title": "Notifiche di macOS",
+    "open": "Apri Impostazioni di Sistema",
+    "status": {
+      "alerts": [
+        "Avvisi",
+        "Le notifiche restano a schermo finché non le chiudi. Tutto a posto."
+      ],
+      "banners": [
+        "Banner",
+        "Le notifiche spariscono da sole dopo qualche secondo e non mostrano subito Apri ed Elimina."
+      ],
+      "none": [
+        "Nessuno stile",
+        "Le notifiche arrivano solo nel Centro Notifiche, senza comparire a schermo."
+      ],
+      "off": [
+        "Disattivate",
+        "macOS non mostra le notifiche di Needo."
+      ],
+      "unknown": [
+        "Non rilevabile",
+        "Non riesco a leggere come sono impostate: controllale nelle Impostazioni di Sistema."
+      ]
+    },
+    "howTo": "Per avere le notifiche fisse a schermo: Apri Impostazioni di Sistema › attiva Consenti notifiche › come stile scegli Avvisi.",
+    "dev": "In sviluppo le notifiche risultano dell'app Electron."
   }
 }
