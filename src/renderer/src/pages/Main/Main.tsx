@@ -33,7 +33,7 @@ export default function Main() {
   return (
     <main className="flex min-w-0 flex-1 flex-col">
       {/* solo se in Needo le notifiche sono accese ma macOS le blocca */}
-      {settings.notifications && macNotifications === 'off' && !warningDismissed && <NotificationsOffBanner onDismiss={() => setWarningDismissed(true)} />}
+      {settings.notifications && settings.notificationsWarning && macNotifications === 'off' && !warningDismissed && <NotificationsOffBanner onDismiss={() => setWarningDismissed(true)} />}
       {paused && <PausedBanner until={end ? `${content.paused.until} ${formatWhen(end, now)}` : null} onResume={() => api.resume(account.id)} />}
       <GmailFrame />
     </main>

@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.1.4
+
+- Notifiche col suono di Mail
+- Impostazioni: sezione "Notifiche di macOS" con lo stato (Avvisi, Banner, disattivate) e come averle fisse a schermo
+- Fascia gialla sopra Gmail se macOS ha disattivato le notifiche di Needo, con "Non ora" e "Non chiedermelo più"
+
 ## 0.1.3
 
 - Gmail carica molto più in fretta all'apertura

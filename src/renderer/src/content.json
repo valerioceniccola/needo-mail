@@ -108,6 +108,10 @@
       "launchAtLogin": [
         "Apri all'accensione del Mac",
         "Needo parte da solo quando accedi"
+      ],
+      "notificationsWarning": [
+        "Avvisami se le notifiche sono disattivate",
+        "Fascia gialla sopra Gmail quando macOS blocca le notifiche di Needo"
       ]
     },
     "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo",
@@ -154,7 +158,8 @@
       "title": "Notifiche disattivate",
       "description": "macOS non mostra le notifiche di Needo, quindi non ti avvisa delle email nuove.",
       "action": "Attiva",
-      "dismiss": "Non ora"
+      "dismiss": "Non ora",
+      "never": "Non chiedermelo più"
     }
   }
 }

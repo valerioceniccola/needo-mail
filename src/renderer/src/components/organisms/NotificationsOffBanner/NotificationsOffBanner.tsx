@@ -7,7 +7,10 @@ type Props = {
   onDismiss: () => void
 }
 
-/** Fascia gialla sopra Gmail quando macOS ha disattivato le notifiche di Needo. */
+/**
+ * Fascia gialla sopra Gmail quando macOS ha disattivato le notifiche di Needo.
+ * "Non ora" la nasconde fino al prossimo avvio, "Non chiedermelo più" per sempre (si riaccende dalle Impostazioni).
+ */
 export default function NotificationsOffBanner({ onDismiss }: Props) {
   const text = content.macNotifications.warning
   return (
@@ -16,6 +19,9 @@ export default function NotificationsOffBanner({ onDismiss }: Props) {
       <span className="shrink-0 font-medium">{text.title}</span>
       <span className="truncate text-[#c9bc96]">{text.description}</span>
       <span className="flex-1" />
+      <Button variant="ghost" onClick={() => api.setSetting('notificationsWarning', false)} className="h-7 text-[#c9bc96]">
+        {text.never}
+      </Button>
       <Button variant="ghost" onClick={onDismiss} className="h-7 text-[#c9bc96]">
         {text.dismiss}
       </Button>
