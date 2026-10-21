@@ -8,6 +8,7 @@ import * as views from './views'
 import { emailFromTitle, fetchUnread, unreadFromTitle } from './unread'
 import { initNotifier, notifyFromGmail, refresh } from './notifier'
 import { buildAppMenu, popupAccountMenu } from './menu'
+import { readAvatar } from './avatar'
 
 // nome mostrato nel menu dell'app e nel Dock anche in sviluppo
 app.setName('Gmail Hub')
@@ -26,8 +27,8 @@ function createWindow(): BrowserWindow {
     title: 'Gmail Hub',
     backgroundColor: '#0E0E10',
     titleBarStyle: 'hiddenInset',
-    // allineati alla riga alta 44px della barra laterale
-    trafficLightPosition: { x: 18, y: 16 },
+    // centrati nella barra laterale larga 76px, nella riga alta 44px
+    trafficLightPosition: { x: 12, y: 16 },
     webPreferences: {
       preload: join(__dirname, '../preload/app.js'),
       sandbox: true,
@@ -108,6 +109,20 @@ function onNavigate(id: string) {
   if (id === visibleAccountId()) state.setNav(views.navState(id))
 }
 
+/** Foto profilo: Gmail disegna la barra in alto qualche secondo dopo il caricamento, quindi riproviamo. */
+function refreshAvatar(id: string, attempt = 0) {
+  setTimeout(async () => {
+    if (!state.findAccount(id)) return
+    const avatar = await readAvatar(id)
+    if (avatar) state.setAvatar(id, avatar)
+    else if (attempt < 4) refreshAvatar(id, attempt + 1)
+  }, 3000)
+}
+
+function onLoaded(id: string) {
+  if (state.findAccount(id)) refreshAvatar(id)
+}
+
 // --- aggiunta e rimozione account -------------------------------------------
 
 function startAdd() {
@@ -137,6 +152,8 @@ function confirmAdd(label: string, color: string) {
     autoPause: { enabled: false, rules: [] }
   })
   refreshUnreadSoon(adding.id, null)
+  // Gmail è già caricato: la foto si può leggere subito
+  refreshAvatar(adding.id)
 }
 
 async function removeAccount(id: string) {
@@ -183,7 +200,7 @@ app.whenReady().then(() => {
   if (!app.isPackaged) app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
 
   win = createWindow()
-  views.initViews(win, { onTitle, onNavigate })
+  views.initViews(win, { onTitle, onNavigate, onLoaded })
   initNotifier(showWindow)
   registerIpc()
 

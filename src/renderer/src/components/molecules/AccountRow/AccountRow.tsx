@@ -1,9 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { CirclePause } from 'lucide-react'
 import type { Account } from '@shared/types'
 import { cn } from '@/lib/utils'
-import ColorDot from '@/components/atoms/ColorDot/ColorDot'
+import Avatar from '@/components/atoms/Avatar/Avatar'
 
 type Props = {
   account: Account
@@ -15,35 +14,39 @@ type Props = {
   onMenu: () => void
 }
 
-/** Riga di un account nella barra laterale: selezionabile, trascinabile, tasto destro per il menu. */
+/** Avatar di un account nella colonna laterale: clic per aprirlo, trascinamento, tasto destro per il menu. */
 export default function AccountRow({ account, index, unread, paused, selected, onSelect, onMenu }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: account.id })
+  const shortcut = index < 9 ? ` · ⌘${index + 1}` : ''
 
   return (
-    <button
-      ref={setNodeRef}
-      type="button"
-      onClick={onSelect}
-      onContextMenu={(e) => {
-        e.preventDefault()
-        onMenu()
-      }}
-      aria-current={selected ? 'page' : undefined}
-      title={index < 9 ? `${account.email} · ⌘${index + 1}` : account.email}
-      style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn(
-        'flex h-[30px] w-full items-center gap-2.5 rounded-md px-2 text-left font-medium outline-none',
-        'hover:bg-[#1c1c21] focus-visible:ring-2 focus-visible:ring-ring',
-        selected ? 'bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-accent' : 'text-sidebar-foreground',
-        paused && !selected && 'text-muted-foreground',
-        isDragging && 'relative z-10 bg-[#1c1c21] shadow-lg'
+    <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={cn('relative flex h-11 items-center justify-center', isDragging && 'z-10')}>
+      {/* barretta dell'account aperto, come in Slack */}
+      {selected && <span aria-hidden="true" className="absolute top-2.5 left-0 h-6 w-1 rounded-r-[3px] bg-foreground" />}
+
+      <button
+        type="button"
+        onClick={onSelect}
+        onContextMenu={(e) => {
+          e.preventDefault()
+          onMenu()
+        }}
+        aria-current={selected ? 'page' : undefined}
+        aria-label={`${account.label}${paused ? ', in pausa' : ''}${unread ? `, ${unread} non letti` : ''}`}
+        // suggerimento nativo di macOS: un tooltip HTML finirebbe sotto la vista Gmail
+        title={`${account.label}${shortcut}${paused ? ' · in pausa' : ''}`}
+        className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-sidebar"
+        {...attributes}
+        {...listeners}
+      >
+        <Avatar account={account} selected={selected} paused={paused} />
+      </button>
+
+      {!paused && unread > 0 && (
+        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-11 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#d93f45] px-[5px] text-[11px] font-semibold text-white shadow-[0_0_0_2px_var(--sidebar)]">
+          {unread > 99 ? '99+' : unread}
+        </span>
       )}
-      {...attributes}
-      {...listeners}
-    >
-      {paused ? <CirclePause className="size-3 shrink-0" strokeWidth={2.4} aria-label="In pausa" /> : <ColorDot color={account.color} />}
-      <span className="flex-1 truncate">{account.label}</span>
-      {unread > 0 && <span className={cn('text-xs font-normal', selected ? 'text-sidebar-foreground' : 'text-subtle')}>{unread}</span>}
-    </button>
+    </div>
   )
 }

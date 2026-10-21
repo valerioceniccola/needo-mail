@@ -12,12 +12,15 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 - Ogni account ha una **sessione separata** (cookie e login propri, persistenti): `session.fromPartition('persist:account-<id>')`.
 - Ogni account ha **etichetta** e **colore** (palette fissa: `#5E9CF2 #F2994A #4CB782 #B37FEB #E86C8E #4DB6C4 #8A8B93`).
 - Aggiunta in due passi: 1) login Google dentro l'app, 2) etichetta + colore. Il nuovo account va in fondo alla lista.
-- Al primo avvio (nessun account) la barra laterale mostra solo "Aggiungi account"; poi l'aggiunta sta nelle Impostazioni.
+- Si aggiunge dal + in fondo alla colonna laterale, da File › Aggiungi account… o dalla schermata di benvenuto (primo avvio).
 
 ### Barra laterale
-- **Una sola lista**, nessuna sezione "Attivi / In pausa". Un account in pausa resta al suo posto, in grigio con l'icona di pausa.
-- Ordine modificabile con **drag and drop** (nella barra laterale e nelle Impostazioni).
-- In fondo alla barra laterale solo **Impostazioni** (icona + etichetta).
+- **Colonna minimale** larga 76 px, stile Slack: in alto i semafori, poi **un avatar per account** (foto profilo Google letta dalla pagina di Gmail; iniziali sul colore dell'account finché non c'è). Niente nome dell'app, niente etichette: nome e colore stanno nell'intestazione.
+- Avatar: bordo sottile nel colore dell'account; quello aperto ha una barretta bianca a sinistra e il bordo più spesso; non letti in un pallino rosso (oltre 99: "99+").
+- **Una sola lista**, nessuna sezione "Attivi / In pausa". Un account in pausa resta al suo posto: avatar grigio e trasparente, icona di pausa sopra, nessun numero.
+- Passando col mouse: suggerimento nativo (`title`) con etichetta e scorciatoia, es. "Lavoro · ⌘2" (un tooltip HTML finirebbe sotto la vista Gmail).
+- Ordine modificabile con **drag and drop** (nella colonna e nelle Impostazioni).
+- In fondo: **+** per aggiungere un account, sotto l'icona delle **Impostazioni**.
 
 ### Scorciatoie
 - Le scorciatoie **non si assegnano**: dipendono solo dalla posizione. ⌘1 = primo account dall'alto, ⌘2 = secondo, … fino a ⌘9. Cambiando l'ordine cambiano i numeri.
