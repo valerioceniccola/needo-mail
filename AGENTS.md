@@ -26,6 +26,9 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 - Le scorciatoie **non si assegnano**: dipendono solo dalla posizione. ⌘1 = primo account dall'alto, ⌘2 = secondo, … fino a ⌘9. Cambiando l'ordine cambiano i numeri.
 - Valgono anche per gli account in pausa (aprirli non li riattiva).
 
+### Selettore di account di Gmail
+- Nascosto via CSS (`views.ts`, `HIDE_ACCOUNT_SWITCHER`): ogni account ha già la sua vista, non servono due modi di cambiare account. Bloccate anche le pagine Google `AddSession` / `AccountChooser` / `SignOutOptions` fuori dall'aggiunta.
+
 ### Navigazione
 - In alto a sinistra: **indietro, avanti, ricarica** sulla vista Gmail dell'account aperto. Accanto: colore, etichetta / email dell'account.
 
@@ -39,7 +42,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (claude.ai/artifact/Penw
 
 ### Badge e notifiche
 - Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** dei soli account **attivi**. Nessun account attivo → nessun badge.
-- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic → apre l'account e quell'email. Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
+- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Gmail Hub.
 
 ### Impostazioni generali
 Elenco account (riordinabile, stato, ⌘n, menu "…", "Aggiungi account"), poi interruttori: badge sul Dock, notifiche, riepilogo a fine pausa, icona nella barra dei menu (spenta di default), apri all'accensione del Mac.
@@ -160,5 +163,6 @@ Fasce che scavalcano la mezzanotte: la parte del mattino appartiene al giorno do
 - `npm run typecheck` — controllo dei tipi (main + renderer)
 - `npm test` — vitest
 - `npm run build:mac` — .dmg firmato e notarizzato
+- `npm run build:mac:local` — .dmg firmato ma non notarizzato, per provarlo sul proprio Mac
 
 Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
