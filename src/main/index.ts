@@ -293,12 +293,20 @@ app.whenReady().then(() => {
   let lastVisible: string | null | undefined
   const sync = () => {
     const visible = visibleAccountId()
-    if (visible !== lastVisible) {
-      lastVisible = visible
+    const changed = visible !== lastVisible
+    lastVisible = visible
+    // aprendo le Impostazioni la vista Gmail si toglie un attimo dopo aver mandato lo stato:
+    // così sotto c'è già la pagina scura delle Impostazioni e non si intravede la sagoma di Gmail
+    const delayHide = changed && visible === null && state.getState().settingsOpen
+    if (changed && !delayHide) {
       views.showView(visible)
       state.setNav(views.navState(visible))
     }
     if (!win.isDestroyed()) win.webContents.send(IPC.state, state.getState())
+    if (delayHide)
+      setTimeout(() => {
+        if (lastVisible === null) views.showView(null)
+      }, 80)
     buildAppMenu(menuActions)
     refresh()
   }
