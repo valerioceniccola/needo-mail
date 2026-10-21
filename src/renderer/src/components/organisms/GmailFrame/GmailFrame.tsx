@@ -1,23 +1,37 @@
-import { Mail } from 'lucide-react'
+import { useLayoutEffect, useRef } from 'react'
+import { api } from '@/app/store'
 import content from '@/content.json'
 
-type Props = {
-  email: string
-}
-
 /**
- * Riquadro dove apparirà Gmail. Per ora è un segnaposto: la vista vera (WebContentsView)
- * verrà posizionata dal processo principale esattamente sopra questo rettangolo.
+ * Riquadro dove appare Gmail. La vista vera (WebContentsView) la disegna il processo principale
+ * sopra questo rettangolo: qui misuriamo il riquadro e gli mandiamo posizione e dimensioni.
  */
-export default function GmailFrame({ email }: Props) {
+export default function GmailFrame() {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const send = () => {
+      const r = el.getBoundingClientRect()
+      api.setViewBounds({ x: r.x, y: r.y, width: r.width, height: r.height })
+    }
+    send()
+    const observer = new ResizeObserver(send)
+    observer.observe(el)
+    window.addEventListener('resize', send)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', send)
+      // riquadro smontato (es. schermata di benvenuto): la vista sparisce
+      api.setViewBounds({ x: 0, y: 0, width: 0, height: 0 })
+    }
+  }, [])
+
   return (
     <div className="flex min-h-0 flex-1 p-2">
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-[10px] bg-[#bbd5ec] text-[#1f1f1f] shadow-[0_0_0_1px_#26262b]">
-        <Mail className="size-8 text-[#444746]" strokeWidth={1.6} aria-hidden="true" />
-        <p className="text-[15px] font-medium">{content.gmail.placeholder}</p>
-        <p className="text-[#444746]">
-          {content.gmail.placeholderHint} {email}
-        </p>
+      <div ref={ref} className="flex flex-1 items-center justify-center rounded-[10px] bg-[#bbd5ec] text-[#444746] shadow-[0_0_0_1px_#26262b]">
+        {content.gmail.loading}
       </div>
     </div>
   )

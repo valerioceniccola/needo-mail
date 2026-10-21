@@ -27,8 +27,11 @@ npm run dev
 - [x] Struttura Electron + React + shadcn, tema scuro della tela
 - [x] Barra laterale con lista unica, drag and drop, ⌘1–⌘9, menu del tasto destro (pausa / riattiva / rimuovi)
 - [x] Motore delle pause e calcolo del badge, con test
-- [ ] Gmail vero in una vista per account (sessioni separate)
-- [ ] Non letti, badge sul Dock, notifiche
-- [ ] Salvataggio su disco, aggiunta account, impostazioni
+- [x] Gmail vero in una vista per account (sessioni separate), indietro / avanti / ricarica
+- [x] Aggiunta account (login Google + etichetta e colore), rimozione con pulizia della sessione
+- [x] Non letti, badge sul Dock solo per gli account attivi, notifiche, riepilogo a fine pausa
+- [x] Salvataggio su disco di account, ordine e selezione
+- [ ] Impostazioni dell'account (etichetta, colore, pausa automatica)
+- [ ] Impostazioni generali
 
-Per ora gli account sono dati di prova in `src/renderer/src/app/store.ts`.
+Gli account si aggiungono dalla schermata di benvenuto o da File › Aggiungi account…

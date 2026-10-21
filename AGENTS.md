@@ -80,20 +80,25 @@ Dalla base Nebula restano React + TypeScript, zustand, lucide-react, motion e da
 Processo principale (Node)
 ├── AccountManager    crea/rimuove una WebContentsView per account, ognuna con la sua session partition
 ├── PauseEngine       ogni minuto calcola chi è attivo (pausa manuale + fasce) → stato per account
-├── UnreadTracker     legge i non letti dal titolo della pagina Gmail ("Posta in arrivo (12)") via 'page-title-updated'
+├── Unread            non letti dal feed Atom di Gmail (session.fetch con i cookie dell'account), riletti 1,5 s dopo ogni cambio del titolo e ogni minuto; il titolo serve solo da ripiego
 ├── Notifier          notifiche native; tace per gli account in pausa; riepilogo al rientro
 ├── Badge             app.dock.setBadge() con la somma degli account attivi
 ├── Store             JSON in ~/Library/Application Support/Gmail Hub/ (store.ts)
 └── WindowState       ricorda posizione e dimensioni della finestra (windowState.ts)
 
 Preload Gmail (iniettato in ogni vista Gmail)
-└── intercetta window.Notification di Gmail e la inoltra al processo principale (che decide se mostrarla)
+└── sostituisce window.Notification di Gmail e inoltra titolo e testo al processo principale (che decide se mostrarla)
 
 Preload app + Renderer (React)
 └── barra laterale, intestazione, menu contestuale, dialog, impostazioni; parla col principale via IPC tipizzato (contextBridge)
 ```
 
 Punti delicati:
+- **Menu del tasto destro nativo** (`Menu.popup`): un menu HTML finirebbe sotto la vista Gmail, che sta sopra la pagina. Per lo stesso motivo, con un dialog aperto l'interfaccia chiama `setOverlay(true)` e la vista si nasconde.
+- **Scorciatoie ⌘1…⌘9 nel menu dell'app** (`menu.ts`), non nell'interfaccia: così funzionano anche col cursore dentro Gmail.
+- **Chiudere la finestra la nasconde** (macOS): le viste restano vive per non letti e notifiche; ⌘Q chiude davvero.
+- **Preload in sandbox**: non possono importare altri file del progetto. `preload/gmail.ts` non importa nulla da `shared/` (altrimenti Rollup crea un file condiviso tra i due preload che la sandbox non sa caricare).
+- **Notifiche**: Gmail le manda solo se in Gmail › Impostazioni › Notifiche desktop sono attive, per ogni account.
 - **User agent**: impostare uno user agent di Chrome senza "Electron", altrimenti Google può bloccare il login ("browser non sicuro").
 - **Memoria**: le viste degli account non visibili restano caricate (servono per notifiche e conteggi); valutare di sospendere solo gli account in pausa.
 - **Link esterni**: i link fuori da Google si aprono nel browser predefinito (`shell.openExternal`), quelli di Google restano nella vista.
