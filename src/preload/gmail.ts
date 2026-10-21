@@ -64,8 +64,10 @@ if (location.hostname === 'mail.google.com') {
   const apply = () => {
     const button = findAccountButton()
     if (!button) return
-    const img = button.querySelector('img')
-    if (img?.src) document.documentElement.dataset.needoAvatar = img.src
+    // nel pulsante possono esserci altre immagini (es. l'anello colorato di Google One): si prende solo
+    // la foto vera, ospitata su googleusercontent (account @gmail.com) o lh3.google.com (Workspace)
+    const img = [...button.querySelectorAll('img')].find((i) => /^https:\/\/[^/]*(googleusercontent\.com|lh\d\.google\.com)\//.test(i.src))
+    if (img) document.documentElement.dataset.needoAvatar = img.src
     const box = containerOf(button)
     if (!box.hasAttribute(HIDDEN)) box.setAttribute(HIDDEN, '')
   }
