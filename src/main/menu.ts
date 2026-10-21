@@ -1,6 +1,6 @@
 import { app, dialog, Menu, type BrowserWindow, type MenuItemConstructorOptions } from 'electron'
 import { isPaused } from '@shared/pause'
-import { findAccount, getState, pause, resume, selectByIndex } from './state'
+import { findAccount, getState, pause, resume, selectByIndex, setEditing } from './state'
 
 type Actions = {
   addAccount: () => void
@@ -63,22 +63,24 @@ export function popupAccountMenu(win: BrowserWindow, id: string, onRemove: (id: 
 
   Menu.buildFromTemplate([
     paused ? { label: 'Riattiva', click: () => resume(id) } : { label: 'Metti in pausa', click: () => pause(id) },
-    { label: 'Impostazioni…', enabled: false, toolTip: 'In arrivo: etichetta, colore e pausa automatica' },
+    { label: 'Impostazioni…', click: () => setEditing(id) },
     { type: 'separator' },
-    {
-      label: 'Rimuovi account…',
-      click: async () => {
-        const { response } = await dialog.showMessageBox(win, {
-          type: 'warning',
-          message: `Rimuovere ${account.label}?`,
-          detail: `${account.email} verrà scollegato da Gmail Hub e la sua sessione cancellata. L'account Google non viene toccato.`,
-          buttons: ['Rimuovi', 'Annulla'],
-          defaultId: 1,
-          cancelId: 1
-        })
-        if (response === 0) onRemove(id)
-      }
-    }
+    { label: 'Rimuovi account…', click: () => confirmRemove(win, id, onRemove) }
   ]).popup({ window: win })
 }
 
+
+/** Conferma prima di rimuovere un account (dal tasto destro o dalle Impostazioni). */
+export async function confirmRemove(win: BrowserWindow, id: string, onRemove: (id: string) => void) {
+  const account = findAccount(id)
+  if (!account) return
+  const { response } = await dialog.showMessageBox(win, {
+    type: 'warning',
+    message: `Rimuovere ${account.label}?`,
+    detail: `${account.email} verrà scollegato da Gmail Hub e la sua sessione cancellata. L'account Google non viene toccato.`,
+    buttons: ['Rimuovi', 'Annulla'],
+    defaultId: 1,
+    cancelId: 1
+  })
+  if (response === 0) onRemove(id)
+}

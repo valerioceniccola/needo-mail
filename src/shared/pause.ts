@@ -62,3 +62,18 @@ export function scheduledPauseEndsAt(account: Account, now: Date): Date | null {
   }
   return null // in pausa tutta la settimana
 }
+
+/**
+ * Quando inizierà la prossima pausa automatica (per "Adesso attivo · in pausa da stasera alle 19:00").
+ * Null se è già in pausa automatica o se nella prossima settimana non ce n'è nessuna.
+ */
+export function nextScheduledPauseAt(account: Account, now: Date): Date | null {
+  if (isScheduledPause(account, now)) return null
+  const t = new Date(now)
+  t.setSeconds(0, 0)
+  for (let i = 0; i < 7 * DAY_MINUTES; i++) {
+    t.setMinutes(t.getMinutes() + 1)
+    if (isScheduledPause(account, t)) return new Date(t)
+  }
+  return null
+}
