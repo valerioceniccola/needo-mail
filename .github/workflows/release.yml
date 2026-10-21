@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+# un rilascio alla volta: un push arrivato durante una pubblicazione aspetta che finisca
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   # controllo veloce su Linux: c'è già una Release completa per questa versione?
   check:
@@ -22,13 +27,26 @@ jobs:
       release: ${{ steps.v.outputs.release }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - id: v
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEFORE: ${{ github.event.before }}
         run: |
           VERSION="$(node -p "require('./package.json').version")"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          # conta come uscita solo se la Release ha già il .dmg (una pubblicazione interrotta si riprova)
+          # su un push si rilascia solo se questo push ha cambiato la versione: le modifiche normali
+          # su main non pubblicano niente (le versioni nuove si fanno solo quando si alza la versione)
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            PREV="$(git show "$BEFORE:package.json" 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version" 2>/dev/null || echo "")"
+            if [ "$PREV" = "$VERSION" ]; then
+              echo "Versione invariata ($VERSION): niente da rilasciare."
+              echo "release=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          # a mano (Run workflow) si può ripubblicare una versione rimasta a metà, cioè senza .dmg
           if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null | grep -qx "Needo-$VERSION.dmg"; then
             echo "La versione $VERSION è già uscita: niente da fare."
             echo "release=false" >> "$GITHUB_OUTPUT"
