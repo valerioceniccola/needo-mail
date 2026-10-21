@@ -12,6 +12,11 @@ const GMAIL_URL = 'https://mail.google.com/mail/u/0/'
 // Google blocca il login nei browser "non sicuri": ci presentiamo come Chrome, senza la parola Electron
 const USER_AGENT = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${process.versions.chrome} Safari/537.36`
 
+// Sulla pagina di accesso Google riconosce comunque Chromium incorporato (dagli header Sec-CH-UA e da
+// navigator.userAgentData) e blocca il login. Lì ci presentiamo come Firefox, che non manda quegli header.
+// Stesso valore in preload/gmail.ts, che sistema anche navigator.* dentro la pagina.
+export const FIREFOX_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:140.0) Gecko/20100101 Firefox/140.0'
+
 // questi domini restano dentro l'app (login, Gmail, allegati, Drive…); tutto il resto va nel browser
 const GOOGLE_HOSTS = /(^|\.)(google\.com|googleusercontent\.com|gstatic\.com|youtube\.com|google\.it)$/
 
@@ -51,6 +56,13 @@ function setupSession(ses: Session) {
   const allowed = new Set(['notifications', 'clipboard-sanitized-write', 'fullscreen'])
   ses.setPermissionRequestHandler((_wc, permission, done) => done(allowed.has(permission)))
   ses.setPermissionCheckHandler((_wc, permission) => allowed.has(permission))
+
+  ses.webRequest.onBeforeSendHeaders({ urls: ['https://accounts.google.com/*'] }, (details, done) => {
+    const headers = { ...details.requestHeaders }
+    for (const key of Object.keys(headers)) if (key.toLowerCase().startsWith('sec-ch-ua')) delete headers[key]
+    headers['User-Agent'] = FIREFOX_USER_AGENT
+    done({ requestHeaders: headers })
+  })
 }
 
 /** Crea (o restituisce) la vista Gmail di un account. */
