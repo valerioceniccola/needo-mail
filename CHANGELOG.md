@@ -1,5 +1,13 @@
 # Novità di Needo
 
+## 0.1.3
+
+- Gmail carica molto più in fretta all'apertura
+- Gmail non si impagina più "compattato" (testi e righe stretti) in alcuni account
+- Foto profilo presa da Google una sola volta e poi salvata; nelle impostazioni dell'account c'è "Prendi da Google" per riprenderla
+- Corretta la foto profilo degli account Gmail che mostrava un cerchio colorato
+- Menu Vista: Dimensioni reali (⌘0), Ingrandisci (⌘+), Riduci (⌘-)
+
 ## 0.1.2
 
 - Account Google Workspace (aziendali): niente più selettore di account in alto a destra e foto profilo letta correttamente
