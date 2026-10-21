@@ -25,6 +25,7 @@ const state: AppState = {
   settingsOpen: false,
   settings: settingsStore.read(),
   canLaunchAtLogin: app.isPackaged,
+  appVersion: app.getVersion(),
   nav: { canGoBack: false, canGoForward: false }
 }
 

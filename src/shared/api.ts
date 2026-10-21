@@ -22,6 +22,8 @@ export type AppState = {
   settings: AppSettings
   /** l'avvio al login si può impostare solo nell'app installata, non in sviluppo */
   canLaunchAtLogin: boolean
+  /** versione dell'app (da package.json) */
+  appVersion: string
   nav: { canGoBack: boolean; canGoForward: boolean }
 }
 

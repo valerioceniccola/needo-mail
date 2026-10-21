@@ -15,7 +15,7 @@ const TOGGLES: (keyof AppSettings)[] = ['badge', 'notifications', 'launchAtLogin
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
 export default function Settings() {
-  const { accounts, settings, canLaunchAtLogin, now } = useStore()
+  const { accounts, settings, canLaunchAtLogin, appVersion, now } = useStore()
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
@@ -63,6 +63,10 @@ export default function Settings() {
             )
           })}
         </div>
+
+        <p className="mt-6 text-center text-xs text-subtle">
+          {content.appName} · {content.general.version} {appVersion}
+        </p>
       </div>
     </main>
   )
