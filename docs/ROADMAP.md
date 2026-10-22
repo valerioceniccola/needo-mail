@@ -8,3 +8,4 @@ Idee e richieste raccolte, da fare con calma (nessuna è in lavorazione).
   - Novità degli aggiornamenti in tutte e due le lingue (Needo mostra quella giusta). Il README resta in italiano.
 - **Sincronizzazione tra Mac**: salvare account, etichette, colori, foto e pause su un proprio account, per ritrovarli su un altro Mac.
 - **Landing page** di Needo (repo separata `needo-mail-landing`): moderna, pochi contenuti, vantaggi e link di download, in italiano e inglese.
+- **Caricamento di Gmail più rapido**: in Chrome ~1 secondo, in Needo ~6. Prima misurare (tempi per account in `npm run dev`: inizio, pagina, Gmail pronto), poi intervenire su quello che pesa.
