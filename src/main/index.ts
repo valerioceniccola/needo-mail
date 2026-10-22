@@ -286,8 +286,15 @@ app.whenReady().then(() => {
   readMacNotifications()
   win.on('focus', readMacNotifications)
 
-  // tutte le viste partono subito: servono anche quelle non a schermo, per non letti e notifiche
-  for (const account of state.getState().accounts) views.ensureView(account.id)
+  // prima la vista dell'account aperto, così ha tutto il Mac per sé; le altre partono dopo, una alla volta.
+  // Non letti e notifiche non dipendono dalle viste (arrivano dal feed con i cookie dell'account),
+  // quindi funzionano da subito per tutti gli account. Cliccando un account non ancora caricato parte subito.
+  const first = state.getState().selectedId
+  if (first) views.ensureView(first)
+  state
+    .getState()
+    .accounts.filter((a) => a.id !== first)
+    .forEach((account, i) => setTimeout(() => state.findAccount(account.id) && views.ensureView(account.id), 4000 + i * 2000))
 
   let lastVisible: string | null | undefined
   const sync = () => {
