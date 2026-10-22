@@ -16,16 +16,6 @@ export default function Welcome() {
           <Plus className="size-3.5" strokeWidth={2.2} />
           {content.welcome.cta}
         </Button>
-        <div className="mt-6 flex gap-[22px] text-xs text-subtle">
-          <span className="flex items-center gap-1.5">
-            <kbd className="rounded border border-[#2e2e34] bg-[#1c1c21] px-1.5 leading-[18px] text-sidebar-foreground">⌘1–9</kbd>
-            {content.welcome.hintSwitch}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <kbd className="rounded border border-[#2e2e34] bg-[#1c1c21] px-1.5 leading-[18px] text-sidebar-foreground">{content.welcome.rightClick}</kbd>
-            {content.welcome.hintMenu}
-          </span>
-        </div>
       </div>
     </main>
   )

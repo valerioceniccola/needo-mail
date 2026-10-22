@@ -24,10 +24,7 @@
   "welcome": {
     "title": "Benvenuto in Needo",
     "text": "Tutti i tuoi account Gmail in una finestra. Ognuno ha la sua sessione e il suo colore, e puoi metterlo in pausa quando non ti serve.",
-    "cta": "Aggiungi il primo account",
-    "hintSwitch": "cambia account",
-    "hintMenu": "pausa e opzioni",
-    "rightClick": "tasto destro"
+    "cta": "Aggiungi il primo account"
   },
   "add": {
     "step1": "1 di 2",
