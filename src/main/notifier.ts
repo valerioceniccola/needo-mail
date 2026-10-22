@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { app, Notification } from 'electron'
 import { badgeCount } from '@shared/badge'
 import { isPaused } from '@shared/pause'
-import { findAccount, getState, select } from './state'
+import { findAccount, getState, select, setSetting } from './state'
 import type { Inbox, MailEntry } from './unread'
 import { staleMailIds } from './staleMail'
 
@@ -153,6 +153,18 @@ export function forgetAccount(accountId: string) {
   seen.delete(accountId)
   for (const item of shown.get(accountId) ?? []) item.notification.close()
   shown.delete(accountId)
+}
+
+/**
+ * macOS chiede il permesso per le notifiche solo alla prima notifica mostrata, che altrimenti sarebbe
+ * la prima email nuova (anche minuti dopo l'installazione). Con il primo account mandiamo subito una
+ * notifica di benvenuto, così la richiesta compare mentre si sta configurando l'app. Una volta sola.
+ */
+export function introduceNotifications() {
+  const { settings, accounts } = getState()
+  if (settings.notificationsIntroduced || !settings.notifications || accounts.length === 0) return
+  setSetting('notificationsIntroduced', true)
+  new Notification({ title: 'Needo', body: 'Ti avviserò qui quando arriva una email nuova.', sound: notificationSound() }).show()
 }
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */

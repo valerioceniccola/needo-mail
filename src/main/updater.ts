@@ -9,6 +9,34 @@ import type { UpdateStatus } from '@shared/api'
 */
 
 const { autoUpdater } = electronUpdater
+
+/**
+ * Novità della versione da mostrare nella finestra di aggiornamento. Arrivano dalla Release di GitHub
+ * (il workflow ci mette la sezione del CHANGELOG): GitHub le dà in HTML, qui diventano testo con i puntini.
+ */
+export function releaseNotesText(notes: string | { version: string; note: string | null }[] | null | undefined): string {
+  // più versioni saltate (fullChangelog): le novità di ognuna, dalla più recente, col suo numero
+  if (Array.isArray(notes)) {
+    if (notes.length === 1) return releaseNotesText(notes[0].note)
+    return notes
+      .map((n) => [n.version, releaseNotesText(n.note)].filter(Boolean).join('\n'))
+      .join('\n\n')
+  }
+  return (notes ?? '')
+    .replace(/<li[^>]*>/gi, '• ')
+    .replace(/<\/(li|p|h\d)>|<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/^- /gm, '• ')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .join('\n')
+}
 const EVERY = 4 * 60 * 60 * 1000
 
 let win: BrowserWindow
@@ -24,6 +52,8 @@ export function initUpdater(window: BrowserWindow, statusListener: (status: Upda
   if (!app.isPackaged) return onStatus({ state: 'dev' })
 
   autoUpdater.autoDownload = false
+  // con più versioni saltate le novità di tutte, non solo dell'ultima
+  autoUpdater.fullChangelog = true
   autoUpdater.autoInstallOnAppQuit = true
 
   autoUpdater.on('checking-for-update', () => onStatus({ state: 'checking' }))
@@ -38,7 +68,12 @@ export function initUpdater(window: BrowserWindow, statusListener: (status: Upda
     const { response } = await dialog.showMessageBox(win, {
       type: 'info',
       message: `È disponibile Needo ${info.version}`,
-      detail: `Hai la versione ${app.getVersion()}. Vuoi scaricare l'aggiornamento? Puoi continuare a usare l'app mentre si scarica.`,
+      detail: [
+        releaseNotesText(info.releaseNotes) && `Novità:\n${releaseNotesText(info.releaseNotes)}`,
+        `Hai la versione ${app.getVersion()}. Vuoi scaricare l'aggiornamento? Puoi continuare a usare l'app mentre si scarica.`
+      ]
+        .filter(Boolean)
+        .join('\n\n'),
       buttons: ['Scarica', 'Più tardi'],
       defaultId: 0,
       cancelId: 1

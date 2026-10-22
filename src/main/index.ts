@@ -9,7 +9,7 @@ import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 import * as state from './state'
 import * as views from './views'
 import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
-import { forgetAccount, handleInbox, initNotifier, refresh, testNotification } from './notifier'
+import { forgetAccount, handleInbox, initNotifier, introduceNotifications, refresh, testNotification } from './notifier'
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { avatarFromFile, readAvatar } from './avatar'
 import { deleteMail } from './mailActions'
@@ -183,6 +183,7 @@ function confirmAdd(label: string, color: string) {
     autoPause: { enabled: false, rules: [] }
   })
   refreshUnreadSoon(adding.id, null)
+  introduceNotifications()
   // Gmail è già caricato: la foto si può leggere subito
   refreshAvatar(adding.id)
 }
@@ -315,10 +316,13 @@ app.whenReady().then(() => {
 
   // orologio delle pause automatiche e ricontrollo periodico dei non letti
   setInterval(state.emit, 30_000)
-  setInterval(() => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null)), 60_000)
+  // posta nuova ogni 30 secondi: il feed è una richiesta leggera (pochi kB per account)
+  setInterval(() => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null)), 30_000)
   state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
+  // chi ha già account ma non ha mai visto la richiesta di macOS (versioni precedenti) la riceve ora
+  introduceNotifications()
   // al risveglio del Mac o allo sblocco si ricontrolla subito: le notifiche di email già gestite
-  // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 60 secondi
+  // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 30 secondi
   const checkNow = () => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
   powerMonitor.on('resume', checkNow)
   powerMonitor.on('unlock-screen', checkNow)

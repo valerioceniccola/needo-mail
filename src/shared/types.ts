@@ -41,13 +41,16 @@ export type AppSettings = {
   launchAtLogin: boolean
   /** fascia gialla sopra Gmail quando macOS ha disattivato le notifiche ("Non chiedermelo più" la spegne) */
   notificationsWarning: boolean
+  /** prima notifica di benvenuto già mostrata: è quella che fa chiedere a macOS il permesso */
+  notificationsIntroduced: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   badge: true,
   notifications: true,
   launchAtLogin: false,
-  notificationsWarning: true
+  notificationsWarning: true,
+  notificationsIntroduced: false
 }
 
 /** Palette fissa dei colori degli account (dalla tela di design). */
