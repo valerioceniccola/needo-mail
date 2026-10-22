@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.1.9
+
+- Clic sulla notifica: Needo si apre subito nella posta in arrivo dell'account giusto
+- I link dentro le email si aprono nel tuo browser
+- Tolto il pulsante Elimina dalle notifiche, che non sempre funzionava
+
 ## 0.1.8
 
 - Le notifiche delle email lette o eliminate altrove (telefono, browser) si chiudono da sole
