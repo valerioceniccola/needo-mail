@@ -14,6 +14,7 @@ const feed = `<?xml version="1.0" encoding="UTF-8"?>
 <summary>Ciao Valerio, ti mando le ultime modifiche &amp; il PDF</summary>
 <link rel="alternate" href="https://mail.google.com/mail?account_id=valerio@studio.it&amp;message_id=18a&amp;view=conv" type="text/html" />
 <id>tag:gmail.google.com,2004:111</id>
+<issued>2026-10-21T22:14:03Z</issued>
 <author><name>Marco Bianchi</name><email>marco@example.com</email></author>
 </entry>
 <entry>
@@ -35,7 +36,8 @@ describe('parseFeed', () => {
       subject: 'Revisione preventivo "sito"',
       author: 'Marco Bianchi',
       summary: 'Ciao Valerio, ti mando le ultime modifiche & il PDF',
-      link: 'https://mail.google.com/mail?account_id=valerio@studio.it&message_id=18a&view=conv'
+      link: 'https://mail.google.com/mail?account_id=valerio@studio.it&message_id=18a&view=conv',
+      time: Date.parse('2026-10-21T22:14:03Z')
     })
     expect(inbox.entries[1].subject).toBe('(senza oggetto)')
   })

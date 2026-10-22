@@ -14,6 +14,8 @@ export type MailEntry = {
   author: string
   summary: string
   link: string
+  /** arrivo dell'email (ms), 0 se il feed non lo dice */
+  time: number
 }
 
 export type Inbox = { count: number; entries: MailEntry[] }
@@ -37,7 +39,8 @@ export function parseFeed(xml: string): Inbox | null {
     subject: tag(e, 'title') || '(senza oggetto)',
     author: tag(e.match(/<author>([\s\S]*?)<\/author>/)?.[1] ?? '', 'name'),
     summary: tag(e, 'summary'),
-    link: decode(e.match(/<link[^>]*href="([^"]+)"/)?.[1] ?? '')
+    link: decode(e.match(/<link[^>]*href="([^"]+)"/)?.[1] ?? ''),
+    time: Date.parse(tag(e, 'issued') || tag(e, 'modified')) || 0
   }))
   return { count: Number(count[1]), entries: entries.filter((e) => e.id) }
 }

@@ -2,7 +2,7 @@
 import './migrate'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, powerMonitor, shell } from 'electron'
 import { IPC, type AccountChanges, type Rect } from '@shared/api'
 import type { AppSettings } from '@shared/types'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
@@ -103,7 +103,7 @@ function refreshUnreadSoon(id: string, titleCount: number | null) {
       if (!state.findAccount(id)) return
       if (inbox) {
         state.setUnread(id, inbox.count)
-        handleInbox(id, inbox.entries)
+        handleInbox(id, inbox)
       } else if (titleCount !== null) {
         state.setUnread(id, titleCount)
       }
@@ -317,6 +317,11 @@ app.whenReady().then(() => {
   setInterval(state.emit, 30_000)
   setInterval(() => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null)), 60_000)
   state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
+  // al risveglio del Mac o allo sblocco si ricontrolla subito: le notifiche di email già gestite
+  // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 60 secondi
+  const checkNow = () => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
+  powerMonitor.on('resume', checkNow)
+  powerMonitor.on('unlock-screen', checkNow)
 
   // su macOS cliccando l'icona nel Dock si riapre la finestra nascosta
   app.on('activate', showWindow)

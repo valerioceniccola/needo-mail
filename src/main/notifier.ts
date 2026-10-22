@@ -5,7 +5,8 @@ import { app, Notification } from 'electron'
 import { badgeCount } from '@shared/badge'
 import { isPaused } from '@shared/pause'
 import { findAccount, getState, select } from './state'
-import type { MailEntry } from './unread'
+import type { Inbox, MailEntry } from './unread'
+import { staleMailIds } from './staleMail'
 
 /*
   Notifiche e badge. Regola: un account in pausa non notifica e non conta nel badge.
@@ -23,6 +24,36 @@ type Handlers = {
 let handlers: Handlers
 // email già viste per account: la prima lettura dopo l'avvio non notifica nulla
 const seen = new Map<string, Set<string>>()
+
+/*
+  Notifiche ancora a schermo (o nel Centro Notifiche), per account. Se un'email viene letta o eliminata
+  altrove (telefono, browser) la sua notifica si chiude da sola al controllo successivo del feed.
+  Una notifica di riepilogo ("5 nuove email") si chiude quando nessuna delle sue email è più da leggere.
+  Tenere qui le notifiche serve anche a non farle raccogliere dal garbage collector.
+*/
+type Shown = { notification: Notification; mails: Map<string, number> }
+const shown = new Map<string, Set<Shown>>()
+
+function track(accountId: string, notification: Notification, mails: MailEntry[]) {
+  const item: Shown = { notification, mails: new Map(mails.map((m) => [m.id, m.time])) }
+  if (!shown.has(accountId)) shown.set(accountId, new Set())
+  shown.get(accountId)!.add(item)
+  // chiusa, cliccata o usata dall'utente: non c'è più niente da togliere
+  const forget = () => shown.get(accountId)?.delete(item)
+  notification.on('close', forget)
+  notification.on('click', forget)
+  notification.on('action', forget)
+}
+
+function closeStale(accountId: string, inbox: Inbox) {
+  for (const item of shown.get(accountId) ?? []) {
+    for (const id of staleMailIds(item.mails, inbox)) item.mails.delete(id)
+    if (item.mails.size === 0) {
+      shown.get(accountId)!.delete(item)
+      item.notification.close()
+    }
+  }
+}
 
 export function initNotifier(h: Handlers) {
   handlers = h
@@ -64,10 +95,11 @@ function open(accountId: string, link?: string) {
   if (link) handlers.openLink(accountId, link)
 }
 
-function notify(accountId: string, title: string, body: string, link?: string) {
+function notify(accountId: string, title: string, body: string, link?: string): Notification {
   const n = new Notification({ title, body, sound: notificationSound() })
   n.on('click', () => open(accountId, link))
   n.show()
+  return n
 }
 
 /**
@@ -90,10 +122,16 @@ function notifyMail(accountId: string, label: string, mail: MailEntry) {
     if (!deleted) notify(accountId, `${label} · non eliminata`, `Non sono riuscito a eliminare "${mail.subject}". Aprila e riprova da Gmail.`, mail.link)
   })
   n.show()
+  track(accountId, n, [mail])
 }
 
-/** Confronta le email non lette con quelle già viste e notifica le nuove (solo account attivi). */
-export function handleInbox(accountId: string, entries: MailEntry[]) {
+/**
+ * Confronta le email non lette con quelle già viste e notifica le nuove (solo account attivi);
+ * toglie le notifiche delle email che nel frattempo sono state lette o eliminate.
+ */
+export function handleInbox(accountId: string, inbox: Inbox) {
+  const { entries } = inbox
+  closeStale(accountId, inbox)
   const known = seen.get(accountId)
   seen.set(accountId, new Set([...(known ?? []), ...entries.map((e) => e.id)]))
   if (!known) return
@@ -105,7 +143,7 @@ export function handleInbox(accountId: string, entries: MailEntry[]) {
 
   // tante email insieme (es. dopo il risveglio del Mac): una notifica sola
   if (fresh.length > 3) {
-    notify(accountId, account.label, `${fresh.length} nuove email`)
+    track(accountId, notify(accountId, account.label, `${fresh.length} nuove email`), fresh)
     return
   }
   for (const mail of fresh) notifyMail(accountId, account.label, mail)
@@ -113,6 +151,8 @@ export function handleInbox(accountId: string, entries: MailEntry[]) {
 
 export function forgetAccount(accountId: string) {
   seen.delete(accountId)
+  for (const item of shown.get(accountId) ?? []) item.notification.close()
+  shown.delete(accountId)
 }
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */
