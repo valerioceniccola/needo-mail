@@ -21,7 +21,8 @@ E quando una casella non ti serve, la metti in pausa: niente notifiche, niente n
 - **Pausa con un clic.** Tasto destro su un account › *Metti in pausa*. Resta in pausa finché non lo riattivi.
 - **Pausa automatica.** Per ogni account puoi scegliere giorni e orari in cui va in pausa da solo, per esempio l'account di lavoro la sera e nel weekend.
 - **Badge sull'icona.** Il numero sull'icona di Needo conta solo i non letti degli account attivi. Puoi anche decidere quali account contano.
-- **Notifiche delle email nuove.** Con i pulsanti *Apri* ed *Elimina* direttamente nella notifica.
+- **Notifiche delle email nuove.** Un clic e sei nella posta in arrivo dell'account giusto. Se leggi o elimini l'email dal telefono, la notifica sul Mac sparisce da sola.
+- **Link nel browser.** I link dentro le email si aprono nel tuo browser predefinito.
 - **Si aggiorna da solo.** Quando esce una versione nuova, Needo te la propone.
 
 ## Installazione
@@ -55,10 +56,7 @@ Needo non ha server e non legge la tua posta. È un contenitore per la pagina di
 La pagina di accesso è quella originale di Google. Needo non vede né salva le tue password, e il codice è pubblico: chiunque può controllarlo.
 
 **Le notifiche non arrivano.**
-Apri *Impostazioni di Sistema › Notifiche › Needo*, attiva *Consenti notifiche* e in *Stile avvisi* scegli *Permanenti*: così restano a schermo con i pulsanti Apri ed Elimina. Puoi arrivarci anche da Needo: Impostazioni › Notifiche di macOS › *Apri Impostazioni di Sistema*.
-
-**"Elimina" cancella l'email per sempre?**
-No, la sposta nel Cestino di Gmail, come il pulsante Elimina di Gmail. Dopo 30 giorni Gmail la cancella del tutto.
+Apri *Impostazioni di Sistema › Notifiche › Needo*, attiva *Consenti notifiche* e in *Stile avvisi* scegli *Permanenti*: così restano a schermo finché non le chiudi. Puoi arrivarci anche da Needo: Impostazioni › Notifiche di macOS › *Apri Impostazioni di Sistema*.
 
 **Come lo tolgo?**
 Trascina Needo dalla cartella Applicazioni nel Cestino.

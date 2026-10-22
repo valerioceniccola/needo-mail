@@ -17,8 +17,8 @@ import { staleMailIds } from './staleMail'
 
 type Handlers = {
   showWindow: () => void
-  openLink: (accountId: string, url: string) => void
-  deleteMail: (accountId: string, url: string) => Promise<boolean>
+  /** porta la vista Gmail dell'account sulla Posta in arrivo, senza ricaricare la pagina */
+  openInbox: (accountId: string) => void
 }
 
 let handlers: Handlers
@@ -89,40 +89,23 @@ function notificationSound(): string {
   return sound
 }
 
-function open(accountId: string, link?: string) {
+// clic sulla notifica: si apre Needo sull'account, nella Posta in arrivo
+function open(accountId: string) {
   select(accountId)
   handlers.showWindow()
-  if (link) handlers.openLink(accountId, link)
+  handlers.openInbox(accountId)
 }
 
-function notify(accountId: string, title: string, body: string, link?: string): Notification {
+function notify(accountId: string, title: string, body: string): Notification {
   const n = new Notification({ title, body, sound: notificationSound() })
-  n.on('click', () => open(accountId, link))
+  n.on('click', () => open(accountId))
   n.show()
   return n
 }
 
-/**
- * Notifica di una singola email con i pulsanti Elimina e Apri.
- * macOS mostra i pulsanti solo se l'app è firmata e ha lo stile avvisi "Permanenti" (NSUserNotificationAlertStyle
- * in electron-builder.yml): in sviluppo resta il clic sulla notifica, che apre l'email.
- */
+/** Notifica di una singola email: mittente, oggetto; il clic apre la Posta in arrivo dell'account. */
 function notifyMail(accountId: string, label: string, mail: MailEntry) {
-  const n = new Notification({
-    title: `${label} · ${mail.author || 'Nuova email'}`,
-    body: mail.subject,
-    actions: mail.link ? [{ type: 'button', text: 'Elimina' }, { type: 'button', text: 'Apri' }] : [],
-    closeButtonText: 'Chiudi',
-    sound: notificationSound()
-  })
-  n.on('click', () => open(accountId, mail.link || undefined))
-  n.on('action', async (event) => {
-    if (event.actionIndex === 1) return open(accountId, mail.link)
-    const deleted = await handlers.deleteMail(accountId, mail.link)
-    if (!deleted) notify(accountId, `${label} · non eliminata`, `Non sono riuscito a eliminare "${mail.subject}". Aprila e riprova da Gmail.`, mail.link)
-  })
-  n.show()
-  track(accountId, n, [mail])
+  track(accountId, notify(accountId, `${label} · ${mail.author || 'Nuova email'}`, mail.subject), [mail])
 }
 
 /**

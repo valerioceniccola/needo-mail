@@ -43,7 +43,8 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (nome di lavoro preceden
 
 ### Badge e notifiche
 - Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** degli account **attivi** che hanno **"Conta nel badge del Dock"** acceso (impostazione del singolo account, `Account.badge`, accesa di default). Il pallino rosso nella colonna resta comunque.
-- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic o pulsante **Apri** → apre l'account e quell'email. Pulsante **Elimina** → sposta la conversazione nel Cestino (come "Elimina" di Gmail), aprendola in una finestra nascosta e premendo il pulsante di Gmail (`mailActions.ts`). I pulsanti macOS li mostra solo con app firmata e stile "Avvisi" (`NSUserNotificationAlertStyle: alert` in `electron-builder.yml`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Needo.
+- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic → apre l'account nella Posta in arrivo (cambio di `#` senza ricaricare). Niente pulsanti Apri/Elimina: aprire la singola email ricaricava Gmail (lento) ed Elimina era fragile. Le notifiche delle email lette o eliminate altrove si chiudono da sole (`staleMail.ts`). Stile avvisi "Permanenti" richiesto con `NSUserNotificationAlertStyle: alert` in `electron-builder.yml`.
+- Link nelle email: nel browser predefinito (anche togliendo il passaggio da google.com/url); restano nell'app solo Gmail, login e allegati (`views.ts`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Needo.
 
 ### Impostazioni generali
 Pagina al posto di Gmail aperta dall'ingranaggio in fondo alla colonna (`pages/Settings`, `state.settingsOpen`; cliccando un avatar si torna a Gmail). Elenco account (maniglia per trascinare, stato, ⌘n, menu "…" = stesso menu del tasto destro, "Aggiungi account"), poi interruttori salvati in `settings.json` (`AppSettings` in `shared/types.ts`):
@@ -186,3 +187,4 @@ Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
 - Riepilogo "di nuovo attivo · N non letti" quando finisce una pausa.
 - Icona nella barra dei menu.
 - Travestire lo user agent (Chrome o Firefox): fa scattare il blocco del login Google.
+- Pulsanti Apri/Elimina nelle notifiche e apertura della singola email dal clic (lenti o fragili): il clic apre la Posta in arrivo.

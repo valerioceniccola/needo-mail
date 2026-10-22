@@ -65,6 +65,21 @@ function isGoogle(url: string): boolean {
   }
 }
 
+// finestre nuove che restano nell'app: solo Gmail stesso e gli allegati (anteprima e download).
+// Tutto il resto, compresi i link dentro le email e Drive/Docs, va nel browser predefinito.
+const IN_APP_WINDOWS = /^https:\/\/(mail\.google\.com|accounts\.google\.com|[^/]*\.googleusercontent\.com)\//
+
+/** Gmail fa passare i link delle email da google.com/url?q=…: si apre direttamente l'indirizzo vero. */
+export function unwrapGoogleRedirect(url: string): string {
+  try {
+    const u = new URL(url)
+    if (/(^|\.)google\.[a-z.]+$/.test(u.hostname) && u.pathname === '/url') return u.searchParams.get('q') || u.searchParams.get('url') || url
+  } catch {
+    // indirizzo non valido: si lascia com'è
+  }
+  return url
+}
+
 function setupSession(ses: Session) {
   // notifiche: le concediamo a Gmail, poi è il processo principale a decidere se mostrarle
   const allowed = new Set(['notifications', 'clipboard-sanitized-write', 'fullscreen'])
@@ -105,11 +120,34 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   // Gmail ci metteva decine di secondi. Il freno si rimette quando è pronta (markReady).
   wc.setBackgroundThrottling(false)
 
-  // finestre nuove (allegati, "apri in nuova finestra"): Google resta nell'app con la stessa sessione, il resto va nel browser
+  // finestre nuove: allegati e Gmail restano nell'app con la stessa sessione; i link delle email nel browser
   wc.setWindowOpenHandler(({ url }) => {
-    if (isGoogle(url)) return { action: 'allow' }
-    shell.openExternal(url)
+    const target = unwrapGoogleRedirect(url)
+    if (IN_APP_WINDOWS.test(target)) return { action: 'allow' }
+    // a volte Gmail apre una finestra vuota e poi le dà l'indirizzo: la lasciamo nascere nascosta e
+    // al primo indirizzo vero la chiudiamo e apriamo quello nel browser (did-create-window qui sotto)
+    if (target === 'about:blank' || target === '') return { action: 'allow', overrideBrowserWindowOptions: { show: false } }
+    if (/^(https?|mailto):/.test(target)) shell.openExternal(target)
     return { action: 'deny' }
+  })
+  wc.on('did-create-window', (child, { url }) => {
+    if (url !== 'about:blank' && url !== '') return
+    const redirect = (event: { preventDefault: () => void }, next: string) => {
+      const target = unwrapGoogleRedirect(next)
+      if (IN_APP_WINDOWS.test(target)) {
+        child.show()
+        return
+      }
+      event.preventDefault()
+      if (/^(https?|mailto):/.test(target)) shell.openExternal(target)
+      child.close()
+    }
+    child.webContents.on('will-navigate', redirect)
+    child.webContents.on('will-redirect', redirect)
+    // se nessuno le dà un indirizzo entro qualche secondo, la finestra vuota si chiude
+    setTimeout(() => {
+      if (!child.isDestroyed() && !child.isVisible()) child.close()
+    }, 5000)
   })
   wc.on('will-navigate', (event, url) => {
     // durante l'aggiunta (signIn) Google può passare dalla scelta dell'account, dopo no

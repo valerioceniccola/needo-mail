@@ -12,7 +12,6 @@ import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
 import { forgetAccount, handleInbox, initNotifier, introduceNotifications, refresh, testNotification } from './notifier'
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { avatarFromFile, readAvatar } from './avatar'
-import { deleteMail } from './mailActions'
 import { notificationStatus, openNotificationSettings } from './notificationStatus'
 import { checkForUpdates, initUpdater, quitAndInstall } from './updater'
 
@@ -270,11 +269,10 @@ app.whenReady().then(() => {
   views.initViews(win, { onTitle, onNavigate, onLoaded })
   initNotifier({
     showWindow,
-    openLink: (id, url) => views.viewContents(id)?.loadURL(url.replace(/^http:/, 'https:')),
-    deleteMail: async (id, url) => {
-      const ok = await deleteMail(id, url)
-      refreshUnreadSoon(id, null)
-      return ok
+    // Gmail è un'app a pagina unica: cambiando solo l'indirizzo dopo # si va in Posta in arrivo all'istante
+    openInbox: (id) => {
+      const wc = views.viewContents(id)
+      if (wc?.getURL().startsWith('https://mail.google.com/')) wc.executeJavaScript(`location.hash = '#inbox'`).catch(() => {})
     }
   })
   registerIpc()
