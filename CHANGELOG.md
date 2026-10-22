@@ -1,5 +1,12 @@
 # Novità di Needo
 
+## 0.1.11
+
+- Gmail resta aggiornato anche negli account che non stai guardando: aprendoli, le email nuove ci sono già
+- Clic sulla notifica: la posta in arrivo si aggiorna subito
+- Il numero dei non letti oltre 99 non finisce più sotto Gmail
+- Schermata di benvenuto più pulita
+
 ## 0.1.10
 
 - Icona nuova di Needo
