@@ -321,13 +321,14 @@ app.whenReady().then(() => {
 
   // orologio delle pause automatiche e ricontrollo periodico dei non letti
   setInterval(state.emit, 30_000)
-  // posta nuova ogni 30 secondi: il feed è una richiesta leggera (pochi kB per account)
-  setInterval(() => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null)), 30_000)
+  // posta nuova ogni 10 secondi: il feed è una richiesta leggera (pochi kB per account). Più spesso no,
+  // per non rischiare limiti di Google; un'email arriva sul Mac in media ~5 secondi dopo
+  setInterval(() => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null)), 10_000)
   state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
   // chi ha già account ma non ha mai visto la richiesta di macOS (versioni precedenti) la riceve ora
   introduceNotifications()
   // al risveglio del Mac o allo sblocco si ricontrolla subito: le notifiche di email già gestite
-  // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 30 secondi
+  // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 10 secondi
   const checkNow = () => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
   powerMonitor.on('resume', checkNow)
   powerMonitor.on('unlock-screen', checkNow)
