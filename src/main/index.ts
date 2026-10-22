@@ -272,7 +272,14 @@ app.whenReady().then(() => {
     // Gmail è un'app a pagina unica: cambiando solo l'indirizzo dopo # si va in Posta in arrivo all'istante
     openInbox: (id) => {
       const wc = views.viewContents(id)
-      if (wc?.getURL().startsWith('https://mail.google.com/')) wc.executeJavaScript(`location.hash = '#inbox'`).catch(() => {})
+      // poi lo stesso "Aggiorna" di Gmail (pulsante con act=20 sopra l'elenco): le email nuove compaiono subito.
+      // Se Gmail cambiasse il pulsante, resta solo il passaggio alla Posta in arrivo.
+      if (wc?.getURL().startsWith('https://mail.google.com/'))
+        wc
+          .executeJavaScript(
+            `location.hash = '#inbox'; setTimeout(() => document.querySelector('[act="20"]')?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })) || 0, 300); setTimeout(() => document.querySelector('[act="20"]')?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true })), 350)`
+          )
+          .catch(() => {})
     }
   })
   registerIpc()

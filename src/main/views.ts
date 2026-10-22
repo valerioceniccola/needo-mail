@@ -116,8 +116,9 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   views.set(id, view)
 
   const wc = view.webContents
-  // finché carica la vista è nascosta, e Chromium rallenterebbe timer e disegno di una pagina nascosta:
-  // Gmail ci metteva decine di secondi. Il freno si rimette quando è pronta (markReady).
+  // niente freno di Chromium sulle viste nascoste: col freno Gmail caricava in decine di secondi e, una volta
+  // carica, dietro le quinte si aggiornava solo ogni tanto (le email nuove comparivano con ritardo aprendo
+  // l'account). Senza freno Gmail resta sincronizzato come una scheda in primo piano; a riposo consuma poco.
   wc.setBackgroundThrottling(false)
 
   // finestre nuove: allegati e Gmail restano nell'app con la stessa sessione; i link delle email nel browser
@@ -169,7 +170,6 @@ export function ensureView(id: string, signIn = false): WebContentsView {
   wc.on('did-start-navigation', (details) => {
     if (details.isMainFrame && !details.isSameDocument && details.url.startsWith('https://mail.google.com/')) {
       ready.delete(id)
-      wc.setBackgroundThrottling(false)
       layout()
     }
   })
@@ -188,8 +188,6 @@ export function ensureView(id: string, signIn = false): WebContentsView {
 function markReady(id: string) {
   if (ready.has(id)) return
   ready.add(id)
-  // caricata: d'ora in poi Chromium può rallentarla quando non è a schermo (meno CPU per gli account dietro)
-  views.get(id)?.webContents.setBackgroundThrottling(true)
   layout()
 }
 
