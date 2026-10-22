@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.1.10
+
+- Icona nuova di Needo
+- Le email nuove arrivano più in fretta: controllo ogni 10 secondi
+- All'avvio si apre subito l'account che guardi, gli altri si caricano subito dopo in background
+
 ## 0.1.9
 
 - Clic sulla notifica: Needo si apre subito nella posta in arrivo dell'account giusto

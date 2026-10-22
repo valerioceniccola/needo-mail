@@ -1,7 +1,7 @@
 {
   "name": "needo-mail",
   "productName": "Needo",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "description": "Needo: i tuoi account Gmail in un contenitore leggero per macOS, con pause e badge solo per gli account attivi",
   "author": "Valerio Ceniccola",
