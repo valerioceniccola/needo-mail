@@ -1,5 +1,12 @@
 # Novità di Needo
 
+## 0.1.8
+
+- Le notifiche delle email lette o eliminate altrove (telefono, browser) si chiudono da sole
+- Al risveglio o allo sblocco del Mac la posta si controlla subito; poi ogni 30 secondi
+- Il permesso per le notifiche viene chiesto subito, appena aggiungi il primo account
+- Quando c'è un aggiornamento, la finestra mostra le novità della versione
+
 ## 0.1.7
 
 - Come la 0.1.6, che era stata pubblicata a metà: stato delle notifiche di macOS letto in modo ufficiale, testi con i nomi di macOS 26, aggiornamenti visibili solo quando sono completi
