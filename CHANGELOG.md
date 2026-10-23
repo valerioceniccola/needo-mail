@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.1.12
+
+- Dopo lo stop del Mac le caselle si aggiornano da sole: niente più email già gestite dal telefono ancora in vista
+- Quando arriva un'email o ne gestisci una altrove, anche la casella in Needo si allinea subito
+
 ## 0.1.11
 
 - Gmail resta aggiornato anche negli account che non stai guardando: aprendoli, le email nuove ci sono già
