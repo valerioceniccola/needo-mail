@@ -101,6 +101,10 @@ function refreshUnreadSoon(id: string, titleCount: number | null) {
       const inbox = await fetchInbox(id)
       if (!state.findAccount(id)) return
       if (inbox) {
+        // i non letti sono cambiati (email nuova, o letta/eliminata altrove): anche la pagina di Gmail
+        // si riallinea, così non mostra uno stato vecchio. Solo quando cambiano: non costa nulla negli altri casi.
+        const before = state.getState().unread[id]
+        if (before !== undefined && before !== inbox.count) views.refreshGmail(id)
         state.setUnread(id, inbox.count)
         handleInbox(id, inbox)
       } else if (titleCount !== null) {
@@ -226,6 +230,8 @@ const menuActions = {
     if (wc) wc.setZoomLevel(step === 0 ? 0 : Math.max(-3, Math.min(3, wc.getZoomLevel() + step * 0.5)))
   },
   gmailDevTools: () => views.viewContents(visibleAccountId())?.openDevTools({ mode: 'detach' }),
+  // solo in sviluppo: lo stesso giro del risveglio del Mac, per provarlo senza mettere il Mac in stop
+  simulateWake: () => {},
   testNotification,
   checkForUpdates
 }
@@ -269,18 +275,7 @@ app.whenReady().then(() => {
   views.initViews(win, { onTitle, onNavigate, onLoaded })
   initNotifier({
     showWindow,
-    // Gmail è un'app a pagina unica: cambiando solo l'indirizzo dopo # si va in Posta in arrivo all'istante
-    openInbox: (id) => {
-      const wc = views.viewContents(id)
-      // poi lo stesso "Aggiorna" di Gmail (pulsante con act=20 sopra l'elenco): le email nuove compaiono subito.
-      // Se Gmail cambiasse il pulsante, resta solo il passaggio alla Posta in arrivo.
-      if (wc?.getURL().startsWith('https://mail.google.com/'))
-        wc
-          .executeJavaScript(
-            `location.hash = '#inbox'; setTimeout(() => document.querySelector('[act="20"]')?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })) || 0, 300); setTimeout(() => document.querySelector('[act="20"]')?.dispatchEvent(new MouseEvent('mouseup', { bubbles: true })), 350)`
-          )
-          .catch(() => {})
-    }
+    openInbox: views.openInbox
   })
   registerIpc()
   applyLaunchAtLogin()
@@ -336,9 +331,15 @@ app.whenReady().then(() => {
   introduceNotifications()
   // al risveglio del Mac o allo sblocco si ricontrolla subito: le notifiche di email già gestite
   // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 10 secondi
-  const checkNow = () => state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
+  // e dopo lo stop si preme "Aggiorna" in ogni casella: Gmail potrebbe essere rimasto allo stato di prima.
+  // Due volte: dopo pochi secondi e dopo 20, perché al risveglio la rete può tornare con calma.
+  const checkNow = () => {
+    state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
+    for (const delay of [3000, 20_000]) setTimeout(() => state.getState().accounts.forEach((a) => views.refreshGmail(a.id)), delay)
+  }
   powerMonitor.on('resume', checkNow)
   powerMonitor.on('unlock-screen', checkNow)
+  menuActions.simulateWake = checkNow
 
   // su macOS cliccando l'icona nel Dock si riapre la finestra nascosta
   app.on('activate', showWindow)

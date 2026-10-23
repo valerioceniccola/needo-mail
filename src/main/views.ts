@@ -289,3 +289,31 @@ export function navState(id: string | null) {
   const history = viewContents(id)?.navigationHistory
   return { canGoBack: history?.canGoBack() ?? false, canGoForward: history?.canGoForward() ?? false }
 }
+
+/*
+  "Aggiorna" di Gmail (il pulsante sopra l'elenco, act=20): rilegge l'elenco dai server senza ricaricare la pagina.
+  Serve quando la pagina è rimasta indietro, tipicamente dopo lo stop del Mac: Gmail perde il collegamento
+  in tempo reale e mostra ancora email gestite altrove finché non si aggiorna. I pulsanti di Gmail reagiscono
+  a mousedown/mouseup, non a click. Se il pulsante non c'è (si sta leggendo un'email, Gmail cambiato) non succede nulla.
+*/
+const PRESS_REFRESH = `(() => {
+  const button = document.querySelector('[act="20"]')
+  if (!button) return false
+  button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+  button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+  return true
+})()`
+
+export function refreshGmail(id: string) {
+  const wc = viewContents(id)
+  if (!wc || wc.isDestroyed() || !ready.has(id) || !wc.getURL().startsWith('https://mail.google.com/')) return
+  wc.executeJavaScript(PRESS_REFRESH, true).catch(() => {})
+}
+
+/** Clic su una notifica: Posta in arrivo (cambio di # senza ricaricare) e poi Aggiorna. */
+export function openInbox(id: string) {
+  const wc = viewContents(id)
+  if (!wc || wc.isDestroyed() || !wc.getURL().startsWith('https://mail.google.com/')) return
+  wc.executeJavaScript(`location.hash = '#inbox'`, true).catch(() => {})
+  setTimeout(() => refreshGmail(id), 300)
+}
