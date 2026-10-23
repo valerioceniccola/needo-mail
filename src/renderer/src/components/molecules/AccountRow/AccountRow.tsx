@@ -28,6 +28,8 @@ export default function AccountRow({ account, index, unread, paused, loading, se
       <button
         type="button"
         onClick={onSelect}
+        // col mouse niente focus (bordo azzurro acceso dopo il clic); il trascinamento usa i pointer event, non questo
+        onMouseDown={(e) => e.preventDefault()}
         onContextMenu={(e) => {
           e.preventDefault()
           onMenu()

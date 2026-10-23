@@ -55,6 +55,8 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={api.startAdd}
+        // col mouse niente focus: il bordo azzurro resterebbe acceso dopo il clic
+        onMouseDown={(e) => e.preventDefault()}
         disabled={!!adding}
         aria-label={content.sidebar.addAccount}
         title={content.sidebar.addAccount}
@@ -65,6 +67,7 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={settingsOpen ? api.closeSettingsPage : api.openSettingsPage}
+        onMouseDown={(e) => e.preventDefault()}
         aria-pressed={settingsOpen}
         aria-label={content.sidebar.settings}
         title={content.sidebar.settings}

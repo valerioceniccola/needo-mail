@@ -32,7 +32,13 @@ function Button({
   ...props
 }: ComponentProps<'button'> & VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot.Root : 'button'
-  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />
+  // col mouse il pulsante non prende il focus: niente bordo azzurro che resta acceso dopo il clic
+  // (il clic funziona lo stesso; da tastiera con Tab il bordo c'è ancora)
+  const onMouseDown: ComponentProps<'button'>['onMouseDown'] = (e) => {
+    e.preventDefault()
+    props.onMouseDown?.(e)
+  }
+  return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} onMouseDown={onMouseDown} />
 }
 
 export { Button, buttonVariants }
