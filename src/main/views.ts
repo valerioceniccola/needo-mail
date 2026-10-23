@@ -301,6 +301,10 @@ const PRESS_REFRESH = `(() => {
   if (!button) return false
   button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
   button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+  // come se il mouse se ne andasse: Gmail toglie l'evidenziazione grigia, che altrimenti resterebbe
+  button.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+  button.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+  button.blur()
   return true
 })()`
 
