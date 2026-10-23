@@ -16,4 +16,3 @@ Idee e richieste raccolte, da fare con calma (nessuna è in lavorazione).
 - **Caricamento di Gmail più rapido**: in Chrome ~1 secondo, in Needo ~6. Prima misurare (tempi per account in `npm run dev`: inizio, pagina, Gmail pronto), poi intervenire su quello che pesa.
 - **Elimina dalla notifica** (da valutare): dentro la casella già aperta (apri l'email, cestino, torna dove eri) oppure, più solido, con le API ufficiali di Gmail (progetto Google Cloud e autorizzazione per account).
 - **Avviso per gli account con la Protezione avanzata di Google**: in Needo non possono accedere (servono passkey o chiave fisica, non disponibili in Electron per i siti di Google).
-- **Clic sulla notifica → apre proprio l'email**: già fatta e poi tolta (commit 7c7fa5e, da riprendere con `git revert`): `#inbox/<id esadecimale del feed>` senza ricaricare Gmail, se dopo 3 s non è a schermo torna alla Posta in arrivo.
