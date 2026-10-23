@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.1.13
+
+- Clic sulla notifica: si apre direttamente l'email
+- I pulsanti non restano più evidenziati in azzurro dopo il clic
+- Il pulsante Aggiorna di Gmail non resta più evidenziato dopo gli aggiornamenti automatici
+
 ## 0.1.12
 
 - Dopo lo stop del Mac le caselle si aggiornano da sole: niente più email già gestite dal telefono ancora in vista
