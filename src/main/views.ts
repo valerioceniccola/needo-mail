@@ -310,10 +310,12 @@ export function refreshGmail(id: string) {
   wc.executeJavaScript(PRESS_REFRESH, true).catch(() => {})
 }
 
-/** Clic su una notifica: Posta in arrivo (cambio di # senza ricaricare) e poi Aggiorna. */
+/**
+ * Clic su una notifica: Posta in arrivo, cambiando solo il # (niente ricarica). Nessun "Aggiorna" qui:
+ * quando arriva l'email i non letti cambiano e la casella si è già aggiornata (refreshUnreadSoon in index.ts).
+ */
 export function openInbox(id: string) {
   const wc = viewContents(id)
   if (!wc || wc.isDestroyed() || !wc.getURL().startsWith('https://mail.google.com/')) return
   wc.executeJavaScript(`location.hash = '#inbox'`, true).catch(() => {})
-  setTimeout(() => refreshGmail(id), 300)
 }
