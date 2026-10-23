@@ -275,8 +275,7 @@ app.whenReady().then(() => {
   views.initViews(win, { onTitle, onNavigate, onLoaded })
   initNotifier({
     showWindow,
-    openInbox: views.openInbox,
-    openMail: views.openMail
+    openInbox: views.openInbox
   })
   registerIpc()
   applyLaunchAtLogin()

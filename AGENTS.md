@@ -43,7 +43,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (nome di lavoro preceden
 
 ### Badge e notifiche
 - Badge sull'icona del Dock = somma dei non letti della **Posta in arrivo** degli account **attivi** che hanno **"Conta nel badge del Dock"** acceso (impostazione del singolo account, `Account.badge`, accesa di default). Il pallino rosso nella colonna resta comunque.
-- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic → apre l'account sull'email della notifica (`#inbox/<id esadecimale del feed>`, senza ricaricare; se dopo 3 s non è a schermo torna alla Posta in arrivo); il riepilogo "N nuove email" apre la Posta in arrivo. Niente pulsanti Apri/Elimina: aprire la singola email ricaricava Gmail (lento) ed Elimina era fragile. Le notifiche delle email lette o eliminate altrove si chiudono da sole (`staleMail.ts`). Stile avvisi "Permanenti" richiesto con `NSUserNotificationAlertStyle: alert` in `electron-builder.yml`.
+- Notifiche native di macOS create dall'app leggendo il feed Atom della posta (email nuove rispetto all'ultimo controllo), titolo "Etichetta · Mittente", testo = oggetto; più di 3 insieme → una sola "N nuove email". Clic → apre l'account nella Posta in arrivo (cambio di `#` senza ricaricare). Niente pulsanti Apri/Elimina: aprire la singola email ricaricava Gmail (lento) ed Elimina era fragile. Le notifiche delle email lette o eliminate altrove si chiudono da sole (`staleMail.ts`). Stile avvisi "Permanenti" richiesto con `NSUserNotificationAlertStyle: alert` in `electron-builder.yml`.
 - Link nelle email: nel browser predefinito (anche togliendo il passaggio da google.com/url); restano nell'app solo Gmail, login e allegati (`views.ts`). Le notifiche desktop di Gmail vengono assorbite dal preload (sarebbero doppie e ignorerebbero la pausa). In sviluppo macOS le mostra a nome di "Electron"; nell'app impacchettata a nome di Needo.
 
 ### Impostazioni generali
@@ -187,4 +187,4 @@ Prima di consegnare una modifica: `npm run typecheck` e `npm test` senza errori.
 - Riepilogo "di nuovo attivo · N non letti" quando finisce una pausa.
 - Icona nella barra dei menu.
 - Travestire lo user agent (Chrome o Firefox): fa scattare il blocco del login Google.
-- Pulsante Elimina nelle notifiche (fragile: dipende dai pulsanti interni di Gmail). Apertura dell'email con ricarica di Gmail (lenta): ora si cambia solo il #.
+- Pulsanti Apri/Elimina nelle notifiche e apertura della singola email dal clic (lenti o fragili): il clic apre la Posta in arrivo.

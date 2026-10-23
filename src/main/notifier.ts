@@ -19,8 +19,6 @@ type Handlers = {
   showWindow: () => void
   /** porta la vista Gmail dell'account sulla Posta in arrivo, senza ricaricare la pagina */
   openInbox: (accountId: string) => void
-  /** apre una email precisa nella vista dell'account (id esadecimale del feed), sennò la Posta in arrivo */
-  openMail: (accountId: string, messageId: string) => void
 }
 
 let handlers: Handlers
@@ -91,30 +89,23 @@ function notificationSound(): string {
   return sound
 }
 
-/** L'id dell'email nel link del feed (…&message_id=18a3f…&…), esadecimale. */
-export function messageIdOf(link: string): string | null {
-  return /[?&]message_id=([0-9a-f]+)/i.exec(link)?.[1] ?? null
-}
-
-// clic sulla notifica: si apre Needo sull'account, sull'email della notifica o nella Posta in arrivo
-function open(accountId: string, link?: string) {
+// clic sulla notifica: si apre Needo sull'account, nella Posta in arrivo
+function open(accountId: string) {
   select(accountId)
   handlers.showWindow()
-  const messageId = link ? messageIdOf(link) : null
-  if (messageId) handlers.openMail(accountId, messageId)
-  else handlers.openInbox(accountId)
+  handlers.openInbox(accountId)
 }
 
-function notify(accountId: string, title: string, body: string, link?: string): Notification {
+function notify(accountId: string, title: string, body: string): Notification {
   const n = new Notification({ title, body, sound: notificationSound() })
-  n.on('click', () => open(accountId, link))
+  n.on('click', () => open(accountId))
   n.show()
   return n
 }
 
-/** Notifica di una singola email: mittente, oggetto; il clic apre proprio quell'email. */
+/** Notifica di una singola email: mittente, oggetto; il clic apre la Posta in arrivo dell'account. */
 function notifyMail(accountId: string, label: string, mail: MailEntry) {
-  track(accountId, notify(accountId, `${label} · ${mail.author || 'Nuova email'}`, mail.subject, mail.link), [mail])
+  track(accountId, notify(accountId, `${label} · ${mail.author || 'Nuova email'}`, mail.subject), [mail])
 }
 
 /**
