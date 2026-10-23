@@ -319,3 +319,24 @@ export function openInbox(id: string) {
   if (!wc || wc.isDestroyed() || !wc.getURL().startsWith('https://mail.google.com/')) return
   wc.executeJavaScript(`location.hash = '#inbox'`, true).catch(() => {})
 }
+
+/**
+ * Clic sulla notifica di una email: la apre nella casella già caricata cambiando solo il # (#inbox/<id>),
+ * senza ricaricare Gmail. L'id del feed è nel formato vecchio (esadecimale) e Gmail lo accetta ancora; se dopo
+ * 3 secondi l'email non è a schermo (id non riconosciuto, email già eliminata) si torna alla Posta in arrivo.
+ */
+export function openMail(id: string, messageId: string) {
+  const wc = viewContents(id)
+  if (!wc || wc.isDestroyed() || !wc.getURL().startsWith('https://mail.google.com/')) return
+  if (!/^[0-9a-f]+$/i.test(messageId)) return openInbox(id)
+  wc.executeJavaScript(
+    `(() => {
+      location.hash = '#inbox/${messageId}'
+      setTimeout(() => {
+        const shown = document.querySelector('[data-legacy-message-id="${messageId}"], [data-legacy-thread-id="${messageId}"]')
+        if (!shown && location.hash.includes('${messageId}')) location.hash = '#inbox'
+      }, 3000)
+    })()`,
+    true
+  ).catch(() => {})
+}
