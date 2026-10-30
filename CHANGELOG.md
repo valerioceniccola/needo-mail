@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.9.0
+
+- La notifica "Codice copiato" resta a schermo come le altre, anche quando l'email del codice viene eliminata
+- Impostazioni: lo stato delle notifiche di macOS in fondo al gruppo Notifiche
+
 ## 0.1.16
 
 - Pulsante Elimina nelle notifiche delle email: l'email va nel Cestino senza aprire Needo
