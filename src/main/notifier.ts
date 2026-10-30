@@ -37,6 +37,15 @@ const seen = new Map<string, Set<string>>()
   Tenere qui le notifiche serve anche a non farle raccogliere dal garbage collector.
 */
 type Shown = { notification: Notification; mails: Map<string, number> }
+
+// notifiche non legate a un'email: tenute qui solo perché il garbage collector non le faccia sparire
+const kept = new Set<Notification>()
+function keep(n: Notification) {
+  kept.add(n)
+  const forget = () => kept.delete(n)
+  n.on('close', forget)
+  n.on('click', forget)
+}
 const shown = new Map<string, Set<Shown>>()
 
 function track(accountId: string, notification: Notification, mails: MailEntry[]) {
@@ -156,7 +165,10 @@ function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
   // in Electron gli appunti sono asincroni: l'eliminazione aspetta che la scrittura sia finita
   const written = clipboard.writeText(code).catch(() => {})
   if (settings.notifications) {
-    track(accountId, notify(accountId, `Codice copiato: ${code}`, `${label} · ${mail.author || mail.subject} — incollalo con ⌘V`, mail.link), [mail])
+    // non legata all'email (niente track): con l'eliminazione automatica, o se la leggi altrove, l'email sparisce
+    // e la notifica si chiuderebbe da sola dopo pochi secondi; deve invece restare come le altre
+    const n = notify(accountId, `Codice copiato: ${code}`, `${label} · ${mail.author || mail.subject} — incollalo con ⌘V`, mail.link)
+    keep(n)
   }
   if (settings.deleteCodeMails) written.then(() => deleteCodeMail(accountId, label, mail, code))
   return true
