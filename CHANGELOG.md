@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.1.15
+
+- Tasto destro dentro Gmail: copia, incolla, link, immagini e correttore
+- Codici di verifica: arriva un'email con un codice, Needo lo copia negli appunti e te lo dice (si può spegnere nelle Impostazioni)
+- Novità da provare: le email dei codici possono andare da sole nel Cestino dopo la copia (spento di default, si attiva nelle Impostazioni)
+
 ## 0.1.14
 
 - In alto, al posto delle frecce indietro e avanti, la casa: ti riporta alla posta in arrivo
