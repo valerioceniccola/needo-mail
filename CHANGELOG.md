@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.1.14
+
+- In alto, al posto delle frecce indietro e avanti, la casa: ti riporta alla posta in arrivo
+- Premendo di nuovo ⌘1…⌘9 (o cliccando l'avatar) dell'account che stai guardando torni alla sua posta in arrivo
+
 ## 0.1.13
 
 - Clic sulla notifica: si apre direttamente l'email
