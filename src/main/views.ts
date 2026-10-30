@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { session, shell, WebContentsView, type BrowserWindow, type Rectangle, type Session, type WebContents } from 'electron'
 import type { Rect } from '@shared/api'
+import { attachContextMenu } from './contextMenu'
 
 /*
   Una WebContentsView per account, ognuna con la sua sessione persistente (cookie e login separati).
@@ -173,6 +174,7 @@ export function ensureView(id: string, signIn = false): WebContentsView {
       layout()
     }
   })
+  attachContextMenu(wc)
   wc.on('dom-ready', () => {
     if (wc.getURL().startsWith('https://mail.google.com/')) {
       wc.insertCSS(HIDE_ACCOUNT_SWITCHER)
