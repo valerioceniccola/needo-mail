@@ -108,6 +108,10 @@
       "notificationsWarning": [
         "Avvisami se le notifiche sono disattivate",
         "Fascia gialla sopra Gmail quando macOS blocca le notifiche di Needo"
+      ],
+      "copyCodes": [
+        "Copia i codici di verifica",
+        "Quando arriva un'email con un codice monouso (accesso, verifica), Needo lo copia negli appunti e te lo dice in una notifica"
       ]
     },
     "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo",

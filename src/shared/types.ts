@@ -43,6 +43,8 @@ export type AppSettings = {
   notificationsWarning: boolean
   /** prima notifica di benvenuto già mostrata: è quella che fa chiedere a macOS il permesso */
   notificationsIntroduced: boolean
+  /** codici monouso (verifica, accesso) copiati da soli negli appunti all'arrivo dell'email */
+  copyCodes: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -50,7 +52,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   notifications: true,
   launchAtLogin: false,
   notificationsWarning: true,
-  notificationsIntroduced: false
+  notificationsIntroduced: false,
+  copyCodes: true
 }
 
 /** Palette fissa dei colori degli account (dalla tela di design). */

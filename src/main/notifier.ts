@@ -1,12 +1,13 @@
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { app, Notification } from 'electron'
+import { app, clipboard, Notification } from 'electron'
 import { badgeCount } from '@shared/badge'
 import { isPaused } from '@shared/pause'
 import { findAccount, getState, select, setSetting } from './state'
 import type { Inbox, MailEntry } from './unread'
 import { staleMailIds } from './staleMail'
+import { findOneTimeCode } from '@shared/otp'
 
 /*
   Notifiche e badge. Regola: un account in pausa non notifica e non conta nel badge.
@@ -118,6 +119,25 @@ function notifyMail(accountId: string, label: string, mail: MailEntry) {
 }
 
 /**
+ * Email con un codice monouso (verifica, accesso): il codice va negli appunti e la notifica lo dice.
+ * Vale anche per gli account in pausa, perché il codice l'hai appena chiesto tu; solo email arrivate da
+ * poco (dopo un risveglio del Mac un codice vecchio non serve più e sporcherebbe gli appunti).
+ * Restituisce true se l'email è stata gestita così (niente notifica normale).
+ */
+function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
+  const { settings } = getState()
+  if (!settings.copyCodes) return false
+  if (mail.time && Date.now() - mail.time > 10 * 60_000) return false
+  const code = findOneTimeCode(mail.subject, mail.summary)
+  if (!code) return false
+  clipboard.writeText(code)
+  if (settings.notifications) {
+    track(accountId, notify(accountId, `Codice copiato: ${code}`, `${label} · ${mail.author || mail.subject} — incollalo con ⌘V`, mail.link), [mail])
+  }
+  return true
+}
+
+/**
  * Confronta le email non lette con quelle già viste e notifica le nuove (solo account attivi);
  * toglie le notifiche delle email che nel frattempo sono state lette o eliminate.
  */
@@ -128,8 +148,9 @@ export function handleInbox(accountId: string, inbox: Inbox) {
   seen.set(accountId, new Set([...(known ?? []), ...entries.map((e) => e.id)]))
   if (!known) return
 
-  const fresh = entries.filter((e) => !known.has(e.id))
+  let fresh = entries.filter((e) => !known.has(e.id))
   const account = findAccount(accountId)
+  if (account) fresh = fresh.filter((mail) => !copyCode(accountId, account.label, mail))
   if (!getState().settings.notifications) return
   if (!fresh.length || !account || isPaused(account, new Date())) return
 
@@ -157,6 +178,14 @@ export function introduceNotifications() {
   if (settings.notificationsIntroduced || !settings.notifications || accounts.length === 0) return
   setSetting('notificationsIntroduced', true)
   new Notification({ title: 'Needo', body: 'Ti avviserò qui quando arriva una email nuova.', sound: notificationSound() }).show()
+}
+
+/** Solo in sviluppo: finta email con un codice, per provare la copia senza farsene mandare una. */
+export function testCode() {
+  const account = getState().accounts[0]
+  if (!account) return
+  const mail = { id: `test-${Date.now()}`, subject: 'Il tuo codice di verifica', summary: 'Usa il codice 482913 per accedere. Scade tra 10 minuti.', author: 'Servizio di prova', link: '', time: Date.now() }
+  if (!copyCode(account.id, account.label, mail)) new Notification({ title: 'Needo', body: 'Copia dei codici disattivata nelle Impostazioni.' }).show()
 }
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */

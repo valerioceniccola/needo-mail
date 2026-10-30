@@ -10,6 +10,7 @@ type Actions = {
   zoom: (step: -1 | 0 | 1) => void
   gmailDevTools: () => void
   simulateWake: () => void
+  testCode: () => void
   testNotification: () => void
   checkForUpdates: () => void
 }
@@ -69,7 +70,8 @@ export function buildAppMenu(actions: Actions) {
           : ([
               { role: 'toggleDevTools' },
               { label: 'Strumenti per sviluppatori di Gmail', accelerator: 'Alt+CmdOrCtrl+J', click: actions.gmailDevTools },
-              { label: 'Simula risveglio del Mac', click: () => actions.simulateWake() }
+              { label: 'Simula risveglio del Mac', click: () => actions.simulateWake() },
+              { label: 'Simula email con codice', click: actions.testCode }
             ] as MenuItemConstructorOptions[]))
       ]
     },

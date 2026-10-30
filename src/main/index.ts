@@ -9,7 +9,7 @@ import { savedBounds, trackWindowState, wasMaximized } from './windowState'
 import * as state from './state'
 import * as views from './views'
 import { emailFromTitle, fetchInbox, unreadFromTitle } from './unread'
-import { forgetAccount, handleInbox, initNotifier, introduceNotifications, refresh, testNotification } from './notifier'
+import { forgetAccount, handleInbox, initNotifier, introduceNotifications, refresh, testCode, testNotification } from './notifier'
 import { buildAppMenu, confirmRemove, popupAccountMenu } from './menu'
 import { avatarFromFile, readAvatar } from './avatar'
 import { notificationStatus, openNotificationSettings } from './notificationStatus'
@@ -232,6 +232,7 @@ const menuActions = {
   gmailDevTools: () => views.viewContents(visibleAccountId())?.openDevTools({ mode: 'detach' }),
   // solo in sviluppo: lo stesso giro del risveglio del Mac, per provarlo senza mettere il Mac in stop
   simulateWake: () => {},
+  testCode,
   testNotification,
   checkForUpdates
 }
