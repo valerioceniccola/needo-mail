@@ -280,8 +280,8 @@ app.whenReady().then(() => {
     showWindow,
     openInbox: views.openInbox,
     openMail: views.openMail,
-    deleteMail: async (id, messageId) => {
-      const result = await views.deleteMailInView(id, messageId)
+    deleteMail: async (id, messageId, byUser) => {
+      const result = await views.deleteMailInView(id, messageId, byUser)
       if (result === 'ok') refreshUnreadSoon(id, null)
       return result
     }

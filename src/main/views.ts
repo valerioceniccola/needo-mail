@@ -386,9 +386,10 @@ const DELETE_IN_PAGE = (messageId: string) => `(async () => {
   return gone ? 'ok' : 'not-deleted'
 })()`
 
-export async function deleteMailInView(id: string, messageId: string): Promise<'ok' | 'busy' | 'not-ready' | 'not-found' | 'no-button' | 'not-deleted'> {
+/** `byUser`: l'ha chiesto l'utente (pulsante Elimina nella notifica), quindi si fa anche sulla casella a schermo. */
+export async function deleteMailInView(id: string, messageId: string, byUser = false): Promise<'ok' | 'busy' | 'not-ready' | 'not-found' | 'no-button' | 'not-deleted'> {
   if (!/^[0-9a-f]+$/i.test(messageId)) return 'not-found'
-  if (id === visibleId && win.isFocused()) return 'busy'
+  if (!byUser && id === visibleId && win.isFocused()) return 'busy'
   const wc = viewContents(id)
   if (!wc || wc.isDestroyed() || !ready.has(id) || !wc.getURL().startsWith('https://mail.google.com/')) return 'not-ready'
   try {

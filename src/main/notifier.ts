@@ -23,7 +23,7 @@ type Handlers = {
   /** apre una email precisa nella vista dell'account (id esadecimale del feed), sennò la Posta in arrivo */
   openMail: (accountId: string, messageId: string) => void
   /** sposta nel Cestino una email dalla casella dell'account (vedi deleteMailInView in views.ts) */
-  deleteMail: (accountId: string, messageId: string) => Promise<string>
+  deleteMail: (accountId: string, messageId: string, byUser?: boolean) => Promise<string>
 }
 
 let handlers: Handlers
@@ -115,9 +115,30 @@ function notify(accountId: string, title: string, body: string, link?: string): 
   return n
 }
 
-/** Notifica di una singola email: mittente, oggetto; il clic apre proprio quell'email. */
+/**
+ * Notifica di una singola email: mittente, oggetto; il clic apre proprio quell'email.
+ * Pulsante Elimina: l'email va nel Cestino dalla casella già aperta (deleteMailInView), senza aprire Needo.
+ * macOS mostra i pulsanti con lo stile avvisi "Permanenti"; con "Temporanei" compaiono passandoci sopra col mouse.
+ */
 function notifyMail(accountId: string, label: string, mail: MailEntry) {
-  track(accountId, notify(accountId, `${label} · ${mail.author || 'Nuova email'}`, mail.subject, mail.link), [mail])
+  const messageId = messageIdOf(mail.link)
+  const n = new Notification({
+    title: `${label} · ${mail.author || 'Nuova email'}`,
+    body: mail.subject,
+    actions: messageId ? [{ type: 'button', text: 'Elimina' }] : [],
+    closeButtonText: 'Chiudi',
+    sound: notificationSound()
+  })
+  n.on('click', () => open(accountId, mail.link))
+  n.on('action', async () => {
+    if (!messageId) return
+    const result = await handlers.deleteMail(accountId, messageId, true)
+    if (result !== 'ok') {
+      new Notification({ title: `${label} · email non eliminata`, body: `"${mail.subject}": ${DELETE_ERRORS[result] ?? 'eliminala da Gmail'}.`, sound: notificationSound() }).show()
+    }
+  })
+  n.show()
+  track(accountId, n, [mail])
 }
 
 /**
