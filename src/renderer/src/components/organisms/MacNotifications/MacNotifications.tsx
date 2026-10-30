@@ -12,7 +12,7 @@ const DOT: Record<NotificationStatus, string> = {
   unknown: 'bg-subtle'
 }
 
-/** Come macOS mostra le notifiche di Needo (Permanenti, Temporanee, spente) e come averle fisse a schermo. */
+/** Riga del gruppo Notifiche: come macOS mostra le notifiche di Needo (Permanenti, Temporanee, spente) e come averle fisse a schermo. */
 export default function MacNotifications() {
   const update = useStore((s) => s.update)
   // lo rilegge il processo principale a ogni ritorno sulla finestra (es. dalle Impostazioni di Sistema)
@@ -20,13 +20,13 @@ export default function MacNotifications() {
   const [label, hint] = content.macNotifications.status[status]
 
   return (
-    <>
-      <h2 className="mt-5 text-[15px] font-semibold">{content.macNotifications.title}</h2>
-      <div className="overflow-hidden rounded-lg border border-border bg-sidebar">
+    <div className="border-t border-[#232328] bg-sidebar">
         <div className="flex items-center gap-3 px-3.5 py-[11px]">
           <span className={cn('size-2 shrink-0 rounded-full', DOT[status])} />
           <span className="flex flex-1 flex-col gap-0.5">
-            <span className="font-medium">{label}</span>
+            <span className="font-medium">
+              {content.macNotifications.title}: {label}
+            </span>
             <span className="text-xs text-muted-foreground">{hint}</span>
           </span>
           <Button variant="outline" size="sm" onClick={api.openNotificationSettings}>
@@ -39,7 +39,6 @@ export default function MacNotifications() {
             {update.state === 'dev' && <> {content.macNotifications.dev}</>}
           </p>
         )}
-      </div>
-    </>
+    </div>
   )
 }

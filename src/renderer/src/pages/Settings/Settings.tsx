@@ -13,7 +13,14 @@ import Avatar from '@/components/atoms/Avatar/Avatar'
 import MacNotifications from '@/components/organisms/MacNotifications/MacNotifications'
 import content from '@/content.json'
 
-const TOGGLES = ['badge', 'notifications', 'copyCodes', 'deleteCodeMails', 'notificationsWarning', 'launchAtLogin'] as const satisfies readonly (keyof AppSettings)[]
+type ToggleKey = keyof typeof content.general.toggles & keyof AppSettings
+
+/** Gruppi di interruttori; 'macStatus' è la riga con lo stato delle notifiche in macOS. */
+const GROUPS: { title: keyof typeof content.general.groups; items: (ToggleKey | 'macStatus')[] }[] = [
+  { title: 'general', items: ['launchAtLogin', 'badge'] },
+  { title: 'notifications', items: ['notifications', 'macStatus', 'notificationsWarning'] },
+  { title: 'codes', items: ['copyCodes', 'deleteCodeMails'] }
+]
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
 export default function Settings() {
@@ -49,24 +56,29 @@ export default function Settings() {
           </DndContext>
         </div>
 
-        <h2 className="mt-5 text-[15px] font-semibold">{content.general.general}</h2>
-        <div className="overflow-hidden rounded-lg border border-border">
-          {TOGGLES.map((key, i) => {
-            const [label, hint] = content.general.toggles[key]
-            const disabled = key === 'launchAtLogin' && !canLaunchAtLogin
-            return (
-              <label key={key} className={cn('flex items-center gap-3 bg-sidebar px-3.5 py-[11px]', i > 0 && 'border-t border-[#232328]', disabled && 'opacity-60')}>
-                <span className="flex flex-1 flex-col gap-0.5">
-                  <span className="font-medium">{label}</span>
-                  <span className="text-xs text-muted-foreground">{disabled ? content.general.loginOnlyInstalled : hint}</span>
-                </span>
-                <Switch checked={settings[key]} disabled={disabled} onCheckedChange={(on) => api.setSetting(key, on)} />
-              </label>
-            )
-          })}
-        </div>
-
-        <MacNotifications />
+        {GROUPS.map((group) => (
+          <section key={group.title} className="flex flex-col gap-3.5">
+            <h2 className="mt-5 text-[15px] font-semibold">{content.general.groups[group.title]}</h2>
+            <div className="overflow-hidden rounded-lg border border-border">
+              {group.items.map((key, i) => {
+                if (key === 'macStatus') return <MacNotifications key={key} />
+                const [label, hint] = content.general.toggles[key]
+                // l'eliminazione delle email dei codici dipende dalla copia: rientrata, e spenta se la copia è spenta
+                const child = key === 'deleteCodeMails'
+                const disabled = (key === 'launchAtLogin' && !canLaunchAtLogin) || (child && !settings.copyCodes)
+                return (
+                  <label key={key} className={cn('flex items-center gap-3 bg-sidebar px-3.5 py-[11px]', i > 0 && 'border-t border-[#232328]', child && 'pl-8', disabled && 'opacity-60')}>
+                    <span className="flex flex-1 flex-col gap-0.5">
+                      <span className="font-medium">{label}</span>
+                      <span className="text-xs text-muted-foreground">{key === 'launchAtLogin' && !canLaunchAtLogin ? content.general.loginOnlyInstalled : hint}</span>
+                    </span>
+                    <Switch checked={settings[key] && !(child && !settings.copyCodes)} disabled={disabled} onCheckedChange={(on) => api.setSetting(key, on)} />
+                  </label>
+                )
+              })}
+            </div>
+          </section>
+        ))}
 
         <div className="mt-6 flex flex-col items-center gap-2 text-xs text-subtle">
           <span>
