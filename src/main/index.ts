@@ -239,7 +239,8 @@ const menuActions = {
 function registerIpc() {
   ipcMain.handle(IPC.getState, () => state.getState())
   ipcMain.on(IPC.openNotificationSettings, () => openNotificationSettings())
-  ipcMain.on(IPC.select, (_e, id: string) => state.select(id))
+  ipcMain.on(IPC.select, (_e, id: string) => state.selectByUser(id))
+  state.setOnReselect((id) => views.backToGmail(id))
   ipcMain.on(IPC.move, (_e, fromId: string, toId: string) => state.move(fromId, toId))
   ipcMain.on(IPC.menu, (_e, id: string) => popupAccountMenu(win, id, removeAccount))
   ipcMain.on(IPC.resume, (_e, id: string) => state.resume(id))

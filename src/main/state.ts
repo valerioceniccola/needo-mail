@@ -89,9 +89,24 @@ export function setSetting<K extends keyof AppSettings>(key: K, value: AppSettin
 }
 
 /** ⌘1…⌘9: la scorciatoia dipende solo dalla posizione nella lista. */
+// riselezione dell'account già aperto (⌘1 sull'account 1, clic sul suo avatar): lo gestisce index.ts
+let onReselect: (id: string) => void = () => {}
+export function setOnReselect(listener: (id: string) => void) {
+  onReselect = listener
+}
+
+/**
+ * Scelta dell'account da ⌘1…⌘9 o dal clic sull'avatar. Se è già quello aperto si torna alla sua
+ * Posta in arrivo (come il pulsante casa); altrimenti si passa all'account.
+ */
+export function selectByUser(id: string) {
+  if (state.selectedId === id && !state.settingsOpen && !state.adding) return onReselect(id)
+  select(id)
+}
+
 export function selectByIndex(index: number) {
   const account = state.accounts[index]
-  if (account) select(account.id)
+  if (account) selectByUser(account.id)
 }
 
 export function move(fromId: string, toId: string) {
