@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.1.16
+
+- Pulsante Elimina nelle notifiche delle email: l'email va nel Cestino senza aprire Needo
+- Impostazioni più ordinate, divise in Generali, Notifiche e Codici di verifica
+
 ## 0.1.15
 
 - Tasto destro dentro Gmail: copia, incolla, link, immagini e correttore
