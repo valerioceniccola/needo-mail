@@ -112,6 +112,10 @@
       "copyCodes": [
         "Copia i codici di verifica",
         "Quando arriva un'email con un codice monouso (accesso, verifica), Needo lo copia negli appunti e te lo dice in una notifica"
+      ],
+      "deleteCodeMails": [
+        "Elimina le email dei codici",
+        "Dopo aver copiato il codice, sposta l'email nel Cestino di Gmail. Non succede sulla casella che stai guardando"
       ]
     },
     "loginOnlyInstalled": "Disponibile nell'app installata, non in sviluppo",

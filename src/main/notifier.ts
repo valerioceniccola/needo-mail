@@ -22,6 +22,8 @@ type Handlers = {
   openInbox: (accountId: string) => void
   /** apre una email precisa nella vista dell'account (id esadecimale del feed), sennò la Posta in arrivo */
   openMail: (accountId: string, messageId: string) => void
+  /** sposta nel Cestino una email dalla casella dell'account (vedi deleteMailInView in views.ts) */
+  deleteMail: (accountId: string, messageId: string) => Promise<string>
 }
 
 let handlers: Handlers
@@ -130,11 +132,38 @@ function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
   if (mail.time && Date.now() - mail.time > 10 * 60_000) return false
   const code = findOneTimeCode(mail.subject, mail.summary)
   if (!code) return false
-  clipboard.writeText(code)
+  // in Electron gli appunti sono asincroni: l'eliminazione aspetta che la scrittura sia finita
+  const written = clipboard.writeText(code).catch(() => {})
   if (settings.notifications) {
     track(accountId, notify(accountId, `Codice copiato: ${code}`, `${label} · ${mail.author || mail.subject} — incollalo con ⌘V`, mail.link), [mail])
   }
+  if (settings.deleteCodeMails) written.then(() => deleteCodeMail(accountId, label, mail, code))
   return true
+}
+
+const DELETE_ERRORS: Record<string, string> = {
+  busy: 'stai guardando quella casella, non ti sposto',
+  'not-ready': 'la casella non era ancora caricata',
+  'not-found': "non ho trovato l'email",
+  'no-button': 'non ho trovato il cestino di Gmail',
+  'not-deleted': 'Gmail non ha confermato'
+}
+
+/** Email del codice nel Cestino, solo se negli appunti c'è davvero il codice. Avvisa solo se non riesce. */
+async function deleteCodeMail(accountId: string, label: string, mail: MailEntry, code: string) {
+  const messageId = messageIdOf(mail.link)
+  if (!messageId || (await clipboard.readText()) !== code) return
+  // un attimo di respiro: Gmail fa in tempo a mostrare l'email arrivata nella casella
+  await new Promise((r) => setTimeout(r, 3000))
+  let result = await handlers.deleteMail(accountId, messageId)
+  // casella non ancora pronta o la stai guardando: si riprova una volta poco dopo
+  if (result === 'not-ready' || result === 'busy') {
+    await new Promise((r) => setTimeout(r, 30_000))
+    result = await handlers.deleteMail(accountId, messageId)
+  }
+  if (result !== 'ok') {
+    new Notification({ title: `${label} · email del codice non eliminata`, body: DELETE_ERRORS[result] ?? 'Eliminala da Gmail.', sound: notificationSound() }).show()
+  }
 }
 
 /**

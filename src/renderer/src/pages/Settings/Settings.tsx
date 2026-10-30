@@ -13,7 +13,7 @@ import Avatar from '@/components/atoms/Avatar/Avatar'
 import MacNotifications from '@/components/organisms/MacNotifications/MacNotifications'
 import content from '@/content.json'
 
-const TOGGLES = ['badge', 'notifications', 'copyCodes', 'notificationsWarning', 'launchAtLogin'] as const satisfies readonly (keyof AppSettings)[]
+const TOGGLES = ['badge', 'notifications', 'copyCodes', 'deleteCodeMails', 'notificationsWarning', 'launchAtLogin'] as const satisfies readonly (keyof AppSettings)[]
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
 export default function Settings() {

@@ -279,7 +279,12 @@ app.whenReady().then(() => {
   initNotifier({
     showWindow,
     openInbox: views.openInbox,
-    openMail: views.openMail
+    openMail: views.openMail,
+    deleteMail: async (id, messageId) => {
+      const result = await views.deleteMailInView(id, messageId)
+      if (result === 'ok') refreshUnreadSoon(id, null)
+      return result
+    }
   })
   registerIpc()
   applyLaunchAtLogin()

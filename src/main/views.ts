@@ -361,3 +361,39 @@ export function openMail(id: string, messageId: string) {
     true
   ).catch(() => {})
 }
+
+/*
+  Eliminazione di una email dentro la casella già aperta (usata per le email con codice monouso, se attivata).
+  Passi, tutti nella pagina di Gmail: apre l'email (#inbox/<id>), controlla che sia proprio quella
+  (data-legacy-message-id), preme il cestino (act=10), verifica che l'email non sia più a schermo, torna dove era.
+  Se un passo non torna si ferma senza toccare nulla. Non si fa sulla casella che stai guardando, per non
+  spostarti mentre leggi o scrivi.
+*/
+const DELETE_IN_PAGE = (messageId: string) => `(async () => {
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+  const until = async (test, ms) => { for (let t = 0; t < ms; t += 150) { const v = test(); if (v) return v; await wait(150) } return null }
+  const selector = '[data-legacy-message-id="${messageId}"], [data-legacy-thread-id="${messageId}"]'
+  const previous = location.hash
+  location.hash = '#inbox/${messageId}'
+  const shown = await until(() => document.querySelector(selector), 8000)
+  if (!shown) { location.hash = previous; return 'not-found' }
+  const button = await until(() => [...document.querySelectorAll('[act="10"]')].find((b) => b.offsetParent !== null), 4000)
+  if (!button) { location.hash = previous; return 'no-button' }
+  for (const type of ['mousedown', 'mouseup', 'click']) button.dispatchEvent(new MouseEvent(type, { bubbles: true }))
+  const gone = await until(() => !document.querySelector(selector) || !location.hash.includes('${messageId}'), 5000)
+  if (!location.hash.includes('${messageId}') && previous === location.hash) return gone ? 'ok' : 'not-deleted'
+  location.hash = previous
+  return gone ? 'ok' : 'not-deleted'
+})()`
+
+export async function deleteMailInView(id: string, messageId: string): Promise<'ok' | 'busy' | 'not-ready' | 'not-found' | 'no-button' | 'not-deleted'> {
+  if (!/^[0-9a-f]+$/i.test(messageId)) return 'not-found'
+  if (id === visibleId && win.isFocused()) return 'busy'
+  const wc = viewContents(id)
+  if (!wc || wc.isDestroyed() || !ready.has(id) || !wc.getURL().startsWith('https://mail.google.com/')) return 'not-ready'
+  try {
+    return await wc.executeJavaScript(DELETE_IN_PAGE(messageId), true)
+  } catch {
+    return 'not-deleted'
+  }
+}
