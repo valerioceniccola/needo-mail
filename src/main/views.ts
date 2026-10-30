@@ -297,9 +297,12 @@ export function navState(id: string | null) {
   }
 }
 
-/** "Torna a Gmail": la vista torna alla Posta in arrivo, da qualunque pagina sia finita. */
+/** Pulsante casa: Posta in arrivo. Dentro Gmail basta cambiare il # (istantaneo); da un'altra pagina si ricarica Gmail. */
 export function backToGmail(id: string | null) {
-  viewContents(id)?.loadURL(GMAIL_URL)
+  const wc = viewContents(id)
+  if (!wc || wc.isDestroyed()) return
+  if (wc.getURL().startsWith('https://mail.google.com/')) wc.executeJavaScript(`location.hash = '#inbox'`, true).catch(() => {})
+  else wc.loadURL(GMAIL_URL)
 }
 
 /*

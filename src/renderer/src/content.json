@@ -7,8 +7,8 @@
     "newAccount": "Nuovo account"
   },
   "topBar": {
-    "reload": "Ricarica",
-    "backToGmail": "Torna a Gmail"
+    "home": "Posta in arrivo",
+    "reload": "Ricarica"
   },
   "paused": {
     "title": "In pausa",
