@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { ChevronLeft, ChevronRight, RotateCw } from 'lucide-react'
-import { api, useStore } from '@/app/store'
+import { RotateCw } from 'lucide-react'
+import { api } from '@/app/store'
 import { Button } from '@/components/ui/button'
 import content from '@/content.json'
 
@@ -9,21 +9,17 @@ type Props = {
   actions?: ReactNode
 }
 
-/** Intestazione: indietro / avanti / ricarica sulla vista Gmail, poi il titolo passato da fuori. */
+/**
+ * Intestazione: ricarica della vista Gmail, poi il titolo passato da fuori.
+ * Niente pulsanti indietro/avanti: in Gmail si naviga con i suoi comandi; restano ⌘[ e ⌘] nel menu Vista.
+ */
 export default function TopBar({ children, actions }: Props) {
-  const nav = useStore((s) => s.nav)
-
   return (
     // pl: lascia spazio ai semafori, che stanno in questa riga
     <header className="app-drag flex h-11 shrink-0 items-center gap-2.5 pr-3 pl-[88px]">
       <div className="app-no-drag flex items-center gap-1">
-        <Button variant="ghost" size="icon" aria-label={content.topBar.back} disabled={!nav.canGoBack} onClick={api.back}>
-          <ChevronLeft className="size-4" />
-        </Button>
-        <Button variant="ghost" size="icon" aria-label={content.topBar.forward} disabled={!nav.canGoForward} onClick={api.forward}>
-          <ChevronRight className="size-4" />
-        </Button>
-        <Button variant="ghost" size="icon" aria-label={content.topBar.reload} onClick={api.reload}>
+        {/* tabIndex -1: non prende mai il focus, quindi niente bordo azzurro che resta acceso */}
+        <Button variant="ghost" size="icon" tabIndex={-1} aria-label={content.topBar.reload} title={content.topBar.reload} onClick={api.reload}>
           <RotateCw className="size-3.5" />
         </Button>
       </div>
