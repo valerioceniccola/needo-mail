@@ -167,7 +167,16 @@ function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
   if (settings.notifications) {
     // non legata all'email (niente track): con l'eliminazione automatica, o se la leggi altrove, l'email sparisce
     // e la notifica si chiuderebbe da sola dopo pochi secondi; deve invece restare come le altre
-    const n = notify(accountId, `Codice copiato: ${code}`, `${label} · ${mail.author || mail.subject} — incollalo con ⌘V`, mail.link)
+    // titolo sempre uguale, così si riconosce a colpo d'occhio e non sembra un'email arrivata;
+    // sottotitolo = il codice; sotto chi l'ha mandato e su quale account
+    const n = new Notification({
+      title: 'Codice copiato',
+      subtitle: code,
+      body: `${mail.author || 'Codice di verifica'} · ${label}`,
+      sound: notificationSound()
+    })
+    n.on('click', () => open(accountId, mail.link))
+    n.show()
     keep(n)
   }
   if (settings.deleteCodeMails) written.then(() => deleteCodeMail(accountId, label, mail, code))
