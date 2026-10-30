@@ -28,7 +28,7 @@ const state: AppState = {
   appVersion: app.getVersion(),
   update: { state: 'idle' },
   macNotifications: 'unknown',
-  nav: { canGoBack: false, canGoForward: false }
+  nav: { canGoBack: false, canGoForward: false, outsideGmail: false }
 }
 
 const listeners = new Set<() => void>()

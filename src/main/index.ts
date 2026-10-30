@@ -264,6 +264,7 @@ function registerIpc() {
   ipcMain.on(IPC.back, menuActions.back)
   ipcMain.on(IPC.forward, menuActions.forward)
   ipcMain.on(IPC.reload, menuActions.reload)
+  ipcMain.on(IPC.backToGmail, () => views.backToGmail(visibleAccountId()))
 
 }
 

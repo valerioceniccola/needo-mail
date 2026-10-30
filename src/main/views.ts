@@ -286,8 +286,20 @@ export function viewContents(id: string | null): WebContents | undefined {
 
 
 export function navState(id: string | null) {
-  const history = viewContents(id)?.navigationHistory
-  return { canGoBack: history?.canGoBack() ?? false, canGoForward: history?.canGoForward() ?? false }
+  const contents = viewContents(id)
+  const history = contents?.navigationHistory
+  const url = contents && !contents.isDestroyed() ? contents.getURL() : ''
+  return {
+    canGoBack: history?.canGoBack() ?? false,
+    canGoForward: history?.canGoForward() ?? false,
+    // la vista è finita su un'altra pagina Google (account, guida, accesso…): compare "Torna a Gmail"
+    outsideGmail: url.startsWith('https://') && !url.startsWith('https://mail.google.com/')
+  }
+}
+
+/** "Torna a Gmail": la vista torna alla Posta in arrivo, da qualunque pagina sia finita. */
+export function backToGmail(id: string | null) {
+  viewContents(id)?.loadURL(GMAIL_URL)
 }
 
 /*

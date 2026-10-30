@@ -31,7 +31,8 @@ const api: GmailHubApi = {
   setOverlay: (visible) => ipcRenderer.invoke(IPC.overlay, visible),
   back: () => ipcRenderer.send(IPC.back),
   forward: () => ipcRenderer.send(IPC.forward),
-  reload: () => ipcRenderer.send(IPC.reload)
+  reload: () => ipcRenderer.send(IPC.reload),
+  backToGmail: () => ipcRenderer.send(IPC.backToGmail)
 }
 
 contextBridge.exposeInMainWorld('gmailHub', api)

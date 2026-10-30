@@ -41,7 +41,7 @@ export type AppState = {
   update: UpdateStatus
   /** come macOS mostra le notifiche di Needo (riletto a ogni ritorno sulla finestra) */
   macNotifications: NotificationStatus
-  nav: { canGoBack: boolean; canGoForward: boolean }
+  nav: { canGoBack: boolean; canGoForward: boolean; outsideGmail: boolean }
 }
 
 /** Funzioni che il preload espone all'interfaccia come window.gmailHub. */
@@ -74,6 +74,8 @@ export type GmailHubApi = {
   back: () => void
   forward: () => void
   reload: () => void
+  /** riporta la vista dell'account aperto su Gmail, se è finita su un'altra pagina */
+  backToGmail: () => void
 }
 
 /** Nomi dei canali IPC, in un solo posto per main e preload. */
@@ -102,5 +104,6 @@ export const IPC = {
   overlay: 'view:overlay',
   back: 'nav:back',
   forward: 'nav:forward',
-  reload: 'nav:reload'
+  reload: 'nav:reload',
+  backToGmail: 'nav:back-to-gmail'
 } as const
