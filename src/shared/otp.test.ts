@@ -17,3 +17,14 @@ describe('findOneTimeCode', () => {
     expect(findOneTimeCode('Riunione', 'Ci vediamo alle 14:30, sala 4')).toBeNull()
   })
 })
+
+describe('codici nel testo completo', async () => {
+  const { htmlToText, mentionsCode } = await import('./otp')
+  it("trova il codice anche dopo un'intestazione di inoltro", () => {
+    const html = `<html><head><style>p{}</style></head><body><p>To: abc@hortelab.com (chatgpt.com) From: noreply@tm.openai.com Actions: Deactivate | Block email | Block domain Removed 1 tracking pixel - View report</p><p>Per continuare, inserisci questo codice di verifica temporaneo:</p><div>052630</div><p>Se non stavi provando ad accedere a ChatGPT, reimposta la tua password.</p></body></html>`
+    expect(findOneTimeCode('Il tuo codice di verifica ChatGPT', htmlToText(html), true)).toBe('052630')
+    // nel testo completo "conferma" da sola non basta: un numero d'ordine non è un codice
+    expect(findOneTimeCode('Conferma ordine', 'Grazie! Conferma del tuo ordine numero 482913, spedizione domani', true)).toBeNull()
+    expect(mentionsCode('Il tuo codice di verifica ChatGPT', 'To: abc@hortelab.com From: noreply@tm.openai.com')).toBe(true)
+  })
+})

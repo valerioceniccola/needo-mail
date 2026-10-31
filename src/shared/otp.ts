@@ -10,12 +10,16 @@ const KEYWORDS = /(codice|code|otp|verifica|verification|verify|one[- ]?time|mon
 // (dopo il codice un punto o una virgola di fine frase va bene; un punto seguito da cifre no: è un numero decimale)
 const CANDIDATE = /(?<![\d€$£#/]|\d[.,:])(?:[A-Z]-)?(\d{3,4}[ -]\d{3,4}|\d{4,8})(?!\d|[.,:/]\d|\s?%|\s?(?:€|eur\b|euro|usd|\$))/gi
 
+// per il testo completo dell'email solo le parole più sicure: "conferma", "accesso", "sicurezza"… compaiono
+// anche in email di ordini o avvisi con numeri qualsiasi
+const STRONG_KEYWORDS = /(codice|code|otp|verifica|verification|verify|one[- ]?time|monouso|passcode)/gi
+
 /** Distanza massima (in caratteri) tra la parola chiave e il codice. */
 const NEAR = 60
 
-export function findOneTimeCode(subject: string, summary: string): string | null {
+export function findOneTimeCode(subject: string, summary: string, strict = false): string | null {
   const text = `${subject} \n ${summary}`
-  const keywords = [...text.matchAll(KEYWORDS)].map((m) => m.index ?? 0)
+  const keywords = [...text.matchAll(strict ? STRONG_KEYWORDS : KEYWORDS)].map((m) => m.index ?? 0)
   if (!keywords.length) return null
 
   let best: { code: string; distance: number } | null = null
@@ -30,4 +34,25 @@ export function findOneTimeCode(subject: string, summary: string): string | null
     if (!best || distance < best.distance || (distance === best.distance && code.length === 6)) best = { code, distance }
   }
   return best?.code ?? null
+}
+
+/** C'è una parola da codice (codice, verifica, OTP…) in oggetto o anteprima: allora vale la pena guardare il testo completo. */
+export function mentionsCode(subject: string, summary: string): boolean {
+  KEYWORDS.lastIndex = 0
+  return KEYWORDS.test(`${subject} ${summary}`)
+}
+
+/** Testo semplice da una pagina HTML (versione stampabile di un'email). */
+export function htmlToText(html: string): string {
+  return html
+    .replace(/<(style|script|head)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;|&#160;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
 }

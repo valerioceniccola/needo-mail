@@ -7,7 +7,8 @@ import { isPaused } from '@shared/pause'
 import { findAccount, getState, select, setSetting } from './state'
 import type { Inbox, MailEntry } from './unread'
 import { staleMailIds } from './staleMail'
-import { findOneTimeCode } from '@shared/otp'
+import { findOneTimeCode, mentionsCode } from '@shared/otp'
+import { fetchMailText } from './mailBody'
 
 /*
   Notifiche e badge. Regola: un account in pausa non notifica e non conta nel badge.
@@ -156,12 +157,24 @@ function notifyMail(accountId: string, label: string, mail: MailEntry) {
  * poco (dopo un risveglio del Mac un codice vecchio non serve più e sporcherebbe gli appunti).
  * Restituisce true se l'email è stata gestita così (niente notifica normale).
  */
-function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
-  const { settings } = getState()
-  if (!settings.copyCodes) return false
+/** Email che potrebbe contenere un codice: copia attiva, arrivata da poco, con una parola da codice. */
+function maybeCode(mail: MailEntry): boolean {
+  if (!getState().settings.copyCodes) return false
   if (mail.time && Date.now() - mail.time > 10 * 60_000) return false
-  const code = findOneTimeCode(mail.subject, mail.summary)
-  if (!code) return false
+  return mentionsCode(mail.subject, mail.summary)
+}
+
+/** Il codice dall'anteprima del feed o, se lì non c'è, dal testo completo dell'email. */
+async function findCode(accountId: string, mail: MailEntry): Promise<string | null> {
+  const fromSummary = findOneTimeCode(mail.subject, mail.summary)
+  if (fromSummary) return fromSummary
+  const messageId = messageIdOf(mail.link)
+  const text = messageId ? await fetchMailText(accountId, messageId) : null
+  return text ? findOneTimeCode(mail.subject, text, true) : null
+}
+
+function copyCode(accountId: string, label: string, mail: MailEntry, code: string) {
+  const { settings } = getState()
   // in Electron gli appunti sono asincroni: l'eliminazione aspetta che la scrittura sia finita
   const written = clipboard.writeText(code).catch(() => {})
   if (settings.notifications) {
@@ -180,7 +193,6 @@ function copyCode(accountId: string, label: string, mail: MailEntry): boolean {
     keep(n)
   }
   if (settings.deleteCodeMails) written.then(() => deleteCodeMail(accountId, label, mail, code))
-  return true
 }
 
 const DELETE_ERRORS: Record<string, string> = {
@@ -221,9 +233,19 @@ export function handleInbox(accountId: string, inbox: Inbox) {
 
   let fresh = entries.filter((e) => !known.has(e.id))
   const account = findAccount(accountId)
-  if (account) fresh = fresh.filter((mail) => !copyCode(accountId, account.label, mail))
+  if (!account) return
+
+  // possibili codici: si cerca il codice (anche nel testo completo, qualche secondo al massimo);
+  // trovato → "Codice copiato" (anche in pausa: l'hai appena chiesto tu); sennò notifica normale
+  for (const mail of fresh.filter(maybeCode)) {
+    findCode(accountId, mail).then((code) => {
+      if (code) return copyCode(accountId, account.label, mail, code)
+      if (getState().settings.notifications && !isPaused(account, new Date())) notifyMail(accountId, account.label, mail)
+    })
+  }
+  fresh = fresh.filter((mail) => !maybeCode(mail))
   if (!getState().settings.notifications) return
-  if (!fresh.length || !account || isPaused(account, new Date())) return
+  if (!fresh.length || isPaused(account, new Date())) return
 
   // tante email insieme (es. dopo il risveglio del Mac): una notifica sola
   if (fresh.length > 3) {
@@ -256,7 +278,9 @@ export function testCode() {
   const account = getState().accounts[0]
   if (!account) return
   const mail = { id: `test-${Date.now()}`, subject: 'Il tuo codice di verifica', summary: 'Usa il codice 482913 per accedere. Scade tra 10 minuti.', author: 'Servizio di prova', link: '', time: Date.now() }
-  if (!copyCode(account.id, account.label, mail)) new Notification({ title: 'Needo', body: 'Copia dei codici disattivata nelle Impostazioni.' }).show()
+  if (!getState().settings.copyCodes) return new Notification({ title: 'Needo', body: 'Copia dei codici disattivata nelle Impostazioni.' }).show()
+  const code = findOneTimeCode(mail.subject, mail.summary)
+  if (code) copyCode(account.id, account.label, mail, code)
 }
 
 /** Notifica di prova dal menu, per controllare i permessi di macOS. */
