@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.9.1
+
+- Notifica del codice più chiara: titolo "Codice copiato", sotto il codice, il mittente e l'account
+- Codici riconosciuti anche quando non stanno nelle prime righe dell'email (per esempio con gli indirizzi alias che aggiungono un riquadro in cima)
+
 ## 0.9.0
 
 - La notifica "Codice copiato" resta a schermo come le altre, anche quando l'email del codice viene eliminata
