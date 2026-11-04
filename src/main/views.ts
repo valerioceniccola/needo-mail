@@ -23,6 +23,7 @@ type Callbacks = {
   onTitle: (id: string, title: string) => void
   onNavigate: (id: string) => void
   onLoaded: (id: string) => void
+  onFound: (id: string, active: number, total: number) => void
 }
 
 const views = new Map<string, WebContentsView>()
@@ -175,6 +176,9 @@ export function ensureView(id: string, signIn = false): WebContentsView {
     }
   })
   attachContextMenu(wc)
+  wc.on('found-in-page', (_e, result) => {
+    if (result.finalUpdate) callbacks.onFound(id, result.activeMatchOrdinal, result.matches)
+  })
   wc.on('dom-ready', () => {
     if (wc.getURL().startsWith('https://mail.google.com/')) {
       wc.insertCSS(HIDE_ACCOUNT_SWITCHER)

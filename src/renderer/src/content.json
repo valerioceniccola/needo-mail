@@ -170,5 +170,13 @@
       "dismiss": "Non ora",
       "never": "Non chiedermelo più"
     }
+  },
+  "find": {
+    "placeholder": "Cerca nella pagina",
+    "none": "Nessun risultato",
+    "of": "di",
+    "previous": "Precedente (⇧↩)",
+    "next": "Successivo (↩)",
+    "close": "Chiudi (esc)"
   }
 }

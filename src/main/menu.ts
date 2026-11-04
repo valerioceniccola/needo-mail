@@ -11,6 +11,8 @@ type Actions = {
   gmailDevTools: () => void
   simulateWake: () => void
   testCode: () => void
+  openFind: () => void
+  findAgain: (forward: boolean) => void
   testNotification: () => void
   checkForUpdates: () => void
 }
@@ -48,7 +50,24 @@ export function buildAppMenu(actions: Actions) {
       label: 'File',
       submenu: [{ label: 'Aggiungi account…', click: actions.addAccount }, { type: 'separator' }, { role: 'close', label: 'Chiudi finestra' }]
     },
-    { role: 'editMenu' },
+    {
+      label: 'Composizione',
+      submenu: [
+        { role: 'undo', label: 'Annulla' },
+        { role: 'redo', label: 'Ripristina' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Taglia' },
+        { role: 'copy', label: 'Copia' },
+        { role: 'paste', label: 'Incolla' },
+        { role: 'pasteAndMatchStyle', label: 'Incolla e adatta stile' },
+        { role: 'selectAll', label: 'Seleziona tutto' },
+        { type: 'separator' },
+        // cerca nella pagina di Gmail (l'email aperta, l'elenco), come ⌘F nei browser
+        { label: 'Trova…', accelerator: 'CmdOrCtrl+F', click: actions.openFind },
+        { label: 'Trova successivo', accelerator: 'CmdOrCtrl+G', click: () => actions.findAgain(true) },
+        { label: 'Trova precedente', accelerator: 'Shift+CmdOrCtrl+G', click: () => actions.findAgain(false) }
+      ]
+    },
     {
       label: 'Vista',
       submenu: [

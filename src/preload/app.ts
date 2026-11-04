@@ -32,6 +32,8 @@ const api: GmailHubApi = {
   back: () => ipcRenderer.send(IPC.back),
   forward: () => ipcRenderer.send(IPC.forward),
   reload: () => ipcRenderer.send(IPC.reload),
+  find: (text, forward, newSearch) => ipcRenderer.send(IPC.find, text, forward, newSearch),
+  closeFind: () => ipcRenderer.send(IPC.closeFind),
   backToGmail: () => ipcRenderer.send(IPC.backToGmail)
 }
 

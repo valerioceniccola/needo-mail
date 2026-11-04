@@ -28,7 +28,8 @@ const state: AppState = {
   appVersion: app.getVersion(),
   update: { state: 'idle' },
   macNotifications: 'unknown',
-  nav: { canGoBack: false, canGoForward: false, outsideGmail: false }
+  nav: { canGoBack: false, canGoForward: false, outsideGmail: false },
+  find: { open: false, active: 0, total: 0, focus: 0 }
 }
 
 const listeners = new Set<() => void>()
@@ -193,6 +194,11 @@ export function setAdding(adding: AppState['adding']) {
 export function setUnread(id: string, count: number) {
   if (state.unread[id] === count) return
   state.unread[id] = count
+  emit()
+}
+
+export function setFind(find: Partial<AppState['find']>) {
+  state.find = { ...state.find, ...find }
   emit()
 }
 

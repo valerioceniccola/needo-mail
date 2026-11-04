@@ -151,6 +151,48 @@ function refreshAvatar(id: string, manual = false, attempt = 0) {
   }, attempt === 0 && manual ? 0 : 3000)
 }
 
+// --- cerca nella pagina (⌘F) -------------------------------------------------
+
+let findText = ''
+
+function onFound(id: string, active: number, total: number) {
+  if (id === visibleAccountId() && state.getState().find.open) state.setFind({ active, total })
+}
+
+function openFind() {
+  if (!visibleAccountId()) return
+  const { find } = state.getState()
+  // la barra sta nell'interfaccia: il cursore va lì (focus cresce, così ⌘F di nuovo seleziona il testo)
+  state.setFind({ open: true, focus: find.focus + 1 })
+  win.webContents.focus()
+}
+
+function find(text: string, forward: boolean, newSearch: boolean) {
+  const wc = views.viewContents(visibleAccountId())
+  if (!wc) return
+  findText = text
+  if (!text) {
+    wc.stopFindInPage('clearSelection')
+    state.setFind({ active: 0, total: 0 })
+    return
+  }
+  wc.findInPage(text, { forward, findNext: newSearch })
+}
+
+function findAgain(forward: boolean) {
+  if (!state.getState().find.open) return openFind()
+  if (findText) find(findText, forward, false)
+}
+
+/** Chiude la barra; con `keepSelection` l'ultimo risultato resta selezionato nella pagina. */
+function closeFind(focusGmail = true) {
+  const wc = views.viewContents(visibleAccountId())
+  wc?.stopFindInPage('keepSelection')
+  findText = ''
+  if (state.getState().find.open) state.setFind({ open: false, active: 0, total: 0 })
+  if (focusGmail) wc?.focus()
+}
+
 function onLoaded(id: string) {
   const account = state.findAccount(id)
   if (account && !account.avatar && !state.getState().avatarPending.includes(id)) refreshAvatar(id)
@@ -233,6 +275,8 @@ const menuActions = {
   // solo in sviluppo: lo stesso giro del risveglio del Mac, per provarlo senza mettere il Mac in stop
   simulateWake: () => {},
   testCode,
+  openFind,
+  findAgain,
   testNotification,
   checkForUpdates
 }
@@ -266,6 +310,8 @@ function registerIpc() {
   ipcMain.on(IPC.back, menuActions.back)
   ipcMain.on(IPC.forward, menuActions.forward)
   ipcMain.on(IPC.reload, menuActions.reload)
+  ipcMain.on(IPC.find, (_e, text: string, forward: boolean, newSearch: boolean) => find(text, forward, newSearch))
+  ipcMain.on(IPC.closeFind, () => closeFind())
   ipcMain.on(IPC.backToGmail, () => views.backToGmail(visibleAccountId()))
 
 }
@@ -275,7 +321,7 @@ app.whenReady().then(() => {
   if (!app.isPackaged) app.dock?.setIcon(join(__dirname, '../../build/icon.png'))
 
   win = createWindow()
-  views.initViews(win, { onTitle, onNavigate, onLoaded })
+  views.initViews(win, { onTitle, onNavigate, onLoaded, onFound })
   initNotifier({
     showWindow,
     openInbox: views.openInbox,
@@ -311,6 +357,12 @@ app.whenReady().then(() => {
   const sync = () => {
     const visible = visibleAccountId()
     const changed = visible !== lastVisible
+    // cambiando account (o aprendo le Impostazioni) la ricerca si chiude: era nella pagina di prima
+    if (changed && lastVisible) views.viewContents(lastVisible)?.stopFindInPage('clearSelection')
+    if (changed && state.getState().find.open) {
+      findText = ''
+      state.getState().find = { ...state.getState().find, open: false, active: 0, total: 0 }
+    }
     lastVisible = visible
     // aprendo le Impostazioni la vista Gmail si toglie un attimo dopo aver mandato lo stato:
     // così sotto c'è già la pagina scura delle Impostazioni e non si intravede la sagoma di Gmail

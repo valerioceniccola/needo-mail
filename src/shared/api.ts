@@ -42,6 +42,8 @@ export type AppState = {
   /** come macOS mostra le notifiche di Needo (riletto a ogni ritorno sulla finestra) */
   macNotifications: NotificationStatus
   nav: { canGoBack: boolean; canGoForward: boolean; outsideGmail: boolean }
+  /** cerca nella pagina (⌘F): barra aperta, risultato attuale e totale; focus cresce a ogni ⌘F per rimettere il cursore nel campo */
+  find: { open: boolean; active: number; total: number; focus: number }
 }
 
 /** Funzioni che il preload espone all'interfaccia come window.gmailHub. */
@@ -74,6 +76,9 @@ export type GmailHubApi = {
   back: () => void
   forward: () => void
   reload: () => void
+  /** cerca nella pagina di Gmail: `newSearch` per un testo nuovo, altrimenti risultato successivo/precedente */
+  find: (text: string, forward: boolean, newSearch: boolean) => void
+  closeFind: () => void
   /** riporta la vista dell'account aperto su Gmail, se è finita su un'altra pagina */
   backToGmail: () => void
 }
@@ -105,5 +110,7 @@ export const IPC = {
   back: 'nav:back',
   forward: 'nav:forward',
   reload: 'nav:reload',
+  find: 'find:search',
+  closeFind: 'find:close',
   backToGmail: 'nav:back-to-gmail'
 } as const

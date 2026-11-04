@@ -31,6 +31,7 @@ export const useStore = create<State>((set) => ({
   update: { state: 'idle' },
   macNotifications: 'unknown',
   nav: { canGoBack: false, canGoForward: false, outsideGmail: false },
+  find: { open: false, active: 0, total: 0, focus: 0 },
   ready: false,
   snapshot: null,
   covered: false,

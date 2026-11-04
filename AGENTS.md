@@ -30,7 +30,7 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (nome di lavoro preceden
 - Nascosto via CSS (`views.ts`, `HIDE_ACCOUNT_SWITCHER`): ogni account ha già la sua vista, non servono due modi di cambiare account. Bloccate anche le pagine Google `AddSession` / `AccountChooser` / `SignOutOptions` fuori dall'aggiunta.
 
 ### Navigazione
-- In alto a sinistra: **casa** (Posta in arrivo dell'account aperto, anche se la vista è finita su un'altra pagina Google) e **ricarica**. Niente indietro/avanti: in Gmail si naviga con i suoi comandi; ⌘[ e ⌘] restano nel menu Vista. Accanto: colore, etichetta / email dell'account.
+- In alto a sinistra: **casa** (Posta in arrivo dell'account aperto, anche se la vista è finita su un'altra pagina Google) e **ricarica**. Niente indietro/avanti: in Gmail si naviga con i suoi comandi; ⌘[ e ⌘] restano nel menu Vista. Accanto: colore, etichetta / email dell'account. ⌘F apre a destra la barra "Cerca nella pagina" (findInPage sulla vista Gmail; ⌘G / ⇧⌘G, Invio / ⇧Invio, esc), si chiude cambiando account.
 
 ### Pausa
 - **Tasto destro** su un account → menu con: *Metti in pausa* (o *Riattiva* se è in pausa), *Impostazioni…*, *Rimuovi account*.
