@@ -177,6 +177,7 @@
     "of": "di",
     "previous": "Precedente (⇧↩)",
     "next": "Successivo (↩)",
-    "close": "Chiudi (esc)"
+    "close": "Chiudi (esc)",
+    "open": "Cerca nella pagina (⌘F)"
   }
 }

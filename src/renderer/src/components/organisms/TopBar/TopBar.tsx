@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { House, RotateCw } from 'lucide-react'
+import { House, RotateCw, Search } from 'lucide-react'
 import { api, useStore } from '@/app/store'
 import FindBar from '@/components/molecules/FindBar/FindBar'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,7 @@ type Props = {
  */
 export default function TopBar({ children, actions }: Props) {
   const findOpen = useStore((s) => s.find.open)
+  const adding = useStore((s) => !!s.adding)
   return (
     // pl: lascia spazio ai semafori, che stanno in questa riga
     <header className="app-drag flex h-11 shrink-0 items-center gap-2.5 pr-3 pl-[88px]">
@@ -30,10 +31,19 @@ export default function TopBar({ children, actions }: Props) {
       </div>
       <span className="mx-1 h-[18px] w-px bg-[#2c2c33]" aria-hidden="true" />
       <div className="flex min-w-0 flex-1 items-center gap-2.5">{children}</div>
-      {findOpen && (
+      {findOpen ? (
         <div className="app-no-drag">
           <FindBar />
         </div>
+      ) : (
+        // lente per chi preferisce cliccare invece di ⌘F (non durante l'aggiunta di un account)
+        !adding && (
+          <div className="app-no-drag">
+            <Button variant="ghost" size="icon" tabIndex={-1} aria-label={content.find.open} title={content.find.open} onClick={api.openFind}>
+              <Search className="size-3.5" />
+            </Button>
+          </div>
+        )
       )}
       {actions && <div className="app-no-drag flex items-center gap-2">{actions}</div>}
     </header>

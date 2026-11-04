@@ -311,6 +311,7 @@ function registerIpc() {
   ipcMain.on(IPC.forward, menuActions.forward)
   ipcMain.on(IPC.reload, menuActions.reload)
   ipcMain.on(IPC.find, (_e, text: string, forward: boolean, newSearch: boolean) => find(text, forward, newSearch))
+  ipcMain.on(IPC.openFind, () => openFind())
   ipcMain.on(IPC.closeFind, () => closeFind())
   ipcMain.on(IPC.backToGmail, () => views.backToGmail(visibleAccountId()))
 

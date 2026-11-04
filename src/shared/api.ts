@@ -78,6 +78,7 @@ export type GmailHubApi = {
   reload: () => void
   /** cerca nella pagina di Gmail: `newSearch` per un testo nuovo, altrimenti risultato successivo/precedente */
   find: (text: string, forward: boolean, newSearch: boolean) => void
+  openFind: () => void
   closeFind: () => void
   /** riporta la vista dell'account aperto su Gmail, se è finita su un'altra pagina */
   backToGmail: () => void
@@ -111,6 +112,7 @@ export const IPC = {
   forward: 'nav:forward',
   reload: 'nav:reload',
   find: 'find:search',
+  openFind: 'find:open',
   closeFind: 'find:close',
   backToGmail: 'nav:back-to-gmail'
 } as const
