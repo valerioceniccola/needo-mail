@@ -1,5 +1,9 @@
 # Novità di Needo
 
+## 0.10.0
+
+- ⌘F: cerca una parola nella pagina di Gmail, come nei browser (⌘G per il risultato successivo)
+
 ## 0.9.1
 
 - Notifica del codice più chiara: titolo "Codice copiato", sotto il codice, il mittente e l'account
