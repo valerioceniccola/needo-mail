@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.10.1
+
+- Codici di verifica riconosciuti in modo più prudente: niente più scambi con codici auth-info, codici cliente, fiscali o sconto
+- Lente in alto a destra per cercare nella pagina (oltre a ⌘F)
+
 ## 0.10.0
 
 - ⌘F: cerca una parola nella pagina di Gmail, come nei browser (⌘G per il risultato successivo)
