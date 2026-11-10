@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.11.0
+
+- Orari di attività: per ogni account scegli quando tenerlo attivo (per esempio lun–ven 9–18); fuori orario va in pausa da solo. Le pause automatiche che avevi già sono state convertite
+- Pausa a tempo dal tasto destro: per 1 ora, fino alle 18:00, fino a domani mattina o finché non la riattivi
+
 ## 0.10.1
 
 - Codici di verifica riconosciuti in modo più prudente: niente più scambi con codici auth-info, codici cliente, fiscali o sconto
