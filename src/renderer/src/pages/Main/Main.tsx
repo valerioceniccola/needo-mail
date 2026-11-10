@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
+import { isPaused, manualPauseEndsAt, scheduledPauseEndsAt } from '@shared/pause'
 import { api, useStore } from '@/app/store'
 import { formatWhen } from '@/lib/format'
 import PausedBanner from '@/components/organisms/PausedBanner/PausedBanner'
@@ -28,13 +28,15 @@ export default function Main() {
   if (!account) return <main className="flex-1" />
 
   const paused = isPaused(account, now)
-  const end = paused && account.override?.state !== 'paused' ? scheduledPauseEndsAt(account, now) : null
+  // fine della pausa: quella manuale a tempo, oppure il rientro negli orari di attività; null = finché non la riattivi
+  const manual = paused && account.override?.state === 'paused'
+  const end = !paused ? null : manual ? manualPauseEndsAt(account, now) : scheduledPauseEndsAt(account, now)
 
   return (
     <main className="flex min-w-0 flex-1 flex-col">
       {/* solo se in Needo le notifiche sono accese ma macOS le blocca */}
       {settings.notifications && settings.notificationsWarning && macNotifications === 'off' && !warningDismissed && <NotificationsOffBanner onDismiss={() => setWarningDismissed(true)} />}
-      {paused && <PausedBanner until={end ? `${content.paused.until} ${formatWhen(end, now)}` : null} onResume={() => api.resume(account.id)} />}
+      {paused && <PausedBanner until={end ? `${manual ? content.paused.manualUntil : content.paused.until} ${formatWhen(end, now)}` : null} onResume={() => api.resume(account.id)} />}
       <GmailFrame />
     </main>
   )

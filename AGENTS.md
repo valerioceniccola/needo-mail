@@ -34,10 +34,10 @@ Design di riferimento: tela "Gmail Hub · stile Linear" (nome di lavoro preceden
 
 ### Pausa
 - **Tasto destro** su un account → menu con: *Metti in pausa* (o *Riattiva* se è in pausa), *Impostazioni…*, *Rimuovi account*.
-- La pausa manuale è immediata e dura **finché non la togli** (nessuna durata da scegliere).
-- **Impostazioni dell'account** (tasto destro → Impostazioni, `AccountSettingsDialog`): etichetta, colore, "Conta nel badge del Dock", pausa automatica.
-- **Pausa automatica**: interruttore + una o più fasce (accendendo senza fasce se ne propone una: lun–ven 19:00–09:00). In fondo al dialog lo stato calcolato sulle fasce non ancora salvate ("Adesso attivo · va in pausa alle 19:00"). Fasce senza giorni non si salvano. Ogni fascia = giorni della settimana + orario "dalle–alle" (può scavalcare la mezzanotte, es. 19:00–09:00) oppure "tutto il giorno".
-- Precedenza: se metti in pausa a mano, l'account resta in pausa finché non lo riattivi tu, anche se la fascia automatica finisce.
+- La pausa manuale ha una durata da un sottomenu: *Per 1 ora*, *Fino alle 18:00* (se mancano almeno 30 minuti), *Fino a domani alle 9:00*, *Finché non la riattivo*. Scaduta, si toglie da sola (`override.until`).
+- **Impostazioni dell'account** (tasto destro → Impostazioni, `AccountSettingsDialog`): foto, etichetta, colore, "Conta nel badge del Dock", orari di attività.
+- **Orari di attività** (`activeHours`): interruttore + uno o più orari in cui la casella è **attiva**; fuori è in pausa automatica (accendendo senza orari se ne propone uno: lun–ven 09:00–18:00). In fondo al dialog lo stato calcolato sugli orari non ancora salvati ("Adesso attiva · va in pausa alle 18:00"). Orari senza giorni non si salvano. Ogni orario = giorni + "dalle–alle" (può scavalcare la mezzanotte; "00:00" come fine = fino a mezzanotte) oppure "tutto il giorno". Prima c'erano fasce di **pausa** (`autoPause`): all'avvio `migrateAccount` le converte nel loro contrario.
+- Precedenza: la pausa manuale vince sugli orari finché dura. *Riattiva* fuori orario tiene attiva la casella fino al prossimo rientro negli orari.
 - Un account in pausa: **nessuna notifica**, **non conta nel badge**. Gmail resta visibile e usabile; sopra compare una fascia "In pausa · … · Riattiva" con fino a quando dura la pausa automatica, se c'è.
 - Quando un account torna attivo **non arriva nessuna notifica**: le email arrivate durante la pausa restano solo nei non letti (niente riepilogo, scelta di Valerio).
 

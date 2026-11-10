@@ -111,13 +111,34 @@ export function popupAccountMenu(win: BrowserWindow, id: string, onRemove: (id: 
   const paused = isPaused(account, new Date())
 
   Menu.buildFromTemplate([
-    paused ? { label: 'Riattiva', click: () => resume(id) } : { label: 'Metti in pausa', click: () => pause(id) },
+    paused ? { label: 'Riattiva', click: () => resume(id) } : { label: 'Metti in pausa', submenu: pauseChoices(id) },
     { label: 'Impostazioni…', click: () => setEditing(id) },
     { type: 'separator' },
     { label: 'Rimuovi account…', click: () => confirmRemove(win, id, onRemove) }
   ]).popup({ window: win })
 }
 
+
+/** Durate della pausa manuale: si toglie da sola, come "Non disturbare" in Slack. */
+function pauseChoices(id: string): MenuItemConstructorOptions[] {
+  const now = new Date()
+  const at = (days: number, hour: number) => {
+    const d = new Date(now)
+    d.setDate(d.getDate() + days)
+    d.setHours(hour, 0, 0, 0)
+    return d
+  }
+  const evening = at(0, 18)
+  const tomorrow = at(1, 9)
+  return [
+    { label: 'Per 1 ora', click: () => pause(id, new Date(now.getTime() + 60 * 60_000)) },
+    // "fino a stasera" ha senso solo se mancano almeno 30 minuti alle 18
+    ...(evening.getTime() - now.getTime() > 30 * 60_000 ? [{ label: 'Fino alle 18:00', click: () => pause(id, evening) }] : []),
+    { label: 'Fino a domani alle 9:00', click: () => pause(id, tomorrow) },
+    { type: 'separator' },
+    { label: 'Finché non la riattivo', click: () => pause(id) }
+  ]
+}
 
 /** Conferma prima di rimuovere un account (dal tasto destro o dalle Impostazioni). */
 export async function confirmRemove(win: BrowserWindow, id: string, onRemove: (id: string) => void) {

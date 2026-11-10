@@ -13,9 +13,10 @@
   "paused": {
     "title": "In pausa",
     "description": "Niente notifiche e non conta nel badge. Puoi comunque leggere e scrivere.",
-    "manual": "Finché non lo riattivi",
-    "until": "Pausa automatica · torna attivo",
-    "resume": "Riattiva"
+    "manual": "Finché non la riattivi",
+    "until": "Fuori orario · torna attiva",
+    "resume": "Riattiva",
+    "manualUntil": "Torna attiva"
   },
   "gmail": {
     "loading": "Caricamento di Gmail…"
@@ -38,18 +39,15 @@
     "confirm": "Aggiungi"
   },
   "settings": {
-    "description": "Foto, etichetta, colore e pausa automatica di questo account.",
+    "description": "Foto, etichetta, colore e orari di attività di questo account.",
     "close": "Chiudi",
-    "autoPause": "Pausa automatica",
-    "autoPauseHint": "Nelle fasce scelte l'account va in pausa da solo: niente notifiche e non conta nel badge.",
-    "addRule": "Aggiungi fascia",
-    "removeRule": "Elimina fascia",
-    "pausedFrom": "In pausa",
+    "addRule": "Aggiungi orario",
+    "removeRule": "Elimina orario",
     "allDay": "tutto il giorno",
     "from": "dalle",
     "to": "alle",
-    "fromLabel": "Inizio della pausa",
-    "toLabel": "Fine della pausa",
+    "fromLabel": "Inizio dell'orario",
+    "toLabel": "Fine dell'orario",
     "nextDay": "del giorno dopo",
     "noDays": "Scegli almeno un giorno.",
     "dayLetters": [
@@ -72,15 +70,18 @@
     ],
     "remove": "Rimuovi account…",
     "save": "Salva",
-    "nowActive": "Adesso attivo · va in pausa",
-    "nowPaused": "Adesso in pausa · torna attivo",
-    "alwaysPaused": "In pausa per tutta la settimana",
+    "nowActive": "Adesso attiva · va in pausa",
+    "nowPaused": "Adesso in pausa · torna attiva",
+    "alwaysPaused": "Nessun orario: sempre in pausa",
     "badge": "Conta nel badge del Dock",
     "badgeHint": "I non letti di questo account si sommano al numero sull'icona dell'app.",
     "photo": "Foto",
     "photoUpload": "Carica foto…",
     "photoGoogle": "Prendi da Google",
-    "photoHint": "Di solito è la foto del profilo Google."
+    "photoHint": "Di solito è la foto del profilo Google.",
+    "activeHours": "Orari di attività",
+    "activeHoursHint": "La casella è attiva solo negli orari scelti; fuori va in pausa da sola: niente notifiche e non conta nel badge.",
+    "activeFrom": "Attiva"
   },
   "general": {
     "accounts": "Account",
@@ -88,8 +89,8 @@
     "addAccount": "Aggiungi account",
     "noAccounts": "Nessun account collegato.",
     "options": "Opzioni account",
-    "stateActive": "Sempre attivo",
-    "stateScheduled": "Pausa automatica",
+    "stateActive": "Sempre attiva",
+    "stateScheduled": "Orari di attività",
     "statePaused": "In pausa",
     "general": "Generali",
     "toggles": {

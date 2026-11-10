@@ -11,14 +11,14 @@ type Props = {
 
 const DAYS: Weekday[] = [0, 1, 2, 3, 4, 5, 6]
 
-/** Una fascia di pausa automatica: giorni della settimana + orario oppure tutto il giorno. */
+/** Una fascia degli orari di attività: giorni della settimana + orario oppure tutto il giorno. */
 export default function PauseRuleEditor({ rule, onChange, onRemove }: Props) {
   const toggleDay = (day: Weekday) => {
     const days = rule.days.includes(day) ? rule.days.filter((d) => d !== day) : [...rule.days, day].sort()
     onChange({ ...rule, days })
   }
-  // fascia che scavalca la mezzanotte (es. 19:00–09:00): la fine è il giorno dopo
-  const overnight = !rule.allDay && rule.from > rule.to
+  // fascia che scavalca la mezzanotte (es. 19:00–02:00): la fine è il giorno dopo; "00:00" = fino a mezzanotte
+  const overnight = !rule.allDay && rule.from > rule.to && rule.to !== '00:00'
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-sidebar p-3">
@@ -54,7 +54,7 @@ export default function PauseRuleEditor({ rule, onChange, onRemove }: Props) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
-        <span>{content.settings.pausedFrom}</span>
+        <span>{content.settings.activeFrom}</span>
         <label className="flex items-center gap-2">
           <input type="checkbox" checked={rule.allDay} onChange={(e) => onChange({ ...rule, allDay: e.target.checked })} className="accent-[var(--primary)]" />
           <span className="text-foreground">{content.settings.allDay}</span>

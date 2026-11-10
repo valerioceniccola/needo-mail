@@ -225,7 +225,7 @@ function confirmAdd(label: string, color: string) {
     email: adding.email,
     color,
     override: null,
-    autoPause: { enabled: false, rules: [] }
+    activeHours: { enabled: false, rules: [] }
   })
   refreshUnreadSoon(adding.id, null)
   introduceNotifications()

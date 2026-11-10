@@ -131,7 +131,7 @@ type ItemProps = {
 /** Riga dell'elenco account: maniglia per trascinare, avatar, nomi, stato, scorciatoia, menu. */
 function AccountItem({ account, index, paused }: ItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: account.id })
-  const state = paused ? content.general.statePaused : account.autoPause.enabled ? content.general.stateScheduled : content.general.stateActive
+  const state = paused ? content.general.statePaused : account.activeHours.enabled ? content.general.stateScheduled : content.general.stateActive
 
   return (
     <div

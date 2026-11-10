@@ -1,7 +1,7 @@
 import type { AccountChanges, AppState, NotificationStatus, UpdateStatus } from '@shared/api'
 import { DEFAULT_SETTINGS, type Account, type AppSettings } from '@shared/types'
 import { app } from 'electron'
-import { isPaused, scheduledPauseEndsAt } from '@shared/pause'
+import { isPaused, migrateAccount, scheduledPauseEndsAt } from '@shared/pause'
 import { createStore } from './store'
 
 /*
@@ -16,7 +16,8 @@ const saved = store.read()
 const settingsStore = createStore<AppSettings>('settings', DEFAULT_SETTINGS)
 
 const state: AppState = {
-  accounts: saved.accounts,
+  // account salvati con le vecchie fasce di pausa: convertiti in orari di attività
+  accounts: saved.accounts.map(migrateAccount),
   selectedId: saved.selectedId ?? saved.accounts[0]?.id ?? null,
   unread: {},
   adding: null,
@@ -119,8 +120,9 @@ export function move(fromId: string, toId: string) {
   commit()
 }
 
-export function pause(id: string) {
-  patch(id, { override: { state: 'paused' } })
+/** Pausa manuale: fino a `until`, oppure finché non la riattivi. */
+export function pause(id: string, until?: Date) {
+  patch(id, { override: until ? { state: 'paused', until: until.toISOString() } : { state: 'paused' } })
 }
 
 /** Se l'account è in pausa automatica, resta attivo fino alla fine della fascia in corso. */
@@ -144,12 +146,12 @@ export function addAccount(account: Account) {
 /** Salva le Impostazioni dell'account: solo i campi ammessi, con un minimo di controllo. */
 export function updateAccount(id: string, changes: AccountChanges) {
   const label = changes.label.trim()
-  const rules = changes.autoPause.rules.filter((r) => r.days.length > 0)
+  const rules = changes.activeHours.rules.filter((r) => r.days.length > 0)
   patch(id, {
     ...(label ? { label } : {}),
     color: changes.color,
     badge: changes.badge !== false,
-    autoPause: { enabled: changes.autoPause.enabled && rules.length > 0, rules }
+    activeHours: { enabled: changes.activeHours.enabled && rules.length > 0, rules }
   })
   state.editingId = null
   emit()

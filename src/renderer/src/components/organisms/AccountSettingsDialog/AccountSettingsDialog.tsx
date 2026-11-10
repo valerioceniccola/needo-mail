@@ -18,24 +18,25 @@ type Props = {
   account: Account
 }
 
-const NEW_RULE: PauseRule = { days: [0, 1, 2, 3, 4], allDay: false, from: '19:00', to: '09:00' }
+// proposta quando si accendono gli orari: giorni feriali, orario d'ufficio
+const NEW_RULE: PauseRule = { days: [0, 1, 2, 3, 4], allDay: false, from: '09:00', to: '18:00' }
 
-/** Impostazioni di un account: foto, etichetta, colore, pausa automatica, rimozione. */
+/** Impostazioni di un account: foto, etichetta, colore, orari di attività, rimozione. */
 export default function AccountSettingsDialog({ account }: Props) {
   const now = useStore((s) => s.now)
   const avatarLoading = useStore((s) => s.avatarPending.includes(account.id))
   const [label, setLabel] = useState(account.label)
   const [color, setColor] = useState(account.color)
   const [badge, setBadge] = useState(account.badge !== false)
-  const [enabled, setEnabled] = useState(account.autoPause.enabled)
-  const [rules, setRules] = useState<PauseRule[]>(account.autoPause.rules)
+  const [enabled, setEnabled] = useState(account.activeHours.enabled)
+  const [rules, setRules] = useState<PauseRule[]>(account.activeHours.rules)
 
   // la vista Gmail starebbe sopra il dialog: finché è aperto al suo posto c'è un'istantanea
   useEffect(coverGmail, [])
 
   const toggleEnabled = (on: boolean) => {
     setEnabled(on)
-    // accendendo senza fasce ne proponiamo una tipica: sere e mattine dei giorni feriali
+    // accendendo senza fasce ne proponiamo una tipica: giorni feriali 9–18
     if (on && rules.length === 0) setRules([NEW_RULE])
   }
 
@@ -43,7 +44,7 @@ export default function AccountSettingsDialog({ account }: Props) {
   const removeRule = (index: number) => setRules(rules.filter((_, i) => i !== index))
 
   const invalid = enabled && rules.some((r) => r.days.length === 0)
-  const save = () => api.updateAccount(account.id, { label, color, badge, autoPause: { enabled, rules } })
+  const save = () => api.updateAccount(account.id, { label, color, badge, activeHours: { enabled, rules } })
 
   return (
     <Dialog open onOpenChange={(open) => !open && api.closeSettings()}>
@@ -117,8 +118,8 @@ export default function AccountSettingsDialog({ account }: Props) {
 
           <label className="flex items-start gap-3">
             <span className="flex flex-1 flex-col gap-0.5">
-              <span className="font-semibold">{content.settings.autoPause}</span>
-              <span className="leading-relaxed text-muted-foreground">{content.settings.autoPauseHint}</span>
+              <span className="font-semibold">{content.settings.activeHours}</span>
+              <span className="leading-relaxed text-muted-foreground">{content.settings.activeHoursHint}</span>
             </span>
             <Switch checked={enabled} onCheckedChange={toggleEnabled} className="mt-0.5" />
           </label>
@@ -139,7 +140,7 @@ export default function AccountSettingsDialog({ account }: Props) {
             <Button type="button" variant="destructive" size="sm" className="-ml-2.5" onClick={() => api.removeAccount(account.id)}>
               {content.settings.remove}
             </Button>
-            <span className="flex-1 truncate text-xs text-muted-foreground">{status({ ...account, autoPause: { enabled, rules } }, now)}</span>
+            <span className="flex-1 truncate text-xs text-muted-foreground">{status({ ...account, activeHours: { enabled, rules } }, now)}</span>
             <Button type="button" variant="outline" onClick={api.closeSettings}>
               {content.add.cancel}
             </Button>
@@ -153,9 +154,9 @@ export default function AccountSettingsDialog({ account }: Props) {
   )
 }
 
-/** "Adesso attivo · in pausa da lunedì alle 19:00", calcolato sulle fasce non ancora salvate. */
+/** "Adesso attiva · va in pausa oggi alle 18:00", calcolato sugli orari non ancora salvati. */
 function status(draft: Account, now: Date): string {
-  if (!draft.autoPause.enabled) return ''
+  if (!draft.activeHours.enabled) return ''
   if (isScheduledPause(draft, now)) {
     const end = scheduledPauseEndsAt(draft, now)
     return end ? `${content.settings.nowPaused} ${formatWhen(end, now)}` : content.settings.alwaysPaused

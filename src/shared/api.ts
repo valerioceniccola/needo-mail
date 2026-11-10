@@ -1,7 +1,7 @@
 import type { Account, AppSettings } from './types'
 
 /** Campi dell'account modificabili dalle Impostazioni. */
-export type AccountChanges = Pick<Account, 'label' | 'color' | 'autoPause'> & { badge: boolean }
+export type AccountChanges = Pick<Account, 'label' | 'color' | 'activeHours'> & { badge: boolean }
 
 /** Stato degli aggiornamenti, mostrato in fondo alle Impostazioni. */
 export type UpdateStatus =
