@@ -10,6 +10,13 @@ describe('findOneTimeCode', () => {
     expect(findOneTimeCode('Sign in to Slack', 'Your confirmation code is 123-456')).toBe('123456')
   })
 
+  it('codice valido anche se subito dopo ci sono il codice cliente e altri numeri (Register.it)', () => {
+    const text =
+      "Caro cliente, È stato appena effettuato un tentativo di accesso al tuo pannello di controllo per accedere all'area contenente dati sensibili. Per verificare la tua identità, utilizza il codice di verifica monouso riportato di seguito. Il codice ha una validità di 10 minuti. Il tuo codice di verifica: 192374 Codice Cliente: VC25042-EURO Indirizzo IP: 2.58.93.36 Sistema Operativo: macOS Browser: Chrome 156.0.0.0 Posizione Stimata: Italia Non condividere questo OTP con nessuno."
+    expect(findOneTimeCode('Codice di verifica', text)).toBe('192374')
+    expect(findOneTimeCode('Codice di verifica', text, true)).toBe('192374')
+  })
+
   it('ignora gli altri tipi di codice (auth-info dei domini, fiscale, cliente, sconto)', () => {
     const registerIt =
       "Gentile Valerio, confermiamo la registrazione del dominio plateva.it e ti comunichiamo il relativo codice auth-info, necessario per un eventuale trasferimento del dominio stesso. Codice auth-info per il dominio plateva.it: AI-2847193"

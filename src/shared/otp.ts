@@ -29,7 +29,7 @@ const NEAR = 60
 export function findOneTimeCode(subject: string, summary: string, strict = false): string | null {
   const text = `${subject} \n ${summary}`
   if (!OTP_CONTEXT.test(text)) return null
-  const keywords = [...text.matchAll(strict ? STRONG_KEYWORDS : KEYWORDS)].map((m) => m.index ?? 0)
+  const keywords = [...text.matchAll(strict ? STRONG_KEYWORDS : KEYWORDS)].map((m) => ({ start: m.index ?? 0, end: (m.index ?? 0) + m[0].length }))
   if (!keywords.length) return null
 
   let best: { code: string; distance: number } | null = null
@@ -39,10 +39,18 @@ export function findOneTimeCode(subject: string, summary: string, strict = false
     // anni (1990–2099) da soli non sono codici
     if (code.length === 4 && /^(19|20)\d\d$/.test(code)) continue
     const at = match.index ?? 0
-    // intorno al numero si parla di un altro tipo di codice (auth-info, cliente, ordine…): no
-    if (NOT_OTP.test(text.slice(Math.max(0, at - NEAR), at + match[0].length + 20))) continue
-    const distance = Math.min(...keywords.map((k) => Math.abs(k - at)))
+    const end = at + match[0].length
+    // la parola chiave più vicina (prima o dopo il numero)
+    const nearest = keywords
+      .map((k) => ({ ...k, distance: k.end <= at ? at - k.end : Math.max(0, k.start - end) }))
+      .sort((a, b) => a.distance - b.distance)[0]
+    const distance = nearest.distance
     if (distance > NEAR) continue
+    // tra la parola chiave e il numero si parla di un altro tipo di codice ("codice auth-info per…: 123",
+    // "codice cliente 123"): no. Si guarda solo quel tratto, non tutto l'intorno: "Il tuo codice di verifica:
+    // 192374 Codice Cliente: …" è un codice valido anche se subito dopo c'è il codice cliente
+    const between = nearest.end <= at ? text.slice(nearest.start, at) : text.slice(end, nearest.end)
+    if (NOT_OTP.test(between)) continue
     if (!best || distance < best.distance || (distance === best.distance && code.length === 6)) best = { code, distance }
   }
   return best?.code ?? null
