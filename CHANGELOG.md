@@ -1,5 +1,11 @@
 # Novità di Needo
 
+## 0.11.1
+
+- Se il controllo della posta si blocca, Needo ricarica da solo la casella dopo circa un minuto (prima bisognava riaprire l'app)
+- Nuovo: Aiuto › Mostra registro di Needo, utile per segnalare un problema
+- Codici di verifica riconosciuti anche quando subito dopo c'è il codice cliente (es. Register.it)
+
 ## 0.11.0
 
 - Orari di attività: per ogni account scegli quando tenerlo attivo (per esempio lun–ven 9–18); fuori orario va in pausa da solo. Le pause automatiche che avevi già sono state convertite
