@@ -1,3 +1,4 @@
+import { log } from './log'
 import { partitionOf } from './views'
 
 /*
@@ -21,12 +22,20 @@ export type MailEntry = {
 export type Inbox = { count: number; entries: MailEntry[] }
 
 /** Non letti e ultime email non lette, oppure null se il feed non risponde (es. login non ancora fatto). */
-export async function fetchInbox(id: string): Promise<Inbox | null> {
+export async function fetchInbox(id: string, quiet = false): Promise<Inbox | null> {
   try {
-    const res = await partitionOf(id).fetch(FEED_URL)
-    if (!res.ok) return null
-    return parseFeed(await res.text())
-  } catch {
+    // al massimo 20 secondi: una richiesta rimasta appesa (rete cambiata, risveglio del Mac) non deve restare lì
+    const res = await partitionOf(id).fetch(FEED_URL, { signal: AbortSignal.timeout(20_000) })
+    if (!res.ok) {
+      if (!quiet) log(`feed ${id}: risposta ${res.status}`)
+      return null
+    }
+    const inbox = parseFeed(await res.text())
+    // risposta che non è il feed: di solito la pagina di accesso di Google (sessione da rinfrescare)
+    if (!inbox && !quiet) log(`feed ${id}: non è il feed (${new URL(res.url).host}${new URL(res.url).pathname})`)
+    return inbox
+  } catch (err) {
+    if (!quiet) log(`feed ${id}: errore ${(err as Error).name}: ${(err as Error).message}`)
     return null
   }
 }

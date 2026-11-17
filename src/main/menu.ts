@@ -11,6 +11,7 @@ type Actions = {
   gmailDevTools: () => void
   simulateWake: () => void
   testCode: () => void
+  showLog: () => void
   openFind: () => void
   findAgain: (forward: boolean) => void
   testNotification: () => void
@@ -95,7 +96,9 @@ export function buildAppMenu(actions: Actions) {
       ]
     },
     { label: 'Account', submenu: accountItems.length ? accountItems : [{ label: 'Nessun account', enabled: false }] },
-    { role: 'windowMenu' }
+    { role: 'windowMenu' },
+    // registro diagnostico: da allegare se qualcosa non va (per esempio la posta smette di arrivare)
+    { role: 'help', label: 'Aiuto', submenu: [{ label: 'Mostra registro di Needo', click: actions.showLog }] }
   ]
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))

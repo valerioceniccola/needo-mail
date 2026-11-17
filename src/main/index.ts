@@ -3,6 +3,7 @@ import './migrate'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { app, BrowserWindow, dialog, ipcMain, powerMonitor, shell } from 'electron'
+import { log, showLog } from './log'
 import { IPC, type AccountChanges, type Rect } from '@shared/api'
 import type { AppSettings } from '@shared/types'
 import { savedBounds, trackWindowState, wasMaximized } from './windowState'
@@ -92,14 +93,40 @@ function applyLaunchAtLogin() {
 
 const unreadTimers = new Map<string, NodeJS.Timeout>()
 
+/*
+  Controllo di salute del feed. Se per un account il feed non risponde più (sessione da rinfrescare,
+  rete rimasta appesa), le notifiche smetterebbero di arrivare finché non si riavvia Needo. Dopo circa
+  un minuto di errori di fila si ricarica la sua casella, come farebbe il riavvio, e lo si scrive nel registro.
+  Non si ricarica la casella che stai usando: si aspetta che passi ad altro.
+*/
+const feedFailures = new Map<string, number>()
+const RELOAD_AFTER = 6
+
+function feedResult(id: string, ok: boolean) {
+  const failures = feedFailures.get(id) ?? 0
+  if (ok) {
+    if (failures > 0) log(`feed ${id}: di nuovo ok dopo ${failures} errori`)
+    feedFailures.delete(id)
+    return
+  }
+  const now = failures + 1
+  feedFailures.set(id, now)
+  if (now % RELOAD_AFTER !== 0) return
+  const inUse = visibleAccountId() === id && win.isFocused()
+  if (inUse) return log(`feed ${id}: ${now} errori, casella in uso: ricarico più tardi`)
+  log(`feed ${id}: ${now} errori di fila, ricarico la casella`)
+  views.viewContents(id)?.reload()
+}
+
 /** Rilegge i non letti poco dopo un cambio del titolo (Gmail lo aggiorna a ogni nuova email). */
 function refreshUnreadSoon(id: string, titleCount: number | null) {
   clearTimeout(unreadTimers.get(id))
   unreadTimers.set(
     id,
     setTimeout(async () => {
-      const inbox = await fetchInbox(id)
+      const inbox = await fetchInbox(id, (feedFailures.get(id) ?? 0) > 0)
       if (!state.findAccount(id)) return
+      feedResult(id, !!inbox)
       if (inbox) {
         // i non letti sono cambiati (email nuova, o letta/eliminata altrove): anche la pagina di Gmail
         // si riallinea, così non mostra uno stato vecchio. Solo quando cambiano: non costa nulla negli altri casi.
@@ -275,6 +302,7 @@ const menuActions = {
   // solo in sviluppo: lo stesso giro del risveglio del Mac, per provarlo senza mettere il Mac in stop
   simulateWake: () => {},
   testCode,
+  showLog,
   openFind,
   findAgain,
   testNotification,
@@ -395,6 +423,8 @@ app.whenReady().then(() => {
   // dal telefono durante la notte si chiudono, quelle nuove arrivano senza aspettare il giro dei 10 secondi
   // e dopo lo stop si preme "Aggiorna" in ogni casella: Gmail potrebbe essere rimasto allo stato di prima.
   // Due volte: dopo pochi secondi e dopo 20, perché al risveglio la rete può tornare con calma.
+  log(`avvio di Needo ${app.getVersion()}`)
+  powerMonitor.on('resume', () => log('risveglio del Mac'))
   const checkNow = () => {
     state.getState().accounts.forEach((a) => refreshUnreadSoon(a.id, null))
     for (const delay of [3000, 20_000]) setTimeout(() => state.getState().accounts.forEach((a) => views.refreshGmail(a.id)), delay)
