@@ -368,7 +368,13 @@ app.whenReady().then(() => {
   })
 
   // stato delle notifiche in macOS: all'avvio e a ogni ritorno sulla finestra (es. dalle Impostazioni di Sistema)
-  const readMacNotifications = () => notificationStatus().then(state.setMacNotifications)
+  // al massimo una lettura ogni 5 secondi: il focus va e viene spesso (finestre di dialogo, cambi di app)
+  let lastRead = 0
+  const readMacNotifications = () => {
+    if (Date.now() - lastRead < 5000) return
+    lastRead = Date.now()
+    notificationStatus().then(state.setMacNotifications).catch(() => {})
+  }
   readMacNotifications()
   win.on('focus', readMacNotifications)
 

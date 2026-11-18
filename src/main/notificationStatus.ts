@@ -13,7 +13,7 @@ import type { NotificationStatus } from '@shared/api'
 */
 
 type NativeSettings = { authorization: 'authorized' | 'denied' | 'provisional' | 'notDetermined'; alertStyle: 'alert' | 'banner' | 'none' }
-type NativeModule = { getSettings: () => NativeSettings | null }
+type NativeModule = { getSettings: () => Promise<NativeSettings | null> }
 
 let native: NativeModule | null | undefined
 
@@ -32,8 +32,11 @@ function loadNative(): NativeModule | null {
   return native
 }
 
-function fromNative(): NotificationStatus | null {
-  const settings = loadNative()?.getSettings()
+async function fromNative(): Promise<NotificationStatus | null> {
+  const native = loadNative()
+  if (!native) return null
+  // al massimo 3 secondi: se macOS non risponde si va avanti senza
+  const settings = await Promise.race([native.getSettings(), new Promise<null>((r) => setTimeout(() => r(null), 3000))])
   if (!settings || settings.authorization === 'notDetermined') return null
   if (settings.authorization === 'denied') return 'off'
   return settings.alertStyle === 'alert' ? 'alerts' : settings.alertStyle === 'banner' ? 'banners' : 'none'
@@ -64,7 +67,7 @@ function flagsOf(xml: string, id: string): number | null {
 export async function notificationStatus(): Promise<NotificationStatus> {
   if (process.platform !== 'darwin') return 'unknown'
   try {
-    const status = fromNative()
+    const status = await fromNative()
     if (status) return status
   } catch {
     // si prova la strada vecchia
