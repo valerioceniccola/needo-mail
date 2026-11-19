@@ -196,6 +196,7 @@ function copyCode(accountId: string, label: string, mail: MailEntry, code: strin
 }
 
 const DELETE_ERRORS: Record<string, string> = {
+  conversation: "fa parte di una conversazione con altre email: eliminandola le perderesti tutte",
   busy: 'stai guardando quella casella, non ti sposto',
   'not-ready': 'la casella non era ancora caricata',
   'not-found': "non ho trovato l'email",

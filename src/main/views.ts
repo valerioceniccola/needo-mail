@@ -318,7 +318,10 @@ export function backToGmail(id: string | null) {
   a mousedown/mouseup, non a click. Se il pulsante non c'è (si sta leggendo un'email, Gmail cambiato) non succede nulla.
 */
 const PRESS_REFRESH = `(() => {
-  const button = document.querySelector('[act="20"]')
+  // solo nell'elenco (non dentro un'email) e solo il pulsante che si chiama davvero "Aggiorna":
+  // mai premere un pulsante di Gmail riconosciuto solo dal numero interno
+  if (location.hash.split('/').length > 1) return false
+  const button = [...document.querySelectorAll('[act="20"]')].find((b) => b.offsetParent !== null && /aggiorna|refresh/i.test(b.getAttribute('aria-label') || b.getAttribute('data-tooltip') || ''))
   if (!button) return false
   button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
   button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
@@ -367,35 +370,56 @@ export function openMail(id: string, messageId: string) {
 }
 
 /*
-  Eliminazione di una email dentro la casella già aperta (usata per le email con codice monouso, se attivata).
-  Passi, tutti nella pagina di Gmail: apre l'email (#inbox/<id>), controlla che sia proprio quella
-  (data-legacy-message-id), preme il cestino (act=10), verifica che l'email non sia più a schermo, torna dove era.
-  Se un passo non torna si ferma senza toccare nulla. Non si fa sulla casella che stai guardando, per non
-  spostarti mentre leggi o scrivi.
+  Eliminazione di una email dentro la casella già aperta (codici monouso, se attivato, e pulsante Elimina
+  nelle notifiche). Va nel Cestino, mai cancellata per sempre. Molto prudente, perché un errore qui
+  elimina un'email sbagliata:
+  - si apre l'email (#inbox/<id>) e si aspetta che sia proprio lei a schermo: l'elemento del messaggio
+    (data-legacy-message-id) visibile, con l'indirizzo giusto, e stabile per mezzo secondo. Non basta una riga
+    dell'elenco (data-legacy-thread-id), e non si preme nulla mentre la pagina di prima è ancora a schermo;
+  - si elimina solo se la conversazione contiene quell'unica email: "Elimina" di Gmail toglie l'intera
+    conversazione, e in una conversazione con altre email si perderebbero anche quelle;
+  - il pulsante deve chiamarsi davvero "Elimina" (aria-label / tooltip), non solo avere il numero interno act=10;
+  - dopo, l'email non deve essere più a schermo; poi si torna dov'era.
+  Se un passo non torna si ferma senza toccare nulla.
 */
 const DELETE_IN_PAGE = (messageId: string) => `(async () => {
   const wait = (ms) => new Promise((r) => setTimeout(r, ms))
   const until = async (test, ms) => { for (let t = 0; t < ms; t += 150) { const v = test(); if (v) return v; await wait(150) } return null }
-  const selector = '[data-legacy-message-id="${messageId}"], [data-legacy-thread-id="${messageId}"]'
+  const visible = (el) => !!el && el.offsetParent !== null
+  const target = () => [...document.querySelectorAll('[data-legacy-message-id="${messageId}"]')].find(visible)
+  const onTarget = () => location.hash.includes('${messageId}') && target()
   const previous = location.hash
+  const back = (result) => { if (location.hash !== previous) location.hash = previous; return result }
   location.hash = '#inbox/${messageId}'
-  const shown = await until(() => document.querySelector(selector), 8000)
-  if (!shown) { location.hash = previous; return 'not-found' }
-  const button = await until(() => [...document.querySelectorAll('[act="10"]')].find((b) => b.offsetParent !== null), 4000)
-  if (!button) { location.hash = previous; return 'no-button' }
+  if (!(await until(onTarget, 8000))) return back('not-found')
+  // stabile per mezzo secondo: la pagina di prima non è più a schermo
+  await wait(500)
+  if (!onTarget()) return back('not-found')
+  // quante email ci sono nella conversazione aperta
+  const messages = new Set([...document.querySelectorAll('[data-legacy-message-id]')].filter(visible).map((m) => m.getAttribute('data-legacy-message-id')))
+  if (messages.size !== 1) return back('conversation')
+  const button = [...document.querySelectorAll('[act="10"]')].find((b) => visible(b) && /elimina|delete|cestino|trash/i.test(b.getAttribute('aria-label') || b.getAttribute('data-tooltip') || ''))
+  if (!button) return back('no-button')
+  if (!onTarget()) return back('not-found')
   for (const type of ['mousedown', 'mouseup', 'click']) button.dispatchEvent(new MouseEvent(type, { bubbles: true }))
-  const gone = await until(() => !document.querySelector(selector) || !location.hash.includes('${messageId}'), 5000)
-  if (!location.hash.includes('${messageId}') && previous === location.hash) return gone ? 'ok' : 'not-deleted'
-  location.hash = previous
-  return gone ? 'ok' : 'not-deleted'
+  const gone = await until(() => !target(), 5000)
+  return back(gone ? 'ok' : 'not-deleted')
 })()`
 
+export type DeleteResult = 'ok' | 'busy' | 'not-ready' | 'not-found' | 'conversation' | 'no-button' | 'not-deleted'
+
 /** `byUser`: l'ha chiesto l'utente (pulsante Elimina nella notifica), quindi si fa anche sulla casella a schermo. */
-export async function deleteMailInView(id: string, messageId: string, byUser = false): Promise<'ok' | 'busy' | 'not-ready' | 'not-found' | 'no-button' | 'not-deleted'> {
+export async function deleteMailInView(id: string, messageId: string, byUser = false): Promise<DeleteResult> {
   if (!/^[0-9a-f]+$/i.test(messageId)) return 'not-found'
-  if (!byUser && id === visibleId && win.isFocused()) return 'busy'
   const wc = viewContents(id)
   if (!wc || wc.isDestroyed() || !ready.has(id) || !wc.getURL().startsWith('https://mail.google.com/')) return 'not-ready'
+  if (!byUser) {
+    // automatico (codici): mai sulla casella a schermo, e mai se in quella casella c'è un'email aperta
+    // (la stavi leggendo o scrivendo una risposta)
+    if (id === visibleId) return 'busy'
+    const hash: string = await wc.executeJavaScript('location.hash', true).catch(() => '')
+    if (hash.split('/').length > 1) return 'busy'
+  }
   try {
     return await wc.executeJavaScript(DELETE_IN_PAGE(messageId), true)
   } catch {
