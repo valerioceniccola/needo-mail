@@ -1,5 +1,10 @@
 # Novità di Needo
 
+## 0.11.2
+
+- Correzione importante: l'eliminazione delle email (pulsante Elimina e codici monouso) poteva eliminare un'email sbagliata o un'intera conversazione. Ora elimina solo l'email giusta, mai una conversazione con altre email, e annota ogni eliminazione nel registro. Se ti mancano delle email, cercale nel Cestino di Gmail
+- Risolto un blocco dell'app (rotellina colorata) che poteva comparire con la finestra di aggiornamento
+
 ## 0.11.1
 
 - Se il controllo della posta si blocca, Needo ricarica da solo la casella dopo circa un minuto (prima bisognava riaprire l'app)
