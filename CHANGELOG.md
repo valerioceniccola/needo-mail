@@ -1,5 +1,9 @@
 # Novità di Needo
 
+## 0.11.3
+
+- Tolta l'eliminazione delle email da Needo (pulsante Elimina nelle notifiche ed eliminazione automatica delle email con codice): non era affidabile. Le email si eliminano da Gmail come sempre
+
 ## 0.11.2
 
 - Correzione importante: l'eliminazione delle email (pulsante Elimina e codici monouso) poteva eliminare un'email sbagliata o un'intera conversazione. Ora elimina solo l'email giusta, mai una conversazione con altre email, e annota ogni eliminazione nel registro. Se ti mancano delle email, cercale nel Cestino di Gmail
