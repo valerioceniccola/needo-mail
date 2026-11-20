@@ -19,7 +19,7 @@ type ToggleKey = keyof typeof content.general.toggles & keyof AppSettings
 const GROUPS: { title: keyof typeof content.general.groups; items: (ToggleKey | 'macStatus')[] }[] = [
   { title: 'general', items: ['launchAtLogin', 'badge'] },
   { title: 'notifications', items: ['notifications', 'notificationsWarning', 'macStatus'] },
-  { title: 'codes', items: ['copyCodes', 'deleteCodeMails'] }
+  { title: 'codes', items: ['copyCodes'] }
 ]
 
 /** Impostazioni generali: elenco degli account (riordinabile) e interruttori dell'app. */
@@ -63,16 +63,14 @@ export default function Settings() {
               {group.items.map((key, i) => {
                 if (key === 'macStatus') return <MacNotifications key={key} />
                 const [label, hint] = content.general.toggles[key]
-                // l'eliminazione delle email dei codici dipende dalla copia: spenta se la copia è spenta
-                const child = key === 'deleteCodeMails'
-                const disabled = (key === 'launchAtLogin' && !canLaunchAtLogin) || (child && !settings.copyCodes)
+                const disabled = key === 'launchAtLogin' && !canLaunchAtLogin
                 return (
                   <label key={key} className={cn('flex items-center gap-3 bg-sidebar px-3.5 py-[11px]', i > 0 && 'border-t border-[#232328]', disabled && 'opacity-60')}>
                     <span className="flex flex-1 flex-col gap-0.5">
                       <span className="font-medium">{label}</span>
                       <span className="text-xs text-muted-foreground">{key === 'launchAtLogin' && !canLaunchAtLogin ? content.general.loginOnlyInstalled : hint}</span>
                     </span>
-                    <Switch checked={settings[key] && !(child && !settings.copyCodes)} disabled={disabled} onCheckedChange={(on) => api.setSetting(key, on)} />
+                    <Switch checked={settings[key]} disabled={disabled} onCheckedChange={(on) => api.setSetting(key, on)} />
                   </label>
                 )
               })}

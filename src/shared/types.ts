@@ -59,8 +59,6 @@ export type AppSettings = {
   notificationsIntroduced: boolean
   /** codici monouso (verifica, accesso) copiati da soli negli appunti all'arrivo dell'email */
   copyCodes: boolean
-  /** dopo aver copiato il codice, l'email va nel Cestino (spento di default) */
-  deleteCodeMails: boolean
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -69,8 +67,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   launchAtLogin: false,
   notificationsWarning: true,
   notificationsIntroduced: false,
-  copyCodes: true,
-  deleteCodeMails: false
+  copyCodes: true
 }
 
 /** Palette fissa dei colori degli account (dalla tela di design). */

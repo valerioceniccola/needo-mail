@@ -354,14 +354,7 @@ app.whenReady().then(() => {
   initNotifier({
     showWindow,
     openInbox: views.openInbox,
-    openMail: views.openMail,
-    deleteMail: async (id, messageId, byUser) => {
-      const result = await views.deleteMailInView(id, messageId, byUser)
-      // ogni eliminazione nel registro (Aiuto › Mostra registro): se un'email sparisce si vede chi è stato
-      log(`elimina ${id} ${messageId} (${byUser ? 'pulsante Elimina' : 'codice monouso'}): ${result}`)
-      if (result === 'ok') refreshUnreadSoon(id, null)
-      return result
-    }
+    openMail: views.openMail
   })
   registerIpc()
   applyLaunchAtLogin()
